@@ -11,6 +11,10 @@
     <maven.compiler.target>21</maven.compiler.target>
     <!-- Prefer using the release setting via the plugin below for JDK-specific compilation -->
     <maven.compiler.release>21</maven.compiler.release>
+    <!-- JavaFX settings -->
+    <javafx.version>22</javafx.version>
+    <!-- Default classifier; profiles below will set javafx.classifier to a value OpenJFX publishes (win/linux/mac) -->
+    <javafx.classifier>${os.detected.classifier}</javafx.classifier>
   </properties>
 
   <dependencies>
@@ -20,10 +24,81 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.42.0.0</version>
     </dependency>
+    <!-- JavaFX controls (platform-specific classifier) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-controls</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.classifier}</classifier>
+    </dependency>
+    <!-- JavaFX FXML (for controllers using javafx.fxml) -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-fxml</artifactId>
+      <version>${javafx.version}</version>
+      <classifier>${javafx.classifier}</classifier>
+    </dependency>
   </dependencies>
 
+  <profiles>
+    <profile>
+      <id>windows</id>
+      <activation>
+        <os>
+          <family>Windows</family>
+        </os>
+      </activation>
+      <properties>
+        <javafx.classifier>win</javafx.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>linux</id>
+      <activation>
+        <os>
+          <family>unix</family>
+        </os>
+      </activation>
+      <properties>
+        <javafx.classifier>linux</javafx.classifier>
+      </properties>
+    </profile>
+    <profile>
+      <id>mac</id>
+      <activation>
+        <os>
+          <family>mac</family>
+        </os>
+      </activation>
+      <properties>
+        <javafx.classifier>mac</javafx.classifier>
+      </properties>
+    </profile>
+  </profiles>
+
   <build>
+    <extensions>
+      <!-- Ensure os-maven-plugin runs early so ${os.detected.classifier} is available for dependencies -->
+      <extension>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.0</version>
+      </extension>
+    </extensions>
     <plugins>
+      <!-- os-maven-plugin detects the current OS and sets ${os.detected.classifier} -->
+      <plugin>
+        <groupId>kr.motd.maven</groupId>
+        <artifactId>os-maven-plugin</artifactId>
+        <version>1.7.0</version>
+        <executions>
+          <execution>
+            <goals>
+              <goal>detect</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Ensure compilation uses Java 21 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -62,6 +137,16 @@
         <version>3.1.0</version>
         <configuration>
           <mainClass>com.cosplay.AppMain</mainClass>
+        </configuration>
+      </plugin>
+      <!-- JavaFX Maven plugin -->
+      <plugin>
+        <groupId>org.openjfx</groupId>
+        <artifactId>javafx-maven-plugin</artifactId>
+        <version>0.0.8</version>
+        <configuration>
+          <!-- Launch the JavaFX Application class (UI) -->
+          <mainClass>com.cosplay.Launcher</mainClass>
         </configuration>
       </plugin>
     </plugins>

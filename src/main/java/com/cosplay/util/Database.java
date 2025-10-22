@@ -40,9 +40,19 @@ public class Database {
             "FOREIGN KEY(costume_id) REFERENCES costumes(costume_id)" +
             ");";
 
+        String createUsers =
+            "CREATE TABLE IF NOT EXISTS users (" +
+            "user_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "username VARCHAR(50) UNIQUE NOT NULL," +
+            "password VARCHAR(255) NOT NULL," +
+            "email VARCHAR(100)," +
+            "role VARCHAR(20) DEFAULT 'customer'" +
+            ");";
+
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
             stmt.execute(createCostumes);
             stmt.execute(createRentals);
+            stmt.execute(createUsers);
             System.out.println("Database initialized (cosplay.db).");
         } catch (SQLException e) {
             System.err.println("Failed to initialize DB: " + e.getMessage());
