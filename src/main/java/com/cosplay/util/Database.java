@@ -40,9 +40,40 @@ public class Database {
             "FOREIGN KEY(costume_id) REFERENCES costumes(costume_id)" +
             ");";
 
+        String createUsers =
+            "CREATE TABLE IF NOT EXISTS users (" +
+            "user_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "username VARCHAR(50) UNIQUE NOT NULL," +
+            "password VARCHAR(255) NOT NULL," +
+            "email VARCHAR(100)," +
+            "role VARCHAR(20) DEFAULT 'customer'" +
+            ");";
+
+        String createFeatured =
+            "CREATE TABLE IF NOT EXISTS featured_images (" +
+            "slot INTEGER PRIMARY KEY," +
+            "image_url TEXT," +
+            "title TEXT" +
+            ");";
+
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
             stmt.execute(createCostumes);
             stmt.execute(createRentals);
+            stmt.execute(createUsers);
+            stmt.execute(createFeatured);
+            // Try to add costume_id column for linking featured slots to costumes
+            try {
+                stmt.executeUpdate("ALTER TABLE featured_images ADD COLUMN costume_id INTEGER REFERENCES costumes(costume_id)");
+            } catch (SQLException ignored) {
+                // Column may already exist; ignore
+            }
+
+            // Seed a default admin account (username: admin, password: admin)
+            stmt.executeUpdate("INSERT OR IGNORE INTO users(username,password,email,role) VALUES('admin','admin','admin@example.com','admin')");
+            // Seed 4 featured slots if absent
+            for (int i = 1; i <= 4; i++) {
+                stmt.executeUpdate("INSERT OR IGNORE INTO featured_images(slot,image_url,title) VALUES(" + i + ", NULL, NULL)");
+            }
             System.out.println("Database initialized (cosplay.db).");
         } catch (SQLException e) {
             System.err.println("Failed to initialize DB: " + e.getMessage());

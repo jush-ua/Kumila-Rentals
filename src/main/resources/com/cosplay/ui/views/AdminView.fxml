@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ComboBox?>
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.AdminController"
+      spacing="12" alignment="TOP_LEFT" style="-fx-padding: 20;">
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+    <Label text="Admin - Featured Images" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="Choose costumes for the 4 featured slots. Title defaults to the costume name (you can override)." styleClass="muted"/>
+
+    <GridPane hgap="8" vgap="8">
+        <columnConstraints>
+            <ColumnConstraints percentWidth="10" />
+            <ColumnConstraints percentWidth="45" />
+            <ColumnConstraints percentWidth="35" />
+            <ColumnConstraints percentWidth="10" />
+        </columnConstraints>
+        <rowConstraints>
+            <RowConstraints minHeight="32"/>
+            <RowConstraints minHeight="32"/>
+            <RowConstraints minHeight="32"/>
+            <RowConstraints minHeight="32"/>
+            <RowConstraints minHeight="32"/>
+        </rowConstraints>
+
+        <!-- Headers -->
+        <Label text="#" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
+        <Label text="Costume" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
+        <Label text="Title (optional)" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
+
+        <!-- Slot 1 -->
+        <Label text="1" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbo1" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
+        <TextField fx:id="title1" promptText="Title" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
+
+        <!-- Slot 2 -->
+        <Label text="2" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbo2" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
+        <TextField fx:id="title2" promptText="Title" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
+
+        <!-- Slot 3 -->
+        <Label text="3" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbo3" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
+        <TextField fx:id="title3" promptText="Title" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
+
+        <!-- Slot 4 -->
+        <Label text="4" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
+        <ComboBox fx:id="cbo4" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
+        <TextField fx:id="title4" promptText="Title" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
+    </GridPane>
+
+    <HBox spacing="10">
+        <Button text="Save" onAction="#save"/>
+        <Button text="Back to Home" onAction="#goHome"/>
+    </HBox>
+</VBox>

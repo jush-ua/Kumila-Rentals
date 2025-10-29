@@ -11,6 +11,11 @@ import java.util.Optional;
 public class CostumeDAO {
 
     public void addCostume(Costume c) {
+        // Only admins are allowed to add costumes
+        var user = com.cosplay.util.Session.getCurrentUser();
+        if (user == null || user.getRole() == null || !"admin".equalsIgnoreCase(user.getRole())) {
+            throw new SecurityException("Only admin users can add costumes.");
+        }
         String sql = "INSERT INTO costumes(name, category, size, description, image_path) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = Database.connect();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+
+<HBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+	  fx:controller="com.cosplay.ui.controllers.NavController"
+	  spacing="20" alignment="CENTER_LEFT"
+	  style="-fx-padding: 15; -fx-background-color: #fffaf5; -fx-border-color: #f5c7a9;">
+	<!-- Left: Logo and Brand Name -->
+	<HBox spacing="10" alignment="CENTER_LEFT">
+		<ImageView fitHeight="40" fitWidth="40" fx:id="logoImage" />
+		<Label text="Kumila Rentals" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
+	</HBox>
+
+	<!-- Spacer to push nav items right -->
+	<Region HBox.hgrow="ALWAYS"/>
+
+	<!-- Right: Navigation buttons -->
+	<HBox spacing="15" alignment="CENTER_RIGHT">
+		<Button fx:id="btnHome" text="Home" onAction="#goHome" styleClass="nav-button"/>
+		<Button fx:id="btnCatalog" text="Catalog" onAction="#goCatalog" styleClass="nav-button"/>
+		<Button fx:id="btnTerms" text="Terms and Conditions" onAction="#goTerms" styleClass="nav-button"/>
+		<Button fx:id="btnAbout" text="About Us" onAction="#goAbout" styleClass="nav-button"/>
+		<Button fx:id="btnAdmin" text="Admin" onAction="#goAdmin" styleClass="nav-button"/>
+		<Button fx:id="btnLogout" text="Logout" onAction="#logout" styleClass="nav-button"/>
+	</HBox>
+</HBox>
+
