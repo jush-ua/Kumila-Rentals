@@ -104,5 +104,3 @@ Right now there is no visual form in the Admin screen to add costumes (only to s
 ## Housekeeping
 - Build outputs are ignored via `.gitignore`.
 - SQLite DB file `cosplay.db` is also ignored so you can reset freely.
-
-If you want a REST API scaffold (Spring Boot) so a web/mobile frontend can call endpoints, we can add that as a separate module or repo.
