@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.CatalogController"
+      spacing="12" alignment="TOP_LEFT" style="-fx-padding: 20;">
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+    <Label text="Catalog" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
+    <Label text="This is a blueprint placeholder for the Catalog screen." styleClass="muted"/>
+    <Button text="Back to Home" onAction="#goHome"/>
+</VBox>

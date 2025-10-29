@@ -1,0 +1,41 @@
+/* Global styles for the desktop app */
+
+.root {
+    -fx-font-family: 'Segoe UI', sans-serif;
+    font-family: 'Segoe UI', sans-serif;
+    -fx-padding: 24;
+    padding: 24;
+}
+
+.label {
+    -fx-font-size: 14px;
+    font-size: 14px;
+}
+
+.button {
+    -fx-font-size: 13px;
+    font-size: 13px;
+}
+
+.muted {
+    -fx-text-fill: #666;
+    -fx-font-size: 11px;
+    font-size: 11px;
+}
+
+/* Nav bar buttons */
+.nav-button {
+    -fx-background-color: transparent;
+    background-color: transparent;
+    -fx-text-fill: #333;
+    -fx-font-weight: normal;
+    font-weight: normal;
+}
+
+.nav-button.active {
+    -fx-background-color: #f5c7a9;
+    background-color: #f5c7a9;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    font-weight: bold;
+}

@@ -13,8 +13,6 @@
     <maven.compiler.release>21</maven.compiler.release>
     <!-- JavaFX settings -->
     <javafx.version>22</javafx.version>
-    <!-- Default classifier; profiles below will set javafx.classifier to a value OpenJFX publishes (win/linux/mac) -->
-    <javafx.classifier>${os.detected.classifier}</javafx.classifier>
   </properties>
 
   <dependencies>
@@ -24,81 +22,34 @@
       <artifactId>sqlite-jdbc</artifactId>
       <version>3.42.0.0</version>
     </dependency>
-    <!-- JavaFX controls (platform-specific classifier) -->
+    <!-- JavaFX modules (plugin will resolve platform-specific classifiers at runtime) -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>${javafx.version}</version>
-      <classifier>${javafx.classifier}</classifier>
+    </dependency>
+    <!-- JavaFX graphics is required for layout nodes such as VBox/HBox, Scene, etc. -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-graphics</artifactId>
+      <version>${javafx.version}</version>
+    </dependency>
+    <!-- JavaFX base contains core APIs referenced by other modules -->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-base</artifactId>
+      <version>${javafx.version}</version>
     </dependency>
     <!-- JavaFX FXML (for controllers using javafx.fxml) -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>${javafx.version}</version>
-      <classifier>${javafx.classifier}</classifier>
     </dependency>
   </dependencies>
 
-  <profiles>
-    <profile>
-      <id>windows</id>
-      <activation>
-        <os>
-          <family>Windows</family>
-        </os>
-      </activation>
-      <properties>
-        <javafx.classifier>win</javafx.classifier>
-      </properties>
-    </profile>
-    <profile>
-      <id>linux</id>
-      <activation>
-        <os>
-          <family>unix</family>
-        </os>
-      </activation>
-      <properties>
-        <javafx.classifier>linux</javafx.classifier>
-      </properties>
-    </profile>
-    <profile>
-      <id>mac</id>
-      <activation>
-        <os>
-          <family>mac</family>
-        </os>
-      </activation>
-      <properties>
-        <javafx.classifier>mac</javafx.classifier>
-      </properties>
-    </profile>
-  </profiles>
-
   <build>
-    <extensions>
-      <!-- Ensure os-maven-plugin runs early so ${os.detected.classifier} is available for dependencies -->
-      <extension>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>1.7.0</version>
-      </extension>
-    </extensions>
     <plugins>
-      <!-- os-maven-plugin detects the current OS and sets ${os.detected.classifier} -->
-      <plugin>
-        <groupId>kr.motd.maven</groupId>
-        <artifactId>os-maven-plugin</artifactId>
-        <version>1.7.0</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>detect</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
       <!-- Ensure compilation uses Java 21 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

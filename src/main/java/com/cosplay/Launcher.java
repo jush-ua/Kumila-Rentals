@@ -1,18 +1,20 @@
 package com.cosplay;
 
+import com.cosplay.ui.SceneNavigator;
+import com.cosplay.ui.Views;
+import com.cosplay.util.Database;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class Launcher extends Application {
     @Override
-    public void start(Stage stage) throws Exception {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/cosplay/ui/views/LoginView.fxml"));
-        Scene scene = new Scene(loader.load());
-        stage.setTitle("Kumila Rentals");
-        stage.setScene(scene);
-        stage.show();
+    public void start(Stage stage) {
+        // Ensure database and tables exist before any DAO operations
+        Database.init();
+
+        // Init navigation and route to Login
+        SceneNavigator.init(stage);
+        SceneNavigator.navigate(Views.LOGIN);
     }
 
     public static void main(String[] args) {
