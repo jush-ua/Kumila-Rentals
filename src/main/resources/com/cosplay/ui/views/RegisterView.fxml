@@ -1,17 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="10" alignment="CENTER"
+<?import javafx.geometry.Insets?>
+<VBox spacing="15" alignment="CENTER" styleClass="register-container"
       xmlns="http://javafx.com/javafx/22"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.RegisterController">
-  <Label text="Create an account"/>
-    <TextField fx:id="usernameField" promptText="Username"/>
-    <PasswordField fx:id="passwordField" promptText="Password"/>
-    <TextField fx:id="emailField" promptText="Email"/>
-    <HBox spacing="10" alignment="CENTER">
-        <Button text="Back to Login" onAction="#goToLogin"/>
-        <Button text="Register" onAction="#handleRegister"/>
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+    
+    <Label text="Create an Account" styleClass="title"/>
+    
+    <VBox spacing="5">
+        <Label text="Username"/>
+        <TextField fx:id="usernameField" promptText="3-20 characters, letters/numbers/underscore" prefWidth="300"/>
+    </VBox>
+    
+    <VBox spacing="5">
+        <Label text="Email"/>
+        <TextField fx:id="emailField" promptText="your.email@example.com" prefWidth="300"/>
+    </VBox>
+    
+    <VBox spacing="5">
+        <Label text="Password"/>
+        <PasswordField fx:id="passwordField" promptText="At least 6 characters" prefWidth="300"/>
+    </VBox>
+    
+    <VBox spacing="5">
+        <Label text="Confirm Password"/>
+        <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password" prefWidth="300"/>
+    </VBox>
+    
+    <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="300"/>
+    
+    <Button fx:id="registerButton" text="Register" onAction="#handleRegister" styleClass="primary-button" prefWidth="300"/>
+    
+    <HBox spacing="5" alignment="CENTER">
+        <Label text="Already have an account?"/>
+        <Hyperlink text="Login here" onAction="#goToLogin"/>
     </HBox>
-  <Label text="Note: This is a prototype UI." styleClass="muted"/>
-  </VBox>
+</VBox>

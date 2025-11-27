@@ -39,3 +39,90 @@
     -fx-font-weight: bold;
     font-weight: bold;
 }
+
+/* Login/Register specific styles */
+.login-container,
+.register-container {
+    -fx-background-color: #ffffff;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
+    -fx-background-radius: 8;
+}
+
+.title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.error-label {
+    -fx-text-fill: #d32f2f;
+    -fx-font-size: 12px;
+    -fx-wrap-text: true;
+    -fx-padding: 5 0 5 0;
+}
+
+.primary-button {
+    -fx-background-color: #f5c7a9;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20 10 20;
+}
+
+.primary-button:hover {
+    -fx-background-color: #f0b899;
+}
+
+.primary-button:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #666666;
+    -fx-opacity: 0.6;
+}
+
+.text-field,
+.password-field {
+    -fx-background-radius: 4;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+    -fx-padding: 8;
+}
+
+.text-field:focused,
+.password-field:focused {
+    -fx-border-color: #f5c7a9;
+    -fx-border-width: 2;
+}
+
+.hyperlink {
+    -fx-text-fill: #f5c7a9;
+    -fx-border-color: transparent;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.google-button {
+    -fx-background-color: #4285F4;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-background-radius: 4;
+    -fx-padding: 10 20 10 20;
+}
+
+.google-button:hover {
+    -fx-background-color: #357ae8;
+}
+
+.google-button:disabled {
+    -fx-background-color: #cccccc;
+    -fx-text-fill: #666666;
+    -fx-opacity: 0.6;
+}
+
+.separator-text {
+    -fx-font-size: 12px;
+    -fx-text-fill: #999999;
+    -fx-padding: 5 0 5 0;
+}
+
