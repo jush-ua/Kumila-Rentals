@@ -6,6 +6,10 @@ public class User {
     private String password; // store hashed in production
     private String email;
     private String role;
+    private boolean emailVerified;
+    private String verificationToken;
+    private String oauthProvider; // "google", "local", etc.
+    private String oauthId; // The ID from the OAuth provider
 
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
@@ -21,6 +25,18 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public boolean isEmailVerified() { return emailVerified; }
+    public void setEmailVerified(boolean emailVerified) { this.emailVerified = emailVerified; }
+
+    public String getVerificationToken() { return verificationToken; }
+    public void setVerificationToken(String verificationToken) { this.verificationToken = verificationToken; }
+
+    public String getOauthProvider() { return oauthProvider; }
+    public void setOauthProvider(String oauthProvider) { this.oauthProvider = oauthProvider; }
+
+    public String getOauthId() { return oauthId; }
+    public void setOauthId(String oauthId) { this.oauthId = oauthId; }
 
     @Override
     public String toString() {

@@ -44,9 +44,13 @@ public class Database {
             "CREATE TABLE IF NOT EXISTS users (" +
             "user_id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "username VARCHAR(50) UNIQUE NOT NULL," +
-            "password VARCHAR(255) NOT NULL," +
+            "password VARCHAR(255)," +
             "email VARCHAR(100)," +
-            "role VARCHAR(20) DEFAULT 'customer'" +
+            "role VARCHAR(20) DEFAULT 'customer'," +
+            "email_verified INTEGER DEFAULT 0," +
+            "verification_token VARCHAR(255)," +
+            "oauth_provider VARCHAR(20)," +
+            "oauth_id VARCHAR(255)" +
             ");";
 
         String createFeatured =
@@ -61,6 +65,21 @@ public class Database {
             stmt.execute(createRentals);
             stmt.execute(createUsers);
             stmt.execute(createFeatured);
+            
+            // Add new columns if they don't exist (for existing databases)
+            try {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN email_verified INTEGER DEFAULT 0");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN verification_token VARCHAR(255)");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN oauth_provider VARCHAR(20)");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE users ADD COLUMN oauth_id VARCHAR(255)");
+            } catch (SQLException ignored) { }
+            
             // Try to add costume_id column for linking featured slots to costumes
             try {
                 stmt.executeUpdate("ALTER TABLE featured_images ADD COLUMN costume_id INTEGER REFERENCES costumes(costume_id)");
@@ -69,7 +88,9 @@ public class Database {
             }
 
             // Seed a default admin account (username: admin, password: admin)
-            stmt.executeUpdate("INSERT OR IGNORE INTO users(username,password,email,role) VALUES('admin','admin','admin@example.com','admin')");
+            // Hash the password using BCrypt
+            String hashedPassword = PasswordUtil.hashPassword("admin");
+            stmt.executeUpdate("INSERT OR IGNORE INTO users(username,password,email,role) VALUES('admin','" + hashedPassword + "','admin@example.com','admin')");
             // Seed 4 featured slots if absent
             for (int i = 1; i <= 4; i++) {
                 stmt.executeUpdate("INSERT OR IGNORE INTO featured_images(slot,image_url,title) VALUES(" + i + ", NULL, NULL)");
