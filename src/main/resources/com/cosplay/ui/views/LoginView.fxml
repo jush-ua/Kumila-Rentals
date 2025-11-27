@@ -1,13 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<VBox spacing="10" alignment="CENTER"
+<?import javafx.geometry.Insets?>
+<VBox spacing="15" alignment="CENTER" styleClass="login-container"
       xmlns="http://javafx.com/javafx/22"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.LoginController">
-    <Label text="Login to Kumila Rentals"/>
-    <TextField fx:id="usernameField" promptText="Username"/>
-    <PasswordField fx:id="passwordField" promptText="Password"/>
-    <Button text="Login" onAction="#handleLogin"/>
-    <Button text="Register" onAction="#goToRegister"/>
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+    
+    <Label text="Login to Kumila Rentals" styleClass="title"/>
+    
+    <VBox spacing="5">
+        <Label text="Username"/>
+        <TextField fx:id="usernameField" promptText="Enter your username" prefWidth="300"/>
+    </VBox>
+    
+    <VBox spacing="5">
+        <Label text="Password"/>
+        <PasswordField fx:id="passwordField" promptText="Enter your password" prefWidth="300"/>
+    </VBox>
+    
+    <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="300"/>
+    
+    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" styleClass="primary-button" prefWidth="300"/>
+    
+    <Label text="OR" styleClass="separator-text"/>
+    
+    <Button fx:id="googleLoginButton" text="Login with Google" onAction="#handleGoogleLogin" styleClass="google-button" prefWidth="300"/>
+    
+    <HBox spacing="5" alignment="CENTER">
+        <Label text="Don't have an account?"/>
+        <Hyperlink text="Register here" onAction="#goToRegister"/>
+    </HBox>
 </VBox>

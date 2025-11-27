@@ -6,7 +6,29 @@ This repository contains:
 
 The desktop UI is intentionally lightweight so a frontend developer can own the look and feel (FXML + CSS) while using the existing navigation, controllers, and DAOs.
 
-## What’s in here
+## Setup
+
+### Google OAuth Configuration (Required for Google Login)
+1. Create OAuth credentials at [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
+2. Set environment variables:
+   ```bash
+   # Windows PowerShell
+   $env:GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+   $env:GOOGLE_CLIENT_SECRET="your-client-secret"
+   
+   # Windows CMD
+   set GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
+   set GOOGLE_CLIENT_SECRET=your-client-secret
+   
+   # Linux/Mac
+   export GOOGLE_CLIENT_ID="your-client-id.apps.googleusercontent.com"
+   export GOOGLE_CLIENT_SECRET="your-client-secret"
+   ```
+3. Or add them to your IDE's run configuration environment variables
+
+See `.env.example` for reference.
+
+## What's in here
 - Backend core (safe to build on):
   - `src/main/java/com/cosplay/model` – POJOs for `User`, `Costume`, `Rental`
   - `src/main/java/com/cosplay/dao` – Data access using SQLite
