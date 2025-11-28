@@ -1,12 +1,14 @@
 package com.cosplay.ui;
 
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-
 import java.io.IOException;
 import java.util.Objects;
+
+import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
 
 /**
  * Simple navigator to switch between JavaFX views.
@@ -30,12 +32,50 @@ public final class SceneNavigator {
                     "FXML not found: " + view.getResource()
             ));
             Parent root = loader.load();
-            Scene scene = new Scene(root);
-            // Attach app stylesheet if present
-            var css = SceneNavigator.class.getResource("/com/cosplay/ui/styles/app.css");
-            if (css != null) scene.getStylesheets().add(css.toExternalForm());
+            // Use the root's preferred size (if provided) to create the Scene so the
+            // window opens at the intended dimensions (e.g. 400x500 for LoginView).
+            double prefW = root.prefWidth(-1);
+            double prefH = root.prefHeight(-1);
+            double sceneW = (prefW > 0) ? prefW : 800;
+            double sceneH = (prefH > 0) ? prefH : 600;
+            Scene scene = new Scene(root, sceneW, sceneH);
+            // Attach global stylesheets if present: `app.css` and `styles.css`.
+            var appCss = SceneNavigator.class.getResource("/com/cosplay/ui/styles/app.css");
+            if (appCss != null) {
+                scene.getStylesheets().add(appCss.toExternalForm());
+                System.out.println("app.css found: " + appCss.toExternalForm());
+            } else {
+                System.out.println("app.css not found on classpath");
+            }
+            var stylesCss = SceneNavigator.class.getResource("/com/cosplay/ui/styles/styles.css");
+            if (stylesCss != null) {
+                scene.getStylesheets().add(stylesCss.toExternalForm());
+                System.out.println("styles.css found: " + stylesCss.toExternalForm());
+            } else {
+                System.out.println("styles.css not found on classpath");
+            }
+            
             primaryStage.setTitle(view.getTitle());
             primaryStage.setScene(scene);
+            // Respect per-view resizable flag (configured in Views)
+            if (view.isResizable()) {
+                // Set a windowed "full-screen" default using the primary screen's visual bounds
+                try {
+                    Rectangle2D vb = Screen.getPrimary().getVisualBounds();
+                    double targetW = vb.getWidth() * 0.98; // small margin from absolute edges
+                    double targetH = vb.getHeight() * 0.96;
+                    primaryStage.setWidth(targetW);
+                    primaryStage.setHeight(targetH);
+                    primaryStage.setX(vb.getMinX() + (vb.getWidth() - targetW) / 2);
+                    primaryStage.setY(vb.getMinY() + (vb.getHeight() - targetH) / 2);
+                    primaryStage.setMaximized(false);
+                } catch (Exception ignored) {
+                    // fallback: do nothing if screen metrics unavailable
+                }
+                primaryStage.setResizable(true);
+            } else {
+                primaryStage.setResizable(false);
+            }
             primaryStage.show();
             currentView = view;
         } catch (IOException e) {

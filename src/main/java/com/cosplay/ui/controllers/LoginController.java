@@ -1,5 +1,9 @@
 package com.cosplay.ui.controllers;
 
+import java.awt.Desktop;
+import java.net.URI;
+import java.util.Optional;
+
 import com.cosplay.Launcher;
 import com.cosplay.dao.UserDAO;
 import com.cosplay.model.User;
@@ -9,6 +13,7 @@ import com.cosplay.util.CallbackServer;
 import com.cosplay.util.GoogleOAuthUtil;
 import com.cosplay.util.Session;
 import com.cosplay.util.ValidationUtil;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -16,10 +21,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
-import java.awt.Desktop;
-import java.net.URI;
-import java.util.Optional;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
 
 public class LoginController {
     @FXML private TextField usernameField;
@@ -27,6 +36,9 @@ public class LoginController {
     @FXML private Button loginButton;
     @FXML private Button googleLoginButton;
     @FXML private Label errorLabel;
+    @FXML private ImageView logoImage;
+    @FXML private AnchorPane rootPane;
+    @FXML private javafx.scene.layout.VBox textFieldPanel;
 
     private final UserDAO userDAO = new UserDAO();
 
@@ -39,6 +51,59 @@ public class LoginController {
         
         // Google login button is always visible
         // Configure GoogleOAuthUtil.java to enable functionality
+
+        try {
+            logoImage.setImage(new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/logo.png")));
+            // Bind the logo width once the scene is available so it scales with window size
+            logoImage.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    logoImage.fitWidthProperty().bind(newScene.widthProperty().multiply(0.20));
+                }
+            });
+        } catch (Exception e) {
+            // ignore if missing
+        }
+
+        try {
+            // Use AnchorPane background with BackgroundSize cover=true so image behaves like CSS 'background-size: cover'
+            Image bg = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png"));
+            BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true); // cover=true
+            BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
+            if (rootPane != null) rootPane.setBackground(new Background(bimg));
+        } catch (Exception e) {
+            // ignore if missing
+        }
+
+        // Responsive bindings: scale controls relative to the root pane size
+        if (rootPane != null) {
+            // Logo scales to ~20% of window width
+            if (logoImage != null) {
+                logoImage.fitWidthProperty().bind(rootPane.widthProperty().multiply(0.20));
+                logoImage.setPreserveRatio(true);
+            }
+
+            // Text fields and text panel take available width minus horizontal padding (20px each side)
+            var availableWidth = rootPane.widthProperty().subtract(40);
+            try {
+                if (textFieldPanel != null) textFieldPanel.prefWidthProperty().bind(availableWidth);
+            } catch (Exception ignored) {}
+            try {
+                if (usernameField != null) usernameField.prefWidthProperty().bind(availableWidth);
+            } catch (Exception ignored) {}
+            try {
+                if (passwordField != null) passwordField.prefWidthProperty().bind(availableWidth);
+            } catch (Exception ignored) {}
+
+            // Buttons: make them proportional to window width (25% each)
+            try {
+                if (loginButton != null) loginButton.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.25));
+            } catch (Exception ignored) {}
+            try {
+                if (googleLoginButton != null) googleLoginButton.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.25));
+            } catch (Exception ignored) {}
+        }
+
+        
     }
 
     @FXML

@@ -1,37 +1,85 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<VBox spacing="15" alignment="CENTER" styleClass="login-container"
-      xmlns="http://javafx.com/javafx/22"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cosplay.ui.controllers.LoginController">
-    <padding>
-        <Insets top="30" right="30" bottom="30" left="30"/>
-    </padding>
-    
-    <Label text="Login to Kumila Rentals" styleClass="title"/>
-    
-    <VBox spacing="5">
-        <Label text="Username"/>
-        <TextField fx:id="usernameField" promptText="Enter your username" prefWidth="300"/>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cosplay.ui.controllers.LoginController"
+            fx:id="rootPane"
+            prefWidth="450" prefHeight="600">
+
+    <!-- Center column (mimics BoxLayout Y_AXIS with vertical glue) -->
+        <VBox alignment="CENTER" spacing="3"
+            AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+            AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+        <!-- top glue (pushes content vertically like Box.createVerticalGlue()) -->
+        <Region prefHeight="30"/>
+
+        <!-- LOGO (logical 100x100) -->
+        <ImageView fx:id="logoImage" fitWidth="100" fitHeight="100" preserveRatio="true" pickOnBounds="true" />
+        <!-- Title -->
+        <Label text="Kumila Rentals" styleClass="title-label"/>
+
+        <!-- TEXT FIELD PANEL (fixed width 400) -->
+        <VBox fx:id="textFieldPanel" spacing="4" alignment="TOP_LEFT" prefWidth="320" maxWidth="320">
+            <!-- Error label (keeps controller compatibility) -->
+            <Label fx:id="errorLabel" text="" style="-fx-text-fill: transparent; -fx-font-size:12px;" />
+
+            <!-- Email label + field -->
+            <Label text="Email" styleClass="field-label"/>
+            <TextField fx:id="usernameField" promptText="" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+
+            <Region prefHeight="5"/>
+
+            <!-- Password label + field -->
+            <Label text="Password" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+
+            <!-- Forgot label (aligned right) -->
+            <HBox prefWidth="320">
+                <Region HBox.hgrow="ALWAYS"/>
+                <Label text="Forgot Password?" styleClass="forgot-label"/>
+            </HBox>
+        </VBox>
+
+        <!-- vertical spacer equal to Swing's Box.createRigidArea(new Dimension(0,10)) -->
+        <Region prefHeight="8"/>
+
+        <!-- LOGIN BUTTON - width 100, height 45 (same as Swing) -->
+        <Button fx:id="loginButton" text="LOG IN"
+                onAction="#handleLogin"
+                prefWidth="100" prefHeight="45"
+                styleClass="accent-button"/>
+
+        <Region prefHeight="10"/>
+
+        <!-- "Or log in with" label -->
+        <Label text="Or log in with" styleClass="or-label"/>
+
+        <Region prefHeight="10"/>
+
+        <!-- GOOGLE BUTTON - width 100, height 40 -->
+        <Button fx:id="googleLoginButton" onAction="#handleGoogleLogin"
+                prefWidth="100" prefHeight="40" styleClass="google-btn">
+            <graphic>
+                <HBox alignment="CENTER" spacing="8">
+                    <ImageView fitWidth="16" fitHeight="16">
+                        <image><Image url="@/com/cosplay/ui/images/google_logo.png"/></image>
+                    </ImageView>
+                    <Label text="GOOGLE" styleClass="google-label"/>
+                </HBox>
+            </graphic>
+        </Button>
+
+        <Region prefHeight="12"/>
+
+        <!-- Create Account link (matches Swing underline-on-hover behavior) -->
+        <Hyperlink fx:id="goToRegister" text="Create Account" onAction="#goToRegister"
+                   styleClass="create-account-link"/>
+
+        <!-- bottom glue -->
+        <Region prefHeight="40"/>
     </VBox>
-    
-    <VBox spacing="5">
-        <Label text="Password"/>
-        <PasswordField fx:id="passwordField" promptText="Enter your password" prefWidth="300"/>
-    </VBox>
-    
-    <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="300"/>
-    
-    <Button fx:id="loginButton" text="Login" onAction="#handleLogin" styleClass="primary-button" prefWidth="300"/>
-    
-    <Label text="OR" styleClass="separator-text"/>
-    
-    <Button fx:id="googleLoginButton" text="Login with Google" onAction="#handleGoogleLogin" styleClass="google-button" prefWidth="300"/>
-    
-    <HBox spacing="5" alignment="CENTER">
-        <Label text="Don't have an account?"/>
-        <Hyperlink text="Register here" onAction="#goToRegister"/>
-    </HBox>
-</VBox>
+
+</AnchorPane>

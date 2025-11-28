@@ -1,0 +1,180 @@
+/* Fonts - bundle Poppins & Magnolia if not installed locally (place ttf in resources/fonts/) */
+@font-face {
+    font-family: "Poppins";
+    src: url("fonts/Poppins-Regular.ttf");
+}
+@font-face {
+    font-family: "Poppins-Bold";
+    src: url("fonts/Poppins-Bold.ttf");
+}
+@font-face {
+    font-family: "Magnolia Script";
+    src: url("fonts/MAGNOLIASCRIPT.otf") format("truetype");
+}
+
+/* Alias because some font registries/reporting use a hyphenated name */
+@font-face {
+    font-family: "Magnolia-Script";
+    src: url("fonts/MAGNOLIASCRIPT.otf") format("truetype");
+}
+
+/* Root defaults */
+.root {
+    -fx-font-family: "Poppins";
+}
+
+/* Title label (Magnolia Script look) */
+.title-label {
+    -fx-font-family: "Magnolia Script";
+    -fx-font-size: 30px;
+    -fx-text-fill: white;
+    -fx-padding: 6 0 7 0;
+}
+
+/* Field labels */
+.field-label {
+    -fx-font-family: "Poppins";
+    font-family: "Poppins";
+    -fx-font-size: 14px;
+    -fx-text-fill: white;
+}
+
+/* Forgot password style (right-aligned) */
+.forgot-label {
+    -fx-font-family: "Poppins";
+    -fx-font-size: 12px;
+    -fx-text-fill: white;
+}
+
+/* Rounded text fields (pixel matched radius 14) */
+.rounded-field {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #DCDCDC;
+    -fx-border-width: 1;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+/* More specific selectors to ensure overrides on controls */
+TextField.rounded-field, PasswordField.rounded-field {
+    -fx-background-color: white;
+    -fx-background-radius: 14;
+    -fx-border-radius: 14;
+    -fx-border-color: #DCDCDC;
+    -fx-border-width: 1;
+    -fx-padding: 6 10 6 10;
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+}
+
+/* Accent button (LOGIN / REGISTER style that matches Swing painting) */
+.accent-button {
+    -fx-background-color: #FAFAFA; /* default background */
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 1;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-text-fill: #F7CD82;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+    -fx-cursor: hand;
+}
+
+/* Specific Button selector to increase specificity and ensure it's applied */
+Button.accent-button {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 1;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-text-fill: #F7CD82;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+}
+
+/* Hover state: bg -> #F7CD82, text -> white, border white */
+.accent-button:hover {
+    -fx-background-color: #F7CD82;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+}
+
+/* Or label */
+.or-label {
+    -fx-font-family: "Poppins";
+    -fx-font-size: 12px;
+    -fx-text-fill: #FAFAFA; /* matches Swing orLabel white-ish */
+}
+
+/* Google button style (matches Swing painting) */
+.google-btn {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 1;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+    -fx-text-fill: #F7CD82;
+    -fx-cursor: hand;
+}
+
+Button.google-btn {
+    -fx-background-color: #FAFAFA;
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 1;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+    -fx-text-fill: #F7CD82;
+}
+
+/* Google hover */
+.google-btn:hover {
+    -fx-background-color: #F7CD82;
+    -fx-text-fill: white;
+}
+
+/* Google label (inside graphic) */
+.google-label {
+    -fx-text-fill: inherit;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+}
+
+/* Create account link styling (matches underline-on-hover) */
+.create-account-link {
+    -fx-text-fill: white;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 12px;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+.create-account-link:hover {
+    -fx-underline: true;
+}
+Hyperlink.create-account-link {
+    -fx-text-fill: white;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 12px;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
+}
+.create-account-link:hover {
+    -fx-underline: true;
+}
+
+/* Error label visibility (controller sets text and style) */
+.label#errorLabel {
+    -fx-text-fill: red;
+    -fx-font-size: 12px;
+}
+
+/* small utility for fixed sizes (keeps exactly pixel-perfect spacing) */
+.region {
+    -fx-min-height: 0;
+}
