@@ -22,3 +22,6 @@ cosplay.db
 # Misc
 *.swp
 *.swo
+
+# Environment variables
+.env

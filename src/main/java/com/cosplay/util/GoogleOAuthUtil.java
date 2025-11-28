@@ -23,11 +23,13 @@ import java.util.List;
  * Utility class for Google OAuth authentication.
  */
 public class GoogleOAuthUtil {
-    // REPLACE THESE WITH YOUR ACTUAL GOOGLE OAUTH CREDENTIALS
-    // Get these from: https://console.cloud.google.com/
-    private static final String CLIENT_ID = "591565160728-uo0utlh3vr5v7toeer1460mib12v5n5h.apps.googleusercontent.com";
-    private static final String CLIENT_SECRET = "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";
-    private static final String REDIRECT_URI = "http://localhost:8080/oauth2callback";
+    // Load credentials from environment variables for security
+    // Set these in your environment or .env file
+    private static final String CLIENT_ID = System.getenv("GOOGLE_CLIENT_ID");
+    private static final String CLIENT_SECRET = System.getenv("GOOGLE_CLIENT_SECRET");
+    private static final String REDIRECT_URI = System.getenv("GOOGLE_REDIRECT_URI") != null 
+        ? System.getenv("GOOGLE_REDIRECT_URI") 
+        : "http://localhost:8080/oauth2callback";
     
     private static final List<String> SCOPES = Arrays.asList(
         "openid",
