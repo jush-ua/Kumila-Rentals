@@ -4,7 +4,7 @@ import java.time.LocalDate;
 
 public class Rental {
     private int id;
-    private int costumeId;
+    private int cosplayId;
     private String customerName;
     private String contactNumber;
     private String address;
@@ -20,8 +20,8 @@ public class Rental {
     // getters / setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
-    public int getCostumeId() { return costumeId; }
-    public void setCostumeId(int costumeId) { this.costumeId = costumeId; }
+    public int getCosplayId() { return cosplayId; }
+    public void setCosplayId(int cosplayId) { this.cosplayId = cosplayId; }
     public String getCustomerName() { return customerName; }
     public void setCustomerName(String customerName) { this.customerName = customerName; }
     public String getContactNumber() { return contactNumber; }
@@ -43,7 +43,8 @@ public class Rental {
 
     @Override
     public String toString() {
-        return String.format("Rental[%d] Costume:%d Name:%s %s->%s Status:%s",
-                id, costumeId, customerName, startDate, endDate, status);
+        return String.format("Rental[%d] Cosplay:%d Name:%s %s->%s Status:%s",
+                id, cosplayId, customerName, startDate, endDate, status);
     }
 }
+

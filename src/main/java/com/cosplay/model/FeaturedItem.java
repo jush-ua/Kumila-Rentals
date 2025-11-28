@@ -4,7 +4,7 @@ public class FeaturedItem {
     private int slot; // 1..4
     private String imageUrl; // could be http(s) or file path
     private String title;
-    private Integer costumeId; // optional: link to a costume
+    private Integer cosplayId; // optional: link to a cosplay
 
     public FeaturedItem() {}
 
@@ -23,6 +23,7 @@ public class FeaturedItem {
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
 
-    public Integer getCostumeId() { return costumeId; }
-    public void setCostumeId(Integer costumeId) { this.costumeId = costumeId; }
+    public Integer getCosplayId() { return cosplayId; }
+    public void setCosplayId(Integer cosplayId) { this.cosplayId = cosplayId; }
 }
+

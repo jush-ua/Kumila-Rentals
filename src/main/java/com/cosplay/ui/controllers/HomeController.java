@@ -7,7 +7,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
 import com.cosplay.dao.FeaturedDAO;
 import com.cosplay.model.FeaturedItem;
-import com.cosplay.dao.CostumeDAO;
+import com.cosplay.dao.CosplayDAO;
 
 public class HomeController {
     // Included NavBar controller (from fx:include with fx:id="navBar")
@@ -47,12 +47,31 @@ public class HomeController {
 
     private void setFromItem(ImageView view, javafx.scene.control.Label titleLabel, FeaturedItem item) {
         if (view == null || item == null) return;
-        // Prefer costume-based image
-        if (item.getCostumeId() != null) {
-            new CostumeDAO().findById(item.getCostumeId()).ifPresent(c -> {
+        // Prefer cosplay-based image
+        if (item.getCosplayId() != null) {
+            new CosplayDAO().findById(item.getCosplayId()).ifPresent(c -> {
                 String path = c.getImagePath();
                 if (path != null && !path.isBlank()) {
-                    try { view.setImage(new Image(path, true)); } catch (Exception ignored) {}
+                    try {
+                        Image image;
+                        // Check if it's a URL or file path
+                        if (path.startsWith("http://") || path.startsWith("https://")) {
+                            image = new Image(path, true);
+                        } else {
+                            // It's a file path - use file:// protocol
+                            java.io.File imageFile = new java.io.File(path);
+                            if (imageFile.exists()) {
+                                image = new Image(imageFile.toURI().toString());
+                            } else {
+                                image = null;
+                            }
+                        }
+                        if (image != null) {
+                            view.setImage(image);
+                        }
+                    } catch (Exception e) {
+                        System.err.println("Failed to load image: " + e.getMessage());
+                    }
                 }
                 String ttl = (item.getTitle() != null && !item.getTitle().isBlank()) ? item.getTitle() : c.getName();
                 if (titleLabel != null && ttl != null) titleLabel.setText(ttl);
@@ -62,10 +81,28 @@ public class HomeController {
         // Fallback legacy URL
         String url = item.getImageUrl();
         if (url != null && !url.isBlank()) {
-            try { view.setImage(new Image(url, true)); } catch (Exception ignored) {}
+            try {
+                Image image;
+                if (url.startsWith("http://") || url.startsWith("https://")) {
+                    image = new Image(url, true);
+                } else {
+                    java.io.File imageFile = new java.io.File(url);
+                    if (imageFile.exists()) {
+                        image = new Image(imageFile.toURI().toString());
+                    } else {
+                        image = null;
+                    }
+                }
+                if (image != null) {
+                    view.setImage(image);
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load image: " + e.getMessage());
+            }
         }
         if (titleLabel != null && item.getTitle() != null && !item.getTitle().isBlank()) {
             titleLabel.setText(item.getTitle());
         }
     }
 }
+

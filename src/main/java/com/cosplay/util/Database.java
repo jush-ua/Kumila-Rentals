@@ -14,20 +14,25 @@ public class Database {
 
     // Called at app startup to create tables if they don't exist
     public static void init() {
-        String createCostumes =
-            "CREATE TABLE IF NOT EXISTS costumes (" +
-            "costume_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+        String createcosplays =
+            "CREATE TABLE IF NOT EXISTS cosplays (" +
+            "cosplay_id INTEGER PRIMARY KEY AUTOINCREMENT," +
             "name TEXT NOT NULL," +
             "category TEXT," +
+            "series_name TEXT," +
             "size TEXT," +
             "description TEXT," +
-            "image_path TEXT" +
+            "image_path TEXT," +
+            "rent_rate_1day REAL," +
+            "rent_rate_2days REAL," +
+            "rent_rate_3days REAL," +
+            "add_ons TEXT" +
             ");";
 
         String createRentals =
             "CREATE TABLE IF NOT EXISTS rentals (" +
             "rental_id INTEGER PRIMARY KEY AUTOINCREMENT," +
-            "costume_id INTEGER NOT NULL," +
+            "cosplay_id INTEGER NOT NULL," +
             "customer_name TEXT," +
             "contact_number TEXT," +
             "address TEXT," +
@@ -37,7 +42,7 @@ public class Database {
             "payment_method TEXT," +
             "proof_of_payment TEXT," +
             "status TEXT DEFAULT 'Pending'," +
-            "FOREIGN KEY(costume_id) REFERENCES costumes(costume_id)" +
+            "FOREIGN KEY(cosplay_id) REFERENCES cosplays(cosplay_id)" +
             ");";
 
         String createUsers =
@@ -61,7 +66,31 @@ public class Database {
             ");";
 
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
-            stmt.execute(createCostumes);
+            // Migrate old 'costumes' table to 'cosplays' if it exists
+            try {
+                stmt.executeUpdate("ALTER TABLE costumes RENAME TO cosplays");
+                System.out.println("Migrated 'costumes' table to 'cosplays'.");
+            } catch (SQLException ignored) {
+                // Table doesn't exist or already renamed
+            }
+            
+            // Migrate old 'costume_id' column in rentals table if it exists
+            try {
+                stmt.executeUpdate("ALTER TABLE rentals RENAME COLUMN costume_id TO cosplay_id");
+                System.out.println("Migrated 'costume_id' column to 'cosplay_id' in rentals.");
+            } catch (SQLException ignored) {
+                // Column doesn't exist or already renamed
+            }
+            
+            // Migrate old 'costume_id' column in featured_images table if it exists
+            try {
+                stmt.executeUpdate("ALTER TABLE featured_images RENAME COLUMN costume_id TO cosplay_id");
+                System.out.println("Migrated 'costume_id' column to 'cosplay_id' in featured_images.");
+            } catch (SQLException ignored) {
+                // Column doesn't exist or already renamed
+            }
+            
+            stmt.execute(createcosplays);
             stmt.execute(createRentals);
             stmt.execute(createUsers);
             stmt.execute(createFeatured);
@@ -80,12 +109,29 @@ public class Database {
                 stmt.executeUpdate("ALTER TABLE users ADD COLUMN oauth_id VARCHAR(255)");
             } catch (SQLException ignored) { }
             
-            // Try to add costume_id column for linking featured slots to costumes
+            // Try to add cosplay_id column for linking featured slots to cosplays
             try {
-                stmt.executeUpdate("ALTER TABLE featured_images ADD COLUMN costume_id INTEGER REFERENCES costumes(costume_id)");
+                stmt.executeUpdate("ALTER TABLE featured_images ADD COLUMN cosplay_id INTEGER REFERENCES cosplays(cosplay_id)");
             } catch (SQLException ignored) {
                 // Column may already exist; ignore
             }
+            
+            // Add new columns to cosplays table if they don't exist
+            try {
+                stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN series_name TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN rent_rate_1day REAL");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN rent_rate_2days REAL");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN rent_rate_3days REAL");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN add_ons TEXT");
+            } catch (SQLException ignored) { }
 
             // Seed a default admin account (username: admin, password: admin)
             // Hash the password using BCrypt
@@ -102,3 +148,4 @@ public class Database {
         }
     }
 }
+

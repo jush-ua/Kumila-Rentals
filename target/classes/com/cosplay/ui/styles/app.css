@@ -5,6 +5,7 @@
     font-family: 'Segoe UI', sans-serif;
     -fx-padding: 24;
     padding: 24;
+    -fx-background-color: #ffffff;
 }
 
 .label {
@@ -15,12 +16,19 @@
 .button {
     -fx-font-size: 13px;
     font-size: 13px;
+    -fx-cursor: hand;
 }
 
 .muted {
     -fx-text-fill: #666;
     -fx-font-size: 11px;
     font-size: 11px;
+}
+
+/* Responsive layout utilities */
+.container {
+    -fx-max-width: 1400px;
+    -fx-alignment: center;
 }
 
 /* Nav bar buttons */
@@ -30,6 +38,12 @@
     -fx-text-fill: #333;
     -fx-font-weight: normal;
     font-weight: normal;
+    -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
+}
+
+.nav-button:hover {
+    -fx-background-color: #f0f0f0;
 }
 
 .nav-button.active {
@@ -46,12 +60,14 @@
     -fx-background-color: #ffffff;
     -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 10, 0, 0, 0);
     -fx-background-radius: 8;
+    -fx-padding: 30;
 }
 
 .title {
     -fx-font-size: 24px;
     -fx-font-weight: bold;
     -fx-text-fill: #333;
+    -fx-wrap-text: true;
 }
 
 .error-label {
@@ -67,6 +83,7 @@
     -fx-font-weight: bold;
     -fx-background-radius: 4;
     -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
 }
 
 .primary-button:hover {
@@ -77,10 +94,12 @@
     -fx-background-color: #cccccc;
     -fx-text-fill: #666666;
     -fx-opacity: 0.6;
+    -fx-cursor: default;
 }
 
 .text-field,
-.password-field {
+.password-field,
+.text-area {
     -fx-background-radius: 4;
     -fx-border-color: #cccccc;
     -fx-border-width: 1;
@@ -88,7 +107,8 @@
 }
 
 .text-field:focused,
-.password-field:focused {
+.password-field:focused,
+.text-area:focused {
     -fx-border-color: #f5c7a9;
     -fx-border-width: 2;
 }
@@ -96,6 +116,7 @@
 .hyperlink {
     -fx-text-fill: #f5c7a9;
     -fx-border-color: transparent;
+    -fx-cursor: hand;
 }
 
 .hyperlink:hover {
@@ -108,6 +129,7 @@
     -fx-font-weight: bold;
     -fx-background-radius: 4;
     -fx-padding: 10 20 10 20;
+    -fx-cursor: hand;
 }
 
 .google-button:hover {
@@ -118,6 +140,7 @@
     -fx-background-color: #cccccc;
     -fx-text-fill: #666666;
     -fx-opacity: 0.6;
+    -fx-cursor: default;
 }
 
 .separator-text {
@@ -125,4 +148,116 @@
     -fx-text-fill: #999999;
     -fx-padding: 5 0 5 0;
 }
+
+/* Table styles */
+.table-view {
+    -fx-background-color: white;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+}
+
+.table-view .column-header {
+    -fx-background-color: #f5f5f5;
+    -fx-font-weight: bold;
+    -fx-padding: 10 5 10 5;
+}
+
+.table-view .table-cell {
+    -fx-padding: 8 5 8 5;
+}
+
+.table-row-cell:selected {
+    -fx-background-color: #f5c7a9;
+    -fx-text-fill: white;
+}
+
+/* ComboBox styles */
+.combo-box {
+    -fx-background-radius: 4;
+    -fx-border-color: #cccccc;
+    -fx-border-width: 1;
+}
+
+.combo-box:focused {
+    -fx-border-color: #f5c7a9;
+    -fx-border-width: 2;
+}
+
+/* ScrollPane styles */
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+/* Card styles for catalog */
+.card {
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 8, 0, 0, 2);
+    -fx-padding: 15;
+}
+
+.card:hover {
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 12, 0, 0, 4);
+    -fx-cursor: hand;
+}
+
+/* Tab pane styles */
+.tab-pane {
+    -fx-background-color: white;
+}
+
+.tab {
+    -fx-background-color: #f5f5f5;
+    -fx-padding: 10 15 10 15;
+}
+
+.tab:selected {
+    -fx-background-color: white;
+    -fx-border-color: #f5c7a9;
+    -fx-border-width: 0 0 3 0;
+}
+
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: #fafafa;
+}
+
+/* Sidebar styles */
+.sidebar-button {
+    -fx-background-color: transparent;
+    -fx-text-fill: white;
+    -fx-font-size: 16px;
+    -fx-padding: 15;
+    -fx-cursor: hand;
+    -fx-alignment: center-left;
+}
+
+.sidebar-button:hover {
+    -fx-background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-button.active {
+    -fx-background-color: #d4a574;
+    -fx-font-weight: bold;
+}
+
+/* List view styles */
+.list-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.list-view .list-cell {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.list-view .list-cell:hover {
+    -fx-background-color: #f9f9f9;
+}
+
 

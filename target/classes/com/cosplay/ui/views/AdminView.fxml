@@ -1,57 +1,73 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
-<?import javafx.scene.control.ComboBox?>
+<?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.AdminController"
-      spacing="12" alignment="TOP_LEFT" style="-fx-padding: 20;">
+      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #f5f5f5;"
+      minWidth="800" minHeight="600">
+    
+    <!-- Navigation Bar -->
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
-    <Label text="Admin - Featured Images" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    <Label text="Choose costumes for the 4 featured slots. Title defaults to the costume name (you can override)." styleClass="muted"/>
-
-    <GridPane hgap="8" vgap="8">
-        <columnConstraints>
-            <ColumnConstraints percentWidth="10" />
-            <ColumnConstraints percentWidth="45" />
-            <ColumnConstraints percentWidth="35" />
-            <ColumnConstraints percentWidth="10" />
-        </columnConstraints>
-        <rowConstraints>
-            <RowConstraints minHeight="32"/>
-            <RowConstraints minHeight="32"/>
-            <RowConstraints minHeight="32"/>
-            <RowConstraints minHeight="32"/>
-            <RowConstraints minHeight="32"/>
-        </rowConstraints>
-
-        <!-- Headers -->
-        <Label text="#" GridPane.rowIndex="0" GridPane.columnIndex="0" style="-fx-font-weight: bold;"/>
-        <Label text="Costume" GridPane.rowIndex="0" GridPane.columnIndex="1" style="-fx-font-weight: bold;"/>
-        <Label text="Title (optional)" GridPane.rowIndex="0" GridPane.columnIndex="2" style="-fx-font-weight: bold;"/>
-
-        <!-- Slot 1 -->
-        <Label text="1" GridPane.rowIndex="1" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbo1" GridPane.rowIndex="1" GridPane.columnIndex="1"/>
-        <TextField fx:id="title1" promptText="Title" GridPane.rowIndex="1" GridPane.columnIndex="2"/>
-
-        <!-- Slot 2 -->
-        <Label text="2" GridPane.rowIndex="2" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbo2" GridPane.rowIndex="2" GridPane.columnIndex="1"/>
-        <TextField fx:id="title2" promptText="Title" GridPane.rowIndex="2" GridPane.columnIndex="2"/>
-
-        <!-- Slot 3 -->
-        <Label text="3" GridPane.rowIndex="3" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbo3" GridPane.rowIndex="3" GridPane.columnIndex="1"/>
-        <TextField fx:id="title3" promptText="Title" GridPane.rowIndex="3" GridPane.columnIndex="2"/>
-
-        <!-- Slot 4 -->
-        <Label text="4" GridPane.rowIndex="4" GridPane.columnIndex="0"/>
-        <ComboBox fx:id="cbo4" GridPane.rowIndex="4" GridPane.columnIndex="1"/>
-        <TextField fx:id="title4" promptText="Title" GridPane.rowIndex="4" GridPane.columnIndex="2"/>
-    </GridPane>
-
-    <HBox spacing="10">
-        <Button text="Save" onAction="#save"/>
-        <Button text="Back to Home" onAction="#goHome"/>
+    
+    <!-- Main Content Area -->
+    <HBox VBox.vgrow="ALWAYS" spacing="0">
+        <!-- Sidebar Navigation -->
+        <VBox spacing="0" style="-fx-background-color: #e6c89d; -fx-padding: 20;" minWidth="250">
+            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 20;">
+                <Label text="👑" style="-fx-font-size: 24px;"/>
+                <Label text="Kumila Rentals" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            </HBox>
+            
+            <Button fx:id="btnHome" text="🏠 Home" onAction="#goHome" 
+                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT" 
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
+            
+            <Button fx:id="btnCatalog" text="👗 Catalog" onAction="#showCatalog" 
+                    styleClass="sidebar-button active" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    style="-fx-background-color: #d4a574; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-font-weight: bold; -fx-cursor: hand;"/>
+            
+            <Button fx:id="btnOrders" text="📋 Orders" onAction="#showOrders" 
+                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
+        </VBox>
+        
+        <!-- Content Area -->
+        <VBox HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+            
+            <!-- Header Section -->
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <Label fx:id="lblSectionTitle" text="Catalog" 
+                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button fx:id="btnAddRental" text="Add Rental" onAction="#addCosplay"
+                        style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+            </HBox>
+            
+            <!-- Table Section -->
+            <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
+                        style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+                    
+                    <!-- Table Header -->
+                    <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #f9f9f9;">
+                        <Label text="No." style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 50;"/>
+                        <Label text="Category" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 150;"/>
+                        <Label text="Series Name" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 200;"/>
+                        <Label text="Character Name" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 200;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                    </HBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Table Rows -->
+                    <ListView fx:id="cosplayListView" VBox.vgrow="ALWAYS" 
+                              style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                    
+                </VBox>
+            </ScrollPane>
+            
+        </VBox>
     </HBox>
 </VBox>
+
