@@ -7,6 +7,7 @@ import com.cosplay.ui.Views;
 import com.cosplay.util.EmailUtil;
 import com.cosplay.util.TokenUtil;
 import com.cosplay.util.ValidationUtil;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -56,11 +57,24 @@ public class RegisterController {
 		} catch (Exception ignored) {}
 
 		try {
-			Image bg = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png"));
-			BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true);
-			BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
-			if (rootPane != null) rootPane.setBackground(new Background(bimg));
-		} catch (Exception ignored) {}
+			var bgStream = getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png");
+			if (bgStream != null) {
+				Image bg = new Image(bgStream);
+				if (!bg.isError()) {
+					BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true);
+					BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
+					if (rootPane != null) rootPane.setBackground(new Background(bimg));
+					System.out.println("Register background image loaded successfully");
+				} else {
+					System.err.println("Register background image error: " + bg.getException());
+				}
+			} else {
+				System.err.println("Register background image stream is null");
+			}
+		} catch (Exception e) {
+			System.err.println("Failed to load register background: " + e.getMessage());
+			e.printStackTrace();
+		}
 
 		// Responsive bindings similar to LoginController
 		if (rootPane != null) {

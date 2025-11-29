@@ -66,12 +66,23 @@ public class LoginController {
 
         try {
             // Use AnchorPane background with BackgroundSize cover=true so image behaves like CSS 'background-size: cover'
-            Image bg = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png"));
-            BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true); // cover=true
-            BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
-            if (rootPane != null) rootPane.setBackground(new Background(bimg));
+            var bgStream = getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png");
+            if (bgStream != null) {
+                Image bg = new Image(bgStream);
+                if (!bg.isError()) {
+                    BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true); // cover=true
+                    BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
+                    if (rootPane != null) rootPane.setBackground(new Background(bimg));
+                    System.out.println("Background image loaded successfully");
+                } else {
+                    System.err.println("Background image error: " + bg.getException());
+                }
+            } else {
+                System.err.println("Background image stream is null");
+            }
         } catch (Exception e) {
-            // ignore if missing
+            System.err.println("Failed to load background image: " + e.getMessage());
+            e.printStackTrace();
         }
 
         // Responsive bindings: scale controls relative to the root pane size

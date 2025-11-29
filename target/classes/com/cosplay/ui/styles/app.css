@@ -5,7 +5,7 @@
     font-family: 'Segoe UI', sans-serif;
     -fx-padding: 24;
     padding: 24;
-    -fx-background-color: #ffffff;
+    /* Note: background-color removed to allow individual views to set their own backgrounds */
 }
 
 .label {

@@ -22,10 +22,7 @@ public final class SceneNavigator {
 
     public static void init(Stage stage) {
         primaryStage = stage;
-        primaryStage.setMinWidth(800);
-        primaryStage.setMinHeight(600);
-        primaryStage.setWidth(1200);
-        primaryStage.setHeight(800);
+        // Don't set default dimensions here - let each view control its own size
     }
 
     public static void navigate(Views view) {
@@ -78,7 +75,12 @@ public final class SceneNavigator {
                 }
                 primaryStage.setResizable(true);
             } else {
+                // For non-resizable views (LOGIN, REGISTER), fit the stage to the scene size
                 primaryStage.setResizable(false);
+                primaryStage.setWidth(sceneW);
+                primaryStage.setHeight(sceneH);
+                primaryStage.sizeToScene();
+                primaryStage.centerOnScreen();
             }
             primaryStage.show();
             currentView = view;
