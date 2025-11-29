@@ -57,3 +57,44 @@
     </VBox>
 
 </AnchorPane>
+<?import javafx.geometry.Insets?>
+<VBox spacing="15" alignment="CENTER" styleClass="register-container"
+      xmlns="http://javafx.com/javafx/22"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.RegisterController"
+      minWidth="400" minHeight="600" maxWidth="600">
+    <padding>
+        <Insets top="30" right="30" bottom="30" left="30"/>
+    </padding>
+    
+    <Label text="Create an Account" styleClass="title"/>
+    
+    <VBox spacing="5" HBox.hgrow="ALWAYS">
+        <Label text="Username"/>
+        <TextField fx:id="usernameField" promptText="3-20 characters, letters/numbers/underscore" prefWidth="300" maxWidth="500" minWidth="250"/>
+    </VBox>
+    
+    <VBox spacing="5" HBox.hgrow="ALWAYS">
+        <Label text="Email"/>
+        <TextField fx:id="emailField" promptText="your.email@example.com" prefWidth="300" maxWidth="500" minWidth="250"/>
+    </VBox>
+    
+    <VBox spacing="5" HBox.hgrow="ALWAYS">
+        <Label text="Password"/>
+        <PasswordField fx:id="passwordField" promptText="At least 6 characters" prefWidth="300" maxWidth="500" minWidth="250"/>
+    </VBox>
+    
+    <VBox spacing="5" HBox.hgrow="ALWAYS">
+        <Label text="Confirm Password"/>
+        <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password" prefWidth="300" maxWidth="500" minWidth="250"/>
+    </VBox>
+    
+    <Label fx:id="errorLabel" styleClass="error-label" wrapText="true" maxWidth="500" minWidth="250"/>
+    
+    <Button fx:id="registerButton" text="Register" onAction="#handleRegister" styleClass="primary-button" prefWidth="300" maxWidth="500" minWidth="250"/>
+    
+    <HBox spacing="5" alignment="CENTER">
+        <Label text="Already have an account?"/>
+        <Hyperlink text="Login here" onAction="#goToLogin"/>
+    </HBox>
+</VBox>

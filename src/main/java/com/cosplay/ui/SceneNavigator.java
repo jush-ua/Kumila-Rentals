@@ -22,6 +22,10 @@ public final class SceneNavigator {
 
     public static void init(Stage stage) {
         primaryStage = stage;
+        primaryStage.setMinWidth(800);
+        primaryStage.setMinHeight(600);
+        primaryStage.setWidth(1200);
+        primaryStage.setHeight(800);
     }
 
     public static void navigate(Views view) {

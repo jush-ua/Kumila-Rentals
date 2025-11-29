@@ -11,12 +11,12 @@ import java.util.List;
 public class RentalDAO {
 
     // Check availability using the given connection to keep checks + insert in single transaction if needed.
-    private boolean isAvailable(Connection conn, int costumeId, LocalDate start, LocalDate end) throws SQLException {
+    private boolean isAvailable(Connection conn, int CosplayId, LocalDate start, LocalDate end) throws SQLException {
         // Overlap if NOT (existing.end < new.start OR existing.start > new.end)
-        String sql = "SELECT 1 FROM rentals WHERE costume_id = ? AND status IN ('Pending','Confirmed','Rented') " +
+        String sql = "SELECT 1 FROM rentals WHERE cosplay_id = ? AND status IN ('Pending','Confirmed','Rented') " +
                      "AND NOT (end_date < ? OR start_date > ?) LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, costumeId);
+            ps.setInt(1, CosplayId);
             ps.setString(2, start.toString());
             ps.setString(3, end.toString());
             try (ResultSet rs = ps.executeQuery()) {
@@ -26,9 +26,9 @@ public class RentalDAO {
     }
 
     // Public wrapper
-    public boolean isAvailable(int costumeId, LocalDate start, LocalDate end) {
+    public boolean isAvailable(int CosplayId, LocalDate start, LocalDate end) {
         try (Connection conn = Database.connect()) {
-            return isAvailable(conn, costumeId, start, end);
+            return isAvailable(conn, CosplayId, start, end);
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
@@ -37,17 +37,17 @@ public class RentalDAO {
 
     // Create a rental safely: check availability inside a transaction and insert
     public boolean createRental(Rental r) {
-        String insert = "INSERT INTO rentals(costume_id, customer_name, contact_number, address, facebook_link, start_date, end_date, payment_method, proof_of_payment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insert = "INSERT INTO rentals(cosplay_id, customer_name, contact_number, address, facebook_link, start_date, end_date, payment_method, proof_of_payment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = Database.connect()) {
             conn.setAutoCommit(false);
             // check availability with the same connection
-            if (!isAvailable(conn, r.getCostumeId(), r.getStartDate(), r.getEndDate())) {
+            if (!isAvailable(conn, r.getCosplayId(), r.getStartDate(), r.getEndDate())) {
                 conn.rollback();
                 return false;
             }
 
             try (PreparedStatement ps = conn.prepareStatement(insert, Statement.RETURN_GENERATED_KEYS)) {
-                ps.setInt(1, r.getCostumeId());
+                ps.setInt(1, r.getCosplayId());
                 ps.setString(2, r.getCustomerName());
                 ps.setString(3, r.getContactNumber());
                 ps.setString(4, r.getAddress());
@@ -84,7 +84,7 @@ public class RentalDAO {
             while (rs.next()) {
                 Rental r = new Rental();
                 r.setId(rs.getInt("rental_id"));
-                r.setCostumeId(rs.getInt("costume_id"));
+                r.setCosplayId(rs.getInt("cosplay_id"));
                 r.setCustomerName(rs.getString("customer_name"));
                 r.setContactNumber(rs.getString("contact_number"));
                 r.setAddress(rs.getString("address"));
@@ -100,3 +100,5 @@ public class RentalDAO {
         return list;
     }
 }
+
+
