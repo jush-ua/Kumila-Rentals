@@ -13,6 +13,15 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundImage;
+import javafx.scene.layout.BackgroundPosition;
+import javafx.scene.layout.BackgroundRepeat;
+import javafx.scene.layout.BackgroundSize;
+import javafx.scene.layout.VBox;
 
 public class RegisterController {
 	@FXML private TextField usernameField;
@@ -21,6 +30,9 @@ public class RegisterController {
 	@FXML private TextField emailField;
 	@FXML private Button registerButton;
 	@FXML private Label errorLabel;
+	@FXML private ImageView logoImage;
+	@FXML private AnchorPane rootPane;
+	@FXML private VBox textFieldPanel;
 
 	private final UserDAO userDAO = new UserDAO();
 
@@ -29,6 +41,35 @@ public class RegisterController {
 		// Clear error label initially
 		if (errorLabel != null) {
 			errorLabel.setText("");
+		}
+
+		// Load logo and background similar to LoginView
+		try {
+			if (logoImage != null) {
+				logoImage.setImage(new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/logo.png")));
+				logoImage.sceneProperty().addListener((obs, oldScene, newScene) -> {
+					if (newScene != null) {
+						logoImage.fitWidthProperty().bind(newScene.widthProperty().multiply(0.20));
+					}
+				});
+			}
+		} catch (Exception ignored) {}
+
+		try {
+			Image bg = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/login_bg.png"));
+			BackgroundSize bsize = new BackgroundSize(100, 100, true, true, false, true);
+			BackgroundImage bimg = new BackgroundImage(bg, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bsize);
+			if (rootPane != null) rootPane.setBackground(new Background(bimg));
+		} catch (Exception ignored) {}
+
+		// Responsive bindings similar to LoginController
+		if (rootPane != null) {
+			var availableWidth = rootPane.widthProperty().subtract(40);
+			try { if (textFieldPanel != null) textFieldPanel.prefWidthProperty().bind(availableWidth); } catch (Exception ignored) {}
+			try { if (usernameField != null) usernameField.prefWidthProperty().bind(availableWidth); } catch (Exception ignored) {}
+			try { if (emailField != null) emailField.prefWidthProperty().bind(availableWidth); } catch (Exception ignored) {}
+			try { if (passwordField != null) passwordField.prefWidthProperty().bind(availableWidth); } catch (Exception ignored) {}
+			try { if (registerButton != null) registerButton.prefWidthProperty().bind(rootPane.widthProperty().multiply(0.25)); } catch (Exception ignored) {}
 		}
 	}
 

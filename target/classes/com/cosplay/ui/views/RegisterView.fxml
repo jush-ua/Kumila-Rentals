@@ -1,6 +1,62 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cosplay.ui.controllers.RegisterController"
+            fx:id="rootPane"
+            prefWidth="450" prefHeight="600">
+
+    <VBox alignment="CENTER" spacing="6"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+        <Region prefHeight="40"/>
+
+        <ImageView fx:id="logoImage" fitWidth="100" fitHeight="100" preserveRatio="true" pickOnBounds="true" />
+        <Label text="Create an Account" styleClass="title-label"/>
+
+        <VBox fx:id="textFieldPanel" spacing="4" alignment="TOP_LEFT" prefWidth="320" maxWidth="320">
+            <Label fx:id="errorLabel" text="" style="-fx-text-fill: transparent; -fx-font-size:12px;" />
+
+            <Label text="Username" styleClass="field-label"/>
+            <TextField fx:id="usernameField" promptText="3-20 characters, letters/numbers/underscore" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+
+            <Region prefHeight="5"/>
+
+            <Label text="Email" styleClass="field-label"/>
+            <TextField fx:id="emailField" promptText="your.email@example.com" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+
+            <Region prefHeight="5"/>
+
+            <Label text="Password" styleClass="field-label"/>
+            <PasswordField fx:id="passwordField" promptText="At least 6 characters" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+
+            <Region prefHeight="5"/>
+
+            <Label text="Confirm Password" styleClass="field-label"/>
+            <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password" prefWidth="320" prefHeight="36" styleClass="rounded-field"/>
+        </VBox>
+
+        <Region prefHeight="8"/>
+
+        <Button fx:id="registerButton" text="REGISTER"
+                onAction="#handleRegister"
+                prefWidth="100" prefHeight="45"
+                styleClass="accent-button"/>
+
+        <Region prefHeight="10"/>
+
+        <HBox spacing="6" alignment="CENTER">
+            <Label text="Already have an account?" style="-fx-font-family: 'Poppins-Bold'; -fx-text-fill: white; -fx-font-size: 12px;" />
+            <Hyperlink fx:id="goToLogin" text="Login Here" onAction="#goToLogin" styleClass="create-account-link" style="-fx-underline: true; -fx-font-size: 12px;" />
+        </HBox>
+
+        <Region prefHeight="40"/>
+    </VBox>
+
+</AnchorPane>
 <?import javafx.geometry.Insets?>
 <VBox spacing="15" alignment="CENTER" styleClass="register-container"
       xmlns="http://javafx.com/javafx/22"
