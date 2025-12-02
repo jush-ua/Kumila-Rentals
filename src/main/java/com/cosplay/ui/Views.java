@@ -2,9 +2,9 @@ package com.cosplay.ui;
 
 /** Defines application views and their FXML resource paths. */
 public enum Views {
-    // Make LOGIN and REGISTER not resizable; other views remain resizable by default
-    LOGIN("/com/cosplay/ui/views/LoginView.fxml", "Kumila Rentals - Login", false),
-    REGISTER("/com/cosplay/ui/views/RegisterView.fxml", "Kumila Rentals - Register", false),
+    // Make LOGIN and REGISTER resizable and maximized by default
+    LOGIN("/com/cosplay/ui/views/LoginView.fxml", "Kumila Rentals - Login", true),
+    REGISTER("/com/cosplay/ui/views/RegisterView.fxml", "Kumila Rentals - Register", true),
     HOME("/com/cosplay/ui/views/HomeView.fxml", "Kumila Rentals - Home", true),
     CATALOG("/com/cosplay/ui/views/CatalogView.fxml", "Kumila Rentals - Catalog", true),
     TERMS("/com/cosplay/ui/views/TermsView.fxml", "Kumila Rentals - Terms", true),

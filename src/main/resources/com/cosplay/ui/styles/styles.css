@@ -21,144 +21,223 @@
 /* Root defaults */
 .root {
     -fx-font-family: "Poppins";
+    -fx-background-color: transparent;
+    -fx-padding: 0;
 }
 
-/* Title label (Magnolia Script look) */
-.title-label {
+/* Root pane for login/register views */
+#rootPane {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+/* HBox container - no spacing or padding */
+HBox {
+    -fx-spacing: 0;
+    -fx-padding: 0;
+}
+
+/* Left panel (decorative background with image) */
+.left-panel {
+    -fx-background-image: url("/com/cosplay/ui/images/login_bg.png");
+    -fx-background-size: cover;
+    -fx-background-position: center;
+    -fx-background-repeat: no-repeat;
+    -fx-padding: 0;
+}
+
+/* Left panel title */
+.left-title {
     -fx-font-family: "Magnolia Script";
-    -fx-font-size: 30px;
+    -fx-font-size: 38px;
     -fx-text-fill: white;
-    -fx-padding: 6 0 7 0;
+    -fx-padding: 4 0 4 0;
 }
 
-/* Field labels */
+/* Left panel subtitle */
+.left-subtitle {
+    -fx-font-family: "Poppins";
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-text-alignment: center;
+}
+
+/* Right panel (form panel - white background) */
+.right-panel {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+/* AnchorPane inside HBox gets white background for right side */
+HBox > AnchorPane {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+/* Title label (Magnolia Script look) - adjusted for right panel */
+.title-label {
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 30px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #F7CD82;
+    -fx-padding: 2 0 1 0;
+}
+
+/* Field labels - updated for right panel */
 .field-label {
     -fx-font-family: "Poppins";
     font-family: "Poppins";
     -fx-font-size: 14px;
-    -fx-text-fill: white;
+    -fx-text-fill: #F7CD82;
 }
 
-/* Forgot password style (right-aligned) */
+/* Forgot password style (right-aligned) - updated for right panel */
 .forgot-label {
     -fx-font-family: "Poppins";
     -fx-font-size: 12px;
-    -fx-text-fill: white;
+    -fx-text-fill: #F7CD82;
+    -fx-cursor: hand;
+}
+
+/* Normal text for right panel */
+.normal-text {
+    -fx-font-family: "Poppins";
+    -fx-font-size: 12px;
+    -fx-text-fill: #F7CD82;
 }
 
 /* Rounded text fields (pixel matched radius 14) */
 .rounded-field {
     -fx-background-color: white;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: #DCDCDC;
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
+    -fx-border-color: #F7CD82;
     -fx-border-width: 1;
-    -fx-padding: 6 10 6 10;
+    -fx-padding: 8 12 8 12;
     -fx-font-size: 14px;
-    -fx-text-fill: black;
+    -fx-text-fill: #333333;
 }
 
 /* More specific selectors to ensure overrides on controls */
 TextField.rounded-field, PasswordField.rounded-field {
     -fx-background-color: white;
-    -fx-background-radius: 14;
-    -fx-border-radius: 14;
-    -fx-border-color: #DCDCDC;
-    -fx-border-width: 1;
-    -fx-padding: 6 10 6 10;
-    -fx-font-size: 14px;
-    -fx-text-fill: black;
-}
-
-/* Accent button (LOGIN / REGISTER style that matches Swing painting) */
-.accent-button {
-    -fx-background-color: #FAFAFA; /* default background */
+    -fx-background-radius: 4;
+    -fx-border-radius: 4;
     -fx-border-color: #F7CD82;
     -fx-border-width: 1;
+    -fx-padding: 8 12 8 12;
+    -fx-font-size: 14px;
+    -fx-text-fill: #333333;
+}
+
+/* Accent button (LOGIN / REGISTER style) */
+.accent-button {
+    -fx-background-color: white;
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 2;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
     -fx-text-fill: #F7CD82;
     -fx-font-family: "Poppins-Bold";
     -fx-font-size: 14px;
+    -fx-font-weight: bold;
     -fx-cursor: hand;
+}
+
+.reg-accent-button {
+    -fx-background-color: white;
+    -fx-border-color: #F7CD82;
+    -fx-border-width: 2;
+    -fx-background-radius: 20;
+    -fx-border-radius: 20;
+    -fx-text-fill: #F7CD82;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-cursor: hand;
+    -fx-margin: 8 16 8 16;
 }
 
 /* Specific Button selector to increase specificity and ensure it's applied */
 Button.accent-button {
-    -fx-background-color: #FAFAFA;
+    -fx-background-color: white;
     -fx-border-color: #F7CD82;
-    -fx-border-width: 1;
+    -fx-border-width: 2;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
     -fx-text-fill: #F7CD82;
     -fx-font-family: "Poppins-Bold";
     -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-margin: 8 16 8 16;
 }
 
-/* Hover state: bg -> #F7CD82, text -> white, border white */
+/* Hover state: bg -> #F7CD82, text -> white, border -> white */
 .accent-button:hover {
     -fx-background-color: #F7CD82;
     -fx-text-fill: white;
     -fx-border-color: white;
+    -fx-border-width: 2;
+}
+
+.reg-accent-button:hover {
+    -fx-background-color: #F7CD82;
+    -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 2;
 }
 
 /* Or label */
 .or-label {
     -fx-font-family: "Poppins";
     -fx-font-size: 12px;
-    -fx-text-fill: #FAFAFA; /* matches Swing orLabel white-ish */
+    -fx-text-fill: #F7CD82;
+    -fx-padding: 7 6 7 6;
 }
 
 /* Google button style (matches Swing painting) */
 .google-btn {
-    -fx-background-color: #FAFAFA;
+    -fx-background-color: white;
     -fx-border-color: #F7CD82;
-    -fx-border-width: 1;
+    -fx-border-width: 2;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
     -fx-font-family: "Poppins-Bold";
     -fx-font-size: 14px;
     -fx-text-fill: #F7CD82;
+    -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 Button.google-btn {
-    -fx-background-color: #FAFAFA;
+    -fx-background-color: white;
     -fx-border-color: #F7CD82;
-    -fx-border-width: 1;
+    -fx-border-width: 2;
     -fx-background-radius: 20;
     -fx-border-radius: 20;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
     -fx-text-fill: #F7CD82;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
 }
 
 /* Google hover */
 .google-btn:hover {
     -fx-background-color: #F7CD82;
     -fx-text-fill: white;
+    -fx-border-color: white;
+    -fx-border-width: 2;
 }
-
-/* Google label (inside graphic) */
-.google-label {
-    -fx-text-fill: inherit;
-    -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
-}
-
-/* Create account link styling (matches underline-on-hover) */
+/* Create account link styling (matches underline-on-hover) - updated for right panel */
 .create-account-link {
-    -fx-text-fill: white;
+    -fx-text-fill: #F7CD82;
     -fx-font-family: "Poppins-Bold";
     -fx-font-size: 12px;
     -fx-background-color: transparent;
     -fx-border-width: 0;
-}
-.create-account-link:hover {
-    -fx-underline: true;
 }
 Hyperlink.create-account-link {
-    -fx-text-fill: white;
+    -fx-text-fill: #F7CD82;
     -fx-font-family: "Poppins-Bold";
     -fx-font-size: 12px;
     -fx-background-color: transparent;
@@ -166,6 +245,11 @@ Hyperlink.create-account-link {
 }
 .create-account-link:hover {
     -fx-underline: true;
+    -fx-text-fill: #F7CD82;
+    -fx-font-family: "Poppins-Bold";
+    -fx-font-size: 12px;
+    -fx-background-color: transparent;
+    -fx-border-width: 0;
 }
 
 /* Error label visibility (controller sets text and style) */
