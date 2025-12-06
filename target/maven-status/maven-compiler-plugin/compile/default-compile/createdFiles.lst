@@ -13,7 +13,6 @@ com\cosplay\util\EmailUtil$1.class
 com\cosplay\ui\controllers\CatalogController.class
 com\cosplay\ui\controllers\HomeController.class
 com\cosplay\util\CallbackServer.class
-com\cosplay\ui\controllers\TermsController.class
 com\cosplay\ui\controllers\LoginController.class
 com\cosplay\dao\RentalDAO.class
 com\cosplay\util\PasswordMigration.class

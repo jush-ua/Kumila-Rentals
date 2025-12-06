@@ -99,6 +99,46 @@ public class RentalDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
     }
+    
+    public boolean updateRentalStatus(int rentalId, String newStatus) {
+        String sql = "UPDATE rentals SET status = ? WHERE rental_id = ?";
+        try (Connection conn = Database.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, rentalId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+    
+    public List<Rental> getRentalsByCosplayId(int cosplayId) {
+        List<Rental> list = new ArrayList<>();
+        String sql = "SELECT * FROM rentals WHERE cosplay_id = ? AND status IN ('Pending','Confirmed','Rented') ORDER BY start_date";
+        try (Connection conn = Database.connect();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, cosplayId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Rental r = new Rental();
+                    r.setId(rs.getInt("rental_id"));
+                    r.setCosplayId(rs.getInt("cosplay_id"));
+                    r.setCustomerName(rs.getString("customer_name"));
+                    r.setContactNumber(rs.getString("contact_number"));
+                    r.setAddress(rs.getString("address"));
+                    r.setFacebookLink(rs.getString("facebook_link"));
+                    r.setStartDate(LocalDate.parse(rs.getString("start_date")));
+                    r.setEndDate(LocalDate.parse(rs.getString("end_date")));
+                    r.setPaymentMethod(rs.getString("payment_method"));
+                    r.setProofOfPayment(rs.getString("proof_of_payment"));
+                    r.setStatus(rs.getString("status"));
+                    list.add(r);
+                }
+            }
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
 }
 
 

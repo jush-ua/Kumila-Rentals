@@ -7,7 +7,7 @@ public enum Views {
     REGISTER("/com/cosplay/ui/views/RegisterView.fxml", "Kumila Rentals - Register", false),
     HOME("/com/cosplay/ui/views/HomeView.fxml", "Kumila Rentals - Home", true),
     CATALOG("/com/cosplay/ui/views/CatalogView.fxml", "Kumila Rentals - Catalog", true),
-    TERMS("/com/cosplay/ui/views/TermsView.fxml", "Kumila Rentals - Terms", true),
+    COSPLAY_DETAILS("/com/cosplay/ui/views/CosplayDetailsView.fxml", "Kumila Rentals - Cosplay Details", true),
     ABOUT("/com/cosplay/ui/views/AboutView.fxml", "Kumila Rentals - About", true),
     ADMIN("/com/cosplay/ui/views/AdminView.fxml", "Kumila Rentals - Admin", true);
 

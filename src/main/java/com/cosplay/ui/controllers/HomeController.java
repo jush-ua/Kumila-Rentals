@@ -53,7 +53,7 @@ public class HomeController {
                 String path = c.getImagePath();
                 if (path != null && !path.isBlank()) {
                     try {
-                        Image image;
+                        Image image = null;
                         // Check if it's a URL or file path
                         if (path.startsWith("http://") || path.startsWith("https://")) {
                             image = new Image(path, true);
@@ -63,11 +63,13 @@ public class HomeController {
                             if (imageFile.exists()) {
                                 image = new Image(imageFile.toURI().toString());
                             } else {
-                                image = null;
+                                System.err.println("Image file not found: " + path);
                             }
                         }
-                        if (image != null) {
+                        if (image != null && !image.isError()) {
                             view.setImage(image);
+                        } else {
+                            System.err.println("Failed to load image for " + c.getName());
                         }
                     } catch (Exception e) {
                         System.err.println("Failed to load image: " + e.getMessage());
@@ -82,7 +84,7 @@ public class HomeController {
         String url = item.getImageUrl();
         if (url != null && !url.isBlank()) {
             try {
-                Image image;
+                Image image = null;
                 if (url.startsWith("http://") || url.startsWith("https://")) {
                     image = new Image(url, true);
                 } else {
@@ -90,11 +92,13 @@ public class HomeController {
                     if (imageFile.exists()) {
                         image = new Image(imageFile.toURI().toString());
                     } else {
-                        image = null;
+                        System.err.println("Image file not found: " + url);
                     }
                 }
-                if (image != null) {
+                if (image != null && !image.isError()) {
                     view.setImage(image);
+                } else {
+                    System.err.println("Failed to load image from URL: " + url);
                 }
             } catch (Exception e) {
                 System.err.println("Failed to load image: " + e.getMessage());
