@@ -58,9 +58,15 @@ public final class SceneNavigator {
             
             primaryStage.setTitle(view.getTitle());
             primaryStage.setScene(scene);
+            
+            // Set minimum window size based on the FXML preferred dimensions
+            primaryStage.setMinWidth(sceneW);
+            primaryStage.setMinHeight(sceneH);
+            
             // Respect per-view resizable flag (configured in Views)
             if (view.isResizable()) {
-                // Set a windowed "full-screen" default using the primary screen's visual bounds
+                primaryStage.setResizable(true);
+                // Set a windowed "maximized" default using the primary screen's visual bounds
                 try {
                     Rectangle2D vb = Screen.getPrimary().getVisualBounds();
                     double targetW = vb.getWidth() * 0.98; // small margin from absolute edges
@@ -73,9 +79,8 @@ public final class SceneNavigator {
                 } catch (Exception ignored) {
                     // fallback: do nothing if screen metrics unavailable
                 }
-                primaryStage.setResizable(true);
             } else {
-                // For non-resizable views (LOGIN, REGISTER), fit the stage to the scene size
+                // For non-resizable views, fit the stage to the scene size
                 primaryStage.setResizable(false);
                 primaryStage.setWidth(sceneW);
                 primaryStage.setHeight(sceneH);

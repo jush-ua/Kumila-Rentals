@@ -8,6 +8,12 @@
     /* Note: background-color removed to allow individual views to set their own backgrounds */
 }
 
+/* Override padding for login/register root panes */
+#rootPane {
+    -fx-padding: 0;
+    padding: 0;
+}
+
 .label {
     -fx-font-size: 14px;
     font-size: 14px;
@@ -35,15 +41,20 @@
 .nav-button {
     -fx-background-color: transparent;
     background-color: transparent;
-    -fx-text-fill: #333;
+    -fx-text-fill: #d47f47;
+    -fx-font-family: 'Segoe UI', sans-serif;
+    -fx-font-size: 14px;
     -fx-font-weight: normal;
     font-weight: normal;
     -fx-padding: 10 20 10 20;
+    -fx-background-radius: 20;
     -fx-cursor: hand;
 }
 
 .nav-button:hover {
-    -fx-background-color: #f0f0f0;
+    -fx-background-color: #f5c7a9;
+    -fx-text-fill: white;
+    -fx-background-radius: 20;
 }
 
 .nav-button.active {
@@ -52,6 +63,7 @@
     -fx-text-fill: white;
     -fx-font-weight: bold;
     font-weight: bold;
+    -fx-background-radius: 20;
 }
 
 /* Login/Register specific styles */
