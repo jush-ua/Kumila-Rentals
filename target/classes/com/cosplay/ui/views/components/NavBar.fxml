@@ -20,7 +20,6 @@
 	<HBox spacing="15" alignment="CENTER_RIGHT">
 		<Button fx:id="btnHome" text="Home" onAction="#goHome" styleClass="nav-button"/>
 		<Button fx:id="btnCatalog" text="Catalog" onAction="#goCatalog" styleClass="nav-button"/>
-		<Button fx:id="btnTerms" text="Terms and Conditions" onAction="#goTerms" styleClass="nav-button"/>
 		<Button fx:id="btnAbout" text="About Us" onAction="#goAbout" styleClass="nav-button"/>
 		<Button fx:id="btnAdmin" text="Admin" onAction="#goAdmin" styleClass="nav-button"/>
 		<Button fx:id="btnLogout" text="Logout" onAction="#logout" styleClass="nav-button"/>

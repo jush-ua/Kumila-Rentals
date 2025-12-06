@@ -1,170 +1,249 @@
 package com.cosplay.ui.controllers;
 
-import com.cosplay.ui.SceneNavigator;
-import com.cosplay.ui.Views;
 import com.cosplay.dao.CosplayDAO;
 import com.cosplay.dao.RentalDAO;
 import com.cosplay.model.Cosplay;
 import com.cosplay.model.Rental;
+import com.cosplay.ui.SceneNavigator;
+import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
 import javafx.fxml.FXML;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
 import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.geometry.Pos;
 import javafx.geometry.Insets;
+import javafx.stage.Stage;
+import javafx.scene.Scene;
 import java.io.File;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-public class CatalogController {
-    // Included NavBar controller (from fx:include with fx:id="navBar")
+public class CosplayDetailsController {
     @FXML private NavController navBarController;
-    @FXML private FlowPane cosplayGrid;
+    @FXML private ImageView cosplayImage;
+    @FXML private Label lblCosplayName;
+    @FXML private Label lblSeriesName;
+    @FXML private Label lblCategory;
+    @FXML private Label lblSize;
+    @FXML private Label lblDescription;
+    @FXML private VBox inclusionsBox;
+    @FXML private Label lblRate1Day;
+    @FXML private Label lblRate2Days;
+    @FXML private Label lblRate3Days;
+    @FXML private Button btnRentNow;
+    @FXML private GridPane calendarGrid;
+    @FXML private Label lblCalendarMonth;
+    @FXML private Button btnPrevMonth;
+    @FXML private Button btnNextMonth;
     
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
-
+    private static Cosplay selectedCosplay;
+    private YearMonth currentMonth;
+    private Set<LocalDate> bookedDates;
+    
+    public static void setSelectedCosplay(Cosplay cosplay) {
+        selectedCosplay = cosplay;
+    }
+    
     @FXML
     private void initialize() {
         if (navBarController != null) {
             navBarController.setActive(Views.CATALOG);
         }
-        loadCosplays();
-    }
-    
-    private void loadCosplays() {
-        cosplayGrid.getChildren().clear();
-        var cosplays = cosplayDAO.getAll();
         
-        for (Cosplay cosplay : cosplays) {
-            VBox card = createCosplayCard(cosplay);
-            cosplayGrid.getChildren().add(card);
+        currentMonth = YearMonth.now();
+        
+        if (selectedCosplay != null) {
+            loadCosplayDetails(selectedCosplay);
+            loadBookedDates();
+            updateCalendar();
         }
     }
     
-    private VBox createCosplayCard(Cosplay cosplay) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2); -fx-cursor: hand;");
-        card.setPrefWidth(200);
+    private void loadBookedDates() {
+        bookedDates = new HashSet<>();
+        List<Rental> rentals = rentalDAO.getRentalsByCosplayId(selectedCosplay.getId());
         
-        // Make the entire card clickable to view details
-        card.setOnMouseClicked(e -> {
-            CosplayDetailsController.setSelectedCosplay(cosplay);
-            SceneNavigator.navigate(Views.COSPLAY_DETAILS);
-        });
+        for (Rental rental : rentals) {
+            LocalDate date = rental.getStartDate();
+            while (!date.isAfter(rental.getEndDate())) {
+                bookedDates.add(date);
+                date = date.plusDays(1);
+            }
+        }
+    }
+    
+    @FXML
+    private void handlePrevMonth() {
+        currentMonth = currentMonth.minusMonths(1);
+        updateCalendar();
+    }
+    
+    @FXML
+    private void handleNextMonth() {
+        currentMonth = currentMonth.plusMonths(1);
+        updateCalendar();
+    }
+    
+    private void updateCalendar() {
+        calendarGrid.getChildren().clear();
         
-        // Add hover effect
-        card.setOnMouseEntered(e -> card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3); -fx-cursor: hand;"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2); -fx-cursor: hand;"));
+        lblCalendarMonth.setText(currentMonth.getMonth().toString() + " " + currentMonth.getYear());
         
-        // Image
-        ImageView imageView = new ImageView();
-        imageView.setFitWidth(180);
-        imageView.setFitHeight(180);
-        imageView.setPreserveRatio(true);
-        imageView.setStyle("-fx-background-color: #f0f0f0;");
+        // Add day headers
+        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        for (int i = 0; i < days.length; i++) {
+            Label dayLabel = new Label(days[i]);
+            dayLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #666;");
+            dayLabel.setMaxWidth(Double.MAX_VALUE);
+            dayLabel.setAlignment(Pos.CENTER);
+            calendarGrid.add(dayLabel, i, 0);
+        }
         
-        boolean imageLoaded = false;
+        // Get first day of month
+        LocalDate firstDay = currentMonth.atDay(1);
+        int startDayOfWeek = firstDay.getDayOfWeek().getValue() % 7; // Sunday = 0
         
+        // Fill calendar
+        int daysInMonth = currentMonth.lengthOfMonth();
+        int row = 1;
+        int col = startDayOfWeek;
+        
+        for (int day = 1; day <= daysInMonth; day++) {
+            LocalDate date = currentMonth.atDay(day);
+            Label dayCell = new Label(String.valueOf(day));
+            dayCell.setPrefSize(40, 40);
+            dayCell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            dayCell.setAlignment(Pos.CENTER);
+            
+            // Style based on availability
+            boolean isPast = date.isBefore(LocalDate.now());
+            boolean isBooked = bookedDates.contains(date);
+            boolean isToday = date.equals(LocalDate.now());
+            
+            if (isPast) {
+                dayCell.setStyle("-fx-background-color: #f0f0f0; -fx-text-fill: #ccc; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+            } else if (isBooked) {
+                dayCell.setStyle("-fx-background-color: #ffcdd2; -fx-text-fill: #c62828; -fx-font-weight: bold; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+            } else if (isToday) {
+                dayCell.setStyle("-fx-background-color: #fff9c4; -fx-text-fill: #333; -fx-font-weight: bold; -fx-border-color: #fbc02d; -fx-border-width: 2;");
+            } else {
+                dayCell.setStyle("-fx-background-color: #c8e6c9; -fx-text-fill: #2e7d32; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+            }
+            
+            calendarGrid.add(dayCell, col, row);
+            
+            col++;
+            if (col > 6) {
+                col = 0;
+                row++;
+            }
+        }
+    }
+    
+    private void loadCosplayDetails(Cosplay cosplay) {
+        // Load image
         if (cosplay.getImagePath() != null && !cosplay.getImagePath().isBlank()) {
             try {
                 String imagePath = cosplay.getImagePath();
                 Image image = null;
                 
-                // Check if it's a file path or URL
                 if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
                     image = new Image(imagePath, true);
                 } else {
-                    // It's a file path - use file:// protocol
                     File imageFile = new File(imagePath);
                     if (imageFile.exists()) {
                         image = new Image(imageFile.toURI().toString());
-                    } else {
-                        System.err.println("Image file not found: " + imagePath);
                     }
                 }
                 
                 if (image != null && !image.isError()) {
-                    imageView.setImage(image);
-                    imageLoaded = true;
-                } else {
-                    System.err.println("Failed to load image for " + cosplay.getName());
+                    cosplayImage.setImage(image);
                 }
             } catch (Exception e) {
-                System.err.println("Failed to load image for " + cosplay.getName() + ": " + e.getMessage());
+                System.err.println("Failed to load image: " + e.getMessage());
             }
         }
         
-        // If no image loaded, show placeholder text
-        if (!imageLoaded) {
-            // Create a placeholder with text
-            javafx.scene.layout.StackPane placeholder = new javafx.scene.layout.StackPane();
-            placeholder.setPrefSize(180, 180);
-            placeholder.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 1;");
-            javafx.scene.control.Label placeholderText = new javafx.scene.control.Label("No Image");
-            placeholderText.setStyle("-fx-text-fill: #999; -fx-font-size: 12px;");
-            placeholder.getChildren().add(placeholderText);
-            card.getChildren().add(placeholder);
-        } else {
-            card.getChildren().add(imageView);
-        }
+        // Set text fields
+        lblCosplayName.setText(cosplay.getName());
         
-        // Name
-        Label nameLabel = new Label(cosplay.getName());
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        nameLabel.setWrapText(true);
-        nameLabel.setMaxWidth(180);
-        
-        if (!imageLoaded) {
-            // Already added placeholder above
-        }
-        
-        card.getChildren().add(nameLabel);
-        
-        // Series Name
         if (cosplay.getSeriesName() != null && !cosplay.getSeriesName().isBlank()) {
-            Label seriesLabel = new Label(cosplay.getSeriesName());
-            seriesLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 11px; -fx-font-style: italic;");
-            card.getChildren().add(seriesLabel);
+            lblSeriesName.setText(cosplay.getSeriesName());
+            lblSeriesName.setVisible(true);
+        } else {
+            lblSeriesName.setVisible(false);
         }
         
-        // Category
         if (cosplay.getCategory() != null && !cosplay.getCategory().isBlank()) {
-            Label categoryLabel = new Label(cosplay.getCategory());
-            categoryLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
-            card.getChildren().add(categoryLabel);
+            lblCategory.setText("Category: " + cosplay.getCategory());
+        } else {
+            lblCategory.setText("Category: N/A");
         }
         
-        // Size
         if (cosplay.getSize() != null && !cosplay.getSize().isBlank()) {
-            Label sizeLabel = new Label("Size: " + cosplay.getSize());
-            sizeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
-            card.getChildren().add(sizeLabel);
+            lblSize.setText("Size: " + cosplay.getSize());
+        } else {
+            lblSize.setText("Size: N/A");
         }
         
-        // Rent Rate (show 1 day rate if available)
+        if (cosplay.getDescription() != null && !cosplay.getDescription().isBlank()) {
+            lblDescription.setText(cosplay.getDescription());
+            lblDescription.setVisible(true);
+        } else {
+            lblDescription.setVisible(false);
+        }
+        
+        // Load inclusions/add-ons
+        inclusionsBox.getChildren().clear();
+        if (cosplay.getAddOns() != null && !cosplay.getAddOns().isBlank()) {
+            String[] addOns = cosplay.getAddOns().split("\n");
+            for (String addOn : addOns) {
+                if (!addOn.trim().isEmpty()) {
+                    Label addOnLabel = new Label("• " + addOn.trim());
+                    addOnLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
+                    inclusionsBox.getChildren().add(addOnLabel);
+                }
+            }
+        }
+        
+        // Set rental rates
         if (cosplay.getRentRate1Day() != null) {
-            Label priceLabel = new Label(String.format("₱%.2f/day", cosplay.getRentRate1Day()));
-            priceLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;");
-            card.getChildren().add(priceLabel);
+            lblRate1Day.setText(String.format("₱%.2f", cosplay.getRentRate1Day()));
+        } else {
+            lblRate1Day.setText("N/A");
         }
         
-        // View Details label
-        Label viewDetailsLabel = new Label("Click to view details");
-        viewDetailsLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888; -fx-font-style: italic;");
-        card.getChildren().add(viewDetailsLabel);
+        if (cosplay.getRentRate2Days() != null) {
+            lblRate2Days.setText(String.format("₱%.2f", cosplay.getRentRate2Days()));
+        } else {
+            lblRate2Days.setText("N/A");
+        }
         
-        return card;
+        if (cosplay.getRentRate3Days() != null) {
+            lblRate3Days.setText(String.format("₱%.2f", cosplay.getRentRate3Days()));
+        } else {
+            lblRate3Days.setText("N/A");
+        }
+    }
+    
+    @FXML
+    private void handleRentNow() {
+        if (selectedCosplay != null) {
+            showRentalDialog(selectedCosplay);
+        }
+    }
+    
+    @FXML
+    private void goBack() {
+        SceneNavigator.navigate(Views.CATALOG);
     }
     
     private void showRentalDialog(Cosplay cosplay) {
@@ -235,7 +314,6 @@ public class CatalogController {
                 } else if (days == 3 && cosplay.getRentRate3Days() != null) {
                     cost = cosplay.getRentRate3Days();
                 } else if (cosplay.getRentRate1Day() != null) {
-                    // Default to daily rate
                     cost = cosplay.getRentRate1Day() * days;
                 }
                 
@@ -376,7 +454,7 @@ public class CatalogController {
             rental.setStartDate(start);
             rental.setEndDate(end);
             rental.setPaymentMethod(cboPayment.getValue());
-            rental.setProofOfPayment(""); // To be uploaded later
+            rental.setProofOfPayment("");
             rental.setStatus("Pending");
             
             boolean success = rentalDAO.createRental(rental);
@@ -412,6 +490,4 @@ public class CatalogController {
         alert.setContentText(message);
         alert.show();
     }
-
-    @FXML private void goHome() { SceneNavigator.navigate(Views.HOME); }
 }

@@ -8,7 +8,6 @@ import javafx.scene.control.Button;
 public class NavController {
 	@FXML private Button btnHome;
 	@FXML private Button btnCatalog;
-	@FXML private Button btnTerms;
 	@FXML private Button btnAbout;
 	@FXML private Button btnAdmin;
 	@FXML private Button btnLogout;
@@ -24,7 +23,6 @@ public class NavController {
 	private void clearActive() {
 		btnHome.getStyleClass().remove("active");
 		btnCatalog.getStyleClass().remove("active");
-		btnTerms.getStyleClass().remove("active");
 		btnAbout.getStyleClass().remove("active");
 	}
 
@@ -33,7 +31,6 @@ public class NavController {
 		switch (view) {
 			case HOME -> btnHome.getStyleClass().add("active");
 			case CATALOG -> btnCatalog.getStyleClass().add("active");
-			case TERMS -> btnTerms.getStyleClass().add("active");
 			case ABOUT -> btnAbout.getStyleClass().add("active");
 			case ADMIN -> btnAdmin.getStyleClass().add("active");
 			default -> {}
@@ -43,7 +40,6 @@ public class NavController {
 	// Navigation handlers
 	@FXML private void goHome() { SceneNavigator.navigate(Views.HOME); }
 	@FXML private void goCatalog() { SceneNavigator.navigate(Views.CATALOG); }
-	@FXML private void goTerms() { SceneNavigator.navigate(Views.TERMS); }
 	@FXML private void goAbout() { SceneNavigator.navigate(Views.ABOUT); }
 	@FXML private void goAdmin() { SceneNavigator.navigate(Views.ADMIN); }
 

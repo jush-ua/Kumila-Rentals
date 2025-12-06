@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.CosplayDetailsController"
+      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #f5f5f5;"
+      minWidth="800" minHeight="600">
+    
+    <!-- Navigation Bar -->
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+    
+    <!-- Main Content Area -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: #f5f5f5;">
+        <VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+            
+            <!-- Back Button -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button text="← Back to Catalog" onAction="#goBack" 
+                        style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-font-size: 14px; -fx-cursor: hand; -fx-underline: true;"/>
+            </HBox>
+            
+            <!-- Main Content Container -->
+            <HBox spacing="30" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 10;">
+                
+                <!-- Left Side - Image -->
+                <VBox spacing="10" alignment="TOP_CENTER" style="-fx-min-width: 400; -fx-max-width: 400;">
+                    <ImageView fx:id="cosplayImage" fitWidth="380" fitHeight="450" preserveRatio="true"
+                               style="-fx-background-color: #f0f0f0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 3);"/>
+                </VBox>
+                
+                <!-- Right Side - Details -->
+                <VBox spacing="15" HBox.hgrow="ALWAYS" style="-fx-min-width: 350;">
+                    
+                    <!-- Title Section -->
+                    <VBox spacing="5">
+                        <Label fx:id="lblCosplayName" text="Cosplay Name" 
+                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <Label fx:id="lblSeriesName" text="Series Name" 
+                               style="-fx-font-size: 16px; -fx-text-fill: #888; -fx-font-style: italic;"/>
+                    </VBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Basic Info -->
+                    <VBox spacing="8">
+                        <Label fx:id="lblCategory" text="Category: N/A" 
+                               style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+                        <Label fx:id="lblSize" text="Size: N/A" 
+                               style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+                    </VBox>
+                    
+                    <!-- Description -->
+                    <VBox spacing="5">
+                        <Label text="Description" 
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <Label fx:id="lblDescription" text="No description available" wrapText="true"
+                               style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                    </VBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Inclusions -->
+                    <VBox spacing="8">
+                        <Label text="Inclusions" 
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <VBox fx:id="inclusionsBox" spacing="5">
+                            <!-- Add-ons will be dynamically added here -->
+                        </VBox>
+                    </VBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Rental Rates -->
+                    <VBox spacing="10">
+                        <Label text="Rental Rates" 
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <GridPane hgap="20" vgap="10">
+                            <Label text="1 Day:" GridPane.columnIndex="0" GridPane.rowIndex="0"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                            <Label fx:id="lblRate1Day" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="0"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
+                            
+                            <Label text="2 Days:" GridPane.columnIndex="0" GridPane.rowIndex="1"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                            <Label fx:id="lblRate2Days" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="1"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
+                            
+                            <Label text="3 Days:" GridPane.columnIndex="0" GridPane.rowIndex="2"
+                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                            <Label fx:id="lblRate3Days" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="2"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
+                        </GridPane>
+                    </VBox>
+                    
+                    <Separator/>
+                    
+                    <!-- Availability Calendar -->
+                    <VBox spacing="10">
+                        <Label text="Availability Calendar" 
+                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <Label text="Check available dates for rental" 
+                               style="-fx-font-size: 12px; -fx-text-fill: #888; -fx-font-style: italic;"/>
+                        
+                        <!-- Calendar Controls -->
+                        <HBox spacing="10" alignment="CENTER">
+                            <Button fx:id="btnPrevMonth" text="◀" onAction="#handlePrevMonth"
+                                    style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                            <Label fx:id="lblCalendarMonth" text="Month Year" HBox.hgrow="ALWAYS" alignment="CENTER"
+                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                            <Button fx:id="btnNextMonth" text="▶" onAction="#handleNextMonth"
+                                    style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                        </HBox>
+                        
+                        <!-- Calendar Grid -->
+                        <GridPane fx:id="calendarGrid" hgap="2" vgap="2" alignment="CENTER"
+                                  style="-fx-background-color: #e0e0e0; -fx-padding: 5; -fx-background-radius: 5;">
+                        </GridPane>
+                        
+                        <!-- Legend -->
+                        <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+                            <HBox spacing="5" alignment="CENTER">
+                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #c8e6c9;"/>
+                                <Label text="Available" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                            </HBox>
+                            <HBox spacing="5" alignment="CENTER">
+                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #ffcdd2;"/>
+                                <Label text="Booked" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                            </HBox>
+                            <HBox spacing="5" alignment="CENTER">
+                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #fff9c4;"/>
+                                <Label text="Today" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
+                            </HBox>
+                        </HBox>
+                    </VBox>
+                    
+                    <!-- Spacer -->
+                    <Region VBox.vgrow="ALWAYS"/>
+                    
+                    <!-- Rent Now Button -->
+                    <Button fx:id="btnRentNow" text="Rent Now" onAction="#handleRentNow" maxWidth="Infinity"
+                            style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    
+                </VBox>
+                
+            </HBox>
+            
+        </VBox>
+    </ScrollPane>
+    
+</VBox>
