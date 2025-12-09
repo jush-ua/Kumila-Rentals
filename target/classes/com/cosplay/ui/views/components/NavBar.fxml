@@ -21,6 +21,7 @@
 		<Button fx:id="btnHome" text="Home" onAction="#goHome" styleClass="nav-button"/>
 		<Button fx:id="btnCatalog" text="Catalog" onAction="#goCatalog" styleClass="nav-button"/>
 		<Button fx:id="btnAbout" text="About Us" onAction="#goAbout" styleClass="nav-button"/>
+		<Button fx:id="btnMessages" text="Messages" onAction="#goMessages" styleClass="nav-button"/>
 		<Button fx:id="btnAdmin" text="Admin" onAction="#goAdmin" styleClass="nav-button"/>
 		<Button fx:id="btnLogout" text="Logout" onAction="#logout" styleClass="nav-button"/>
 	</HBox>

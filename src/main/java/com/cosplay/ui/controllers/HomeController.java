@@ -1,22 +1,22 @@
 package com.cosplay.ui.controllers;
 
-import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import javafx.fxml.FXML;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.Image;
+import javafx.scene.layout.HBox;
+import javafx.scene.control.Label;
 import com.cosplay.dao.FeaturedDAO;
+import com.cosplay.dao.EventBannerDAO;
 import com.cosplay.model.FeaturedItem;
 import com.cosplay.dao.CosplayDAO;
 
 public class HomeController {
     // Included NavBar controller (from fx:include with fx:id="navBar")
     @FXML private NavController navBarController;
-    @FXML private ImageView jtLogo;
-    @FXML private ImageView lalamoveLogo;
-    @FXML private ImageView lbcLogo;
-    @FXML private ImageView gcashLogo;
-    @FXML private ImageView mayaLogo;
+    @FXML private HBox eventBanner;
+    @FXML private Label eventBannerTitle;
+    @FXML private Label eventBannerMessage;
     @FXML private ImageView set1Image;
     @FXML private ImageView set2Image;
     @FXML private ImageView set3Image;
@@ -33,8 +33,68 @@ public class HomeController {
             navBarController.setActive(Views.HOME);
         }
 
+        // Load event banner
+        loadEventBanner();
+
         // Load featured images from DB
         loadFeaturedImages();
+    }
+
+    private void loadEventBanner() {
+        EventBannerDAO bannerDAO = new EventBannerDAO();
+        bannerDAO.getActiveBanner().ifPresentOrElse(
+            banner -> {
+                // Set the banner content
+                eventBannerTitle.setText(banner.getTitle());
+                eventBannerMessage.setText(banner.getMessage());
+                
+                // Apply custom colors if set
+                String bgColor = banner.getBackgroundColor() != null ? banner.getBackgroundColor() : "#fff4ed";
+                String txtColor = banner.getTextColor() != null ? banner.getTextColor() : "#d47f47";
+                
+                eventBanner.setStyle(
+                    "-fx-background-color: " + bgColor + "; " +
+                    "-fx-padding: 12 20; " +
+                    "-fx-border-color: " + txtColor + "; " +
+                    "-fx-border-width: 0 0 2 0;"
+                );
+                
+                eventBannerTitle.setStyle(
+                    "-fx-font-size: 15px; " +
+                    "-fx-font-weight: bold; " +
+                    "-fx-text-fill: " + txtColor + ";"
+                );
+                
+                String messageTxtColor = adjustColorBrightness(txtColor, 0.8);
+                eventBannerMessage.setStyle(
+                    "-fx-font-size: 13px; " +
+                    "-fx-text-fill: " + messageTxtColor + ";"
+                );
+                
+                // Show the banner
+                eventBanner.setVisible(true);
+                eventBanner.setManaged(true);
+            },
+            () -> {
+                // No active banner - hide it
+                eventBanner.setVisible(false);
+                eventBanner.setManaged(false);
+            }
+        );
+    }
+    
+    @FXML
+    private void dismissBanner() {
+        eventBanner.setVisible(false);
+        eventBanner.setManaged(false);
+    }
+    
+    /**
+     * Helper method to adjust color brightness (simplified version)
+     */
+    private String adjustColorBrightness(String hexColor, double factor) {
+        // Simple brightness adjustment - in production might want more sophisticated color manipulation
+        return hexColor; // For now, return as-is
     }
 
     private void loadFeaturedImages() {

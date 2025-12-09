@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
+
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.MessagesController"
+      spacing="0" alignment="TOP_CENTER" style="-fx-background-color: #FFF;"
+      minWidth="600" minHeight="400">
+
+    <!-- Navigation Bar -->
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+
+    <!-- Main Content Area -->
+    <VBox VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 30;">
+        
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="15">
+            <Label text="Messages" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Label fx:id="lblUnreadCount" text="0 unread" style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
+        </HBox>
+
+        <!-- User View: Send Message Form -->
+        <VBox fx:id="userMessageSection" spacing="15" style="-fx-background-color: #f9f9f9; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;">
+            <Label text="Send a Message to Admin" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+            
+            <VBox spacing="8">
+                <Label text="Subject:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+                <TextField fx:id="txtSubject" promptText="Enter message subject" style="-fx-font-size: 14px;"/>
+            </VBox>
+            
+            <VBox spacing="8">
+                <Label text="Message:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+                <TextArea fx:id="txtMessage" promptText="Enter your message here..." 
+                          wrapText="true" prefRowCount="6" style="-fx-font-size: 14px;"/>
+            </VBox>
+            
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Button fx:id="btnSendMessage" text="Send Message" onAction="#sendMessage"
+                        style="-fx-background-color: #d47f47; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 25; -fx-cursor: hand;"/>
+                <Label fx:id="lblSendStatus" text="" style="-fx-text-fill: #4CAF50; -fx-font-size: 13px;"/>
+            </HBox>
+        </VBox>
+
+        <!-- User View: Message History -->
+        <VBox fx:id="userHistorySection" spacing="10" VBox.vgrow="ALWAYS">
+            <Label text="Your Message History" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                <VBox fx:id="userMessagesContainer" spacing="10" style="-fx-padding: 5;"/>
+            </ScrollPane>
+        </VBox>
+
+        <!-- Admin View: All Messages -->
+        <VBox fx:id="adminMessageSection" spacing="15" VBox.vgrow="ALWAYS" managed="false" visible="false">
+            <HBox alignment="CENTER_LEFT" spacing="15">
+                <Label text="All User Messages" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Refresh" onAction="#loadMessages" 
+                        style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 8 15; -fx-cursor: hand;"/>
+            </HBox>
+            
+            <!-- Filter Buttons -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <Label text="Filter:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
+                <ToggleButton fx:id="btnFilterAll" text="All" selected="true" onAction="#filterMessages"
+                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
+                <ToggleButton fx:id="btnFilterUnread" text="Unread" onAction="#filterMessages"
+                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
+                <ToggleButton fx:id="btnFilterRead" text="Read" onAction="#filterMessages"
+                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
+                <ToggleButton fx:id="btnFilterReplied" text="Replied" onAction="#filterMessages"
+                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
+            </HBox>
+            
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
+                <VBox fx:id="adminMessagesContainer" spacing="10" style="-fx-padding: 5;"/>
+            </ScrollPane>
+        </VBox>
+
+    </VBox>
+</VBox>

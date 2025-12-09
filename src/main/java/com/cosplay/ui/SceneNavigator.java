@@ -28,6 +28,14 @@ public final class SceneNavigator {
     public static void navigate(Views view) {
         ensureInit();
         try {
+            // Save current window state before switching
+            boolean wasMaximized = primaryStage.isMaximized();
+            double prevWidth = primaryStage.getWidth();
+            double prevHeight = primaryStage.getHeight();
+            double prevX = primaryStage.getX();
+            double prevY = primaryStage.getY();
+            boolean wasResizable = primaryStage.isResizable();
+            
             FXMLLoader loader = new FXMLLoader(Objects.requireNonNull(
                     SceneNavigator.class.getResource(view.getResource()),
                     "FXML not found: " + view.getResource()
@@ -66,18 +74,31 @@ public final class SceneNavigator {
             // Respect per-view resizable flag (configured in Views)
             if (view.isResizable()) {
                 primaryStage.setResizable(true);
-                // Set a windowed "maximized" default using the primary screen's visual bounds
-                try {
-                    Rectangle2D vb = Screen.getPrimary().getVisualBounds();
-                    double targetW = vb.getWidth() * 0.98; // small margin from absolute edges
-                    double targetH = vb.getHeight() * 0.96;
-                    primaryStage.setWidth(targetW);
-                    primaryStage.setHeight(targetH);
-                    primaryStage.setX(vb.getMinX() + (vb.getWidth() - targetW) / 2);
-                    primaryStage.setY(vb.getMinY() + (vb.getHeight() - targetH) / 2);
-                    primaryStage.setMaximized(false);
-                } catch (Exception ignored) {
-                    // fallback: do nothing if screen metrics unavailable
+                
+                // If switching between resizable views, preserve window state
+                if (wasResizable && currentView != null && currentView.isResizable()) {
+                    // Preserve the previous window state
+                    primaryStage.setMaximized(wasMaximized);
+                    if (!wasMaximized) {
+                        primaryStage.setWidth(prevWidth);
+                        primaryStage.setHeight(prevHeight);
+                        primaryStage.setX(prevX);
+                        primaryStage.setY(prevY);
+                    }
+                } else {
+                    // First time or switching from non-resizable: set default large size
+                    try {
+                        Rectangle2D vb = Screen.getPrimary().getVisualBounds();
+                        double targetW = vb.getWidth() * 0.98; // small margin from absolute edges
+                        double targetH = vb.getHeight() * 0.96;
+                        primaryStage.setWidth(targetW);
+                        primaryStage.setHeight(targetH);
+                        primaryStage.setX(vb.getMinX() + (vb.getWidth() - targetW) / 2);
+                        primaryStage.setY(vb.getMinY() + (vb.getHeight() - targetH) / 2);
+                        primaryStage.setMaximized(false);
+                    } catch (Exception ignored) {
+                        // fallback: do nothing if screen metrics unavailable
+                    }
                 }
             } else {
                 // For non-resizable views, fit the stage to the scene size

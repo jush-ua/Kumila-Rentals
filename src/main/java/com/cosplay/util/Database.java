@@ -65,6 +65,31 @@ public class Database {
             "title TEXT" +
             ");";
 
+        String createEventBanners =
+            "CREATE TABLE IF NOT EXISTS event_banners (" +
+            "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "title TEXT NOT NULL," +
+            "message TEXT NOT NULL," +
+            "is_active INTEGER DEFAULT 0," +
+            "background_color TEXT DEFAULT '#fff4ed'," +
+            "text_color TEXT DEFAULT '#d47f47'," +
+            "link_url TEXT," +
+            "link_text TEXT" +
+            ");";
+
+        String createMessages =
+            "CREATE TABLE IF NOT EXISTS messages (" +
+            "message_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "sender_id INTEGER NOT NULL," +
+            "sender_name TEXT NOT NULL," +
+            "sender_email TEXT," +
+            "subject TEXT NOT NULL," +
+            "message TEXT NOT NULL," +
+            "timestamp TEXT NOT NULL," +
+            "status TEXT DEFAULT 'unread'," +
+            "FOREIGN KEY(sender_id) REFERENCES users(user_id)" +
+            ");";
+
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
             // Migrate old 'costumes' table to 'cosplays' if it exists
             try {
@@ -94,6 +119,8 @@ public class Database {
             stmt.execute(createRentals);
             stmt.execute(createUsers);
             stmt.execute(createFeatured);
+            stmt.execute(createEventBanners);
+            stmt.execute(createMessages);
             
             // Add new columns if they don't exist (for existing databases)
             try {

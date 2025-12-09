@@ -34,6 +34,10 @@
             <Button fx:id="btnFeatured" text="⭐ Featured" onAction="#showFeatured" 
                     styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
                     style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
+            
+            <Button fx:id="btnEvents" text="📢 Event Banners" onAction="#showEventBanners" 
+                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
         </VBox>
         
         <!-- Content Area -->
@@ -53,13 +57,9 @@
                         style="-fx-background-color: transparent; -fx-border-color: transparent;">
                 <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
                     
-                    <!-- Table Header -->
-                    <HBox spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #f9f9f9;">
-                        <Label text="No." style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 50;"/>
-                        <Label text="Category" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 150;"/>
-                        <Label text="Series Name" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 200;"/>
-                        <Label text="Character Name" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-min-width: 200;"/>
-                        <Region HBox.hgrow="ALWAYS"/>
+                    <!-- Table Header (Dynamic) -->
+                    <HBox fx:id="tableHeader" spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #f9f9f9;">
+                        <!-- Header labels will be dynamically added based on current section -->
                     </HBox>
                     
                     <Separator/>

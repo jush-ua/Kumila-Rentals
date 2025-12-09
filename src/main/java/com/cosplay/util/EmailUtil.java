@@ -77,7 +77,7 @@ public class EmailUtil {
      * @param body email body
      * @return true if email sent successfully, false otherwise
      */
-    private static boolean sendEmail(String toEmail, String subject, String body) {
+    public static boolean sendEmail(String toEmail, String subject, String body) {
         // Check if email is configured
         if (EMAIL_USERNAME.equals("your-email@gmail.com") || EMAIL_PASSWORD.equals("your-app-password")) {
             System.out.println("=== EMAIL NOT CONFIGURED ===");

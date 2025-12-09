@@ -9,6 +9,7 @@ public enum Views {
     CATALOG("/com/cosplay/ui/views/CatalogView.fxml", "Kumila Rentals - Catalog", true),
     COSPLAY_DETAILS("/com/cosplay/ui/views/CosplayDetailsView.fxml", "Kumila Rentals - Cosplay Details", true),
     ABOUT("/com/cosplay/ui/views/AboutView.fxml", "Kumila Rentals - About", true),
+    MESSAGES("/com/cosplay/ui/views/MessagesView.fxml", "Kumila Rentals - Messages", true),
     ADMIN("/com/cosplay/ui/views/AdminView.fxml", "Kumila Rentals - Admin", true);
 
     private final String resource;

@@ -3,9 +3,11 @@ package com.cosplay.ui.controllers;
 import com.cosplay.dao.CosplayDAO;
 import com.cosplay.dao.RentalDAO;
 import com.cosplay.dao.FeaturedDAO;
+import com.cosplay.dao.EventBannerDAO;
 import com.cosplay.model.Cosplay;
 import com.cosplay.model.Rental;
 import com.cosplay.model.FeaturedItem;
+import com.cosplay.model.EventBanner;
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
@@ -13,6 +15,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
@@ -26,15 +29,18 @@ public class AdminController {
     @FXML private NavController navBarController;
     @FXML private ListView<Object> cosplayListView;
     @FXML private ListView<Rental> ordersListView;
+    @FXML private HBox tableHeader;
     @FXML private Label lblSectionTitle;
     @FXML private Button btnAddRental;
     @FXML private Button btnCatalog;
     @FXML private Button btnOrders;
     @FXML private Button btnFeatured;
+    @FXML private Button btnEvents;
 
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
     private final FeaturedDAO featuredDAO = new FeaturedDAO();
+    private final EventBannerDAO eventBannerDAO = new EventBannerDAO();
     private String currentSection = "catalog";
 
     @FXML
@@ -56,6 +62,7 @@ public class AdminController {
         btnAddRental.setText("Add Rental");
         btnAddRental.setVisible(true);
         updateSidebarButtons();
+        updateTableHeader();
         loadCosplays();
     }
 
@@ -65,6 +72,7 @@ public class AdminController {
         lblSectionTitle.setText("Order Tracker");
         btnAddRental.setVisible(false);
         updateSidebarButtons();
+        updateTableHeader();
         loadOrders();
     }
     
@@ -74,25 +82,96 @@ public class AdminController {
         lblSectionTitle.setText("Featured Cosplays");
         btnAddRental.setVisible(false);
         updateSidebarButtons();
+        updateTableHeader();
         loadFeatured();
+    }
+    
+    @FXML
+    public void showEventBanners() {
+        currentSection = "events";
+        lblSectionTitle.setText("Event Banners");
+        btnAddRental.setText("Add Event Banner");
+        btnAddRental.setVisible(true);
+        btnAddRental.setOnAction(e -> addEventBanner());
+        updateSidebarButtons();
+        updateTableHeader();
+        loadEventBanners();
+    }
+    
+    private void updateTableHeader() {
+        if (tableHeader == null) return;
+        
+        tableHeader.getChildren().clear();
+        
+        String headerStyle = "-fx-font-weight: bold; -fx-font-size: 14px;";
+        
+        switch (currentSection) {
+            case "catalog":
+                addHeaderLabel("No.", 50);
+                addHeaderLabel("Category", 150);
+                addHeaderLabel("Series Name", 200);
+                addHeaderLabel("Character Name", 200);
+                addHeaderSpacer();
+                break;
+                
+            case "orders":
+                addHeaderLabel("Order Details", 450);
+                addHeaderLabel("Status", 120);
+                addHeaderLabel("Payment", 120);
+                addHeaderSpacer();
+                break;
+                
+            case "featured":
+                addHeaderLabel("Cosplay Name", 250);
+                addHeaderLabel("Series", 200);
+                addHeaderLabel("Featured Status", 120);
+                addHeaderSpacer();
+                break;
+                
+            case "events":
+                addHeaderLabel("Event Title", 300);
+                addHeaderLabel("Status", 100);
+                addHeaderLabel("Colors", 150);
+                addHeaderSpacer();
+                break;
+        }
+    }
+    
+    private void addHeaderLabel(String text, int minWidth) {
+        Label label = new Label(text);
+        label.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        label.setMinWidth(minWidth);
+        tableHeader.getChildren().add(label);
+    }
+    
+    private void addHeaderSpacer() {
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        tableHeader.getChildren().add(spacer);
     }
     
     private void updateSidebarButtons() {
         String activeStyle = "-fx-background-color: #d4a574; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-font-weight: bold; -fx-cursor: hand;";
         String inactiveStyle = "-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;";
         
-        if ("catalog".equals(currentSection)) {
-            btnCatalog.setStyle(activeStyle);
-            btnOrders.setStyle(inactiveStyle);
-            if (btnFeatured != null) btnFeatured.setStyle(inactiveStyle);
-        } else if ("orders".equals(currentSection)) {
-            btnCatalog.setStyle(inactiveStyle);
-            btnOrders.setStyle(activeStyle);
-            if (btnFeatured != null) btnFeatured.setStyle(inactiveStyle);
-        } else if ("featured".equals(currentSection)) {
-            btnCatalog.setStyle(inactiveStyle);
-            btnOrders.setStyle(inactiveStyle);
-            if (btnFeatured != null) btnFeatured.setStyle(activeStyle);
+        btnCatalog.setStyle(inactiveStyle);
+        btnOrders.setStyle(inactiveStyle);
+        if (btnFeatured != null) btnFeatured.setStyle(inactiveStyle);
+        if (btnEvents != null) btnEvents.setStyle(inactiveStyle);
+        
+        switch(currentSection) {
+            case "catalog":
+                btnCatalog.setStyle(activeStyle);
+                break;
+            case "orders":
+                btnOrders.setStyle(activeStyle);
+                break;
+            case "featured":
+                if (btnFeatured != null) btnFeatured.setStyle(activeStyle);
+                break;
+            case "events":
+                if (btnEvents != null) btnEvents.setStyle(activeStyle);
+                break;
         }
     }
 
@@ -161,7 +240,7 @@ public class AdminController {
     }
     
     private HBox createRentalRow(Rental rental) {
-        HBox row = new HBox(15);
+        HBox row = new HBox(20);
         row.setAlignment(Pos.CENTER_LEFT);
         row.setPadding(new Insets(15));
         row.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0; -fx-background-color: white;");
@@ -173,8 +252,9 @@ public class AdminController {
             cosplayName = cosplayOpt.get().getName();
         }
         
+        // Order Details column - consolidated (450px to match header)
         VBox detailsBox = new VBox(5);
-        detailsBox.setMinWidth(400);
+        detailsBox.setMinWidth(450);
         
         Label lblOrder = new Label("Order #" + rental.getId());
         lblOrder.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #e6a84c;");
@@ -193,12 +273,13 @@ public class AdminController {
         
         detailsBox.getChildren().addAll(lblOrder, lblCosplay, lblCustomer, lblContact, lblDates);
         
-        VBox statusBox = new VBox(5);
+        // Status column (120px to match header)
+        VBox statusBox = new VBox(3);
         statusBox.setAlignment(Pos.CENTER_LEFT);
-        statusBox.setMinWidth(150);
+        statusBox.setMinWidth(120);
         
-        Label lblStatus = new Label("Status:");
-        lblStatus.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
+        Label lblStatusLabel = new Label("Status:");
+        lblStatusLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
         
         Label lblStatusValue = new Label(rental.getStatus() != null ? rental.getStatus() : "Pending");
         String statusColor = switch(rental.getStatus() != null ? rental.getStatus() : "Pending") {
@@ -210,19 +291,20 @@ public class AdminController {
         };
         lblStatusValue.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " + statusColor + ";");
         
-        statusBox.getChildren().addAll(lblStatus, lblStatusValue);
+        statusBox.getChildren().addAll(lblStatusLabel, lblStatusValue);
         
-        VBox paymentBox = new VBox(5);
+        // Payment column (120px to match header)
+        VBox paymentBox = new VBox(3);
         paymentBox.setAlignment(Pos.CENTER_LEFT);
         paymentBox.setMinWidth(120);
         
-        Label lblPayment = new Label("Payment:");
-        lblPayment.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
+        Label lblPaymentLabel = new Label("Payment:");
+        lblPaymentLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
         
         Label lblPaymentValue = new Label(rental.getPaymentMethod() != null ? rental.getPaymentMethod() : "N/A");
-        lblPaymentValue.setStyle("-fx-font-size: 12px;");
+        lblPaymentValue.setStyle("-fx-font-size: 13px;");
         
-        paymentBox.getChildren().addAll(lblPayment, lblPaymentValue);
+        paymentBox.getChildren().addAll(lblPaymentLabel, lblPaymentValue);
         
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
@@ -485,6 +567,14 @@ public class AdminController {
         txtSize.setPromptText("Size");
         txtSize.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
         
+        Label lblDescription = new Label("Description");
+        lblDescription.setStyle("-fx-font-weight: bold;");
+        TextArea txtDescription = new TextArea(cosplay != null ? cosplay.getDescription() : "");
+        txtDescription.setPromptText("Enter a detailed description of the cosplay...");
+        txtDescription.setPrefRowCount(4);
+        txtDescription.setWrapText(true);
+        txtDescription.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
         Label lblRentRates = new Label("Rent Rates");
         lblRentRates.setStyle("-fx-font-weight: bold;");
         
@@ -566,6 +656,7 @@ public class AdminController {
             String series = txtSeries.getText().trim();
             String character = txtCharacter.getText().trim();
             String size = txtSize.getText().trim();
+            String description = txtDescription.getText().trim();
             
             if (character.isEmpty()) {
                 showAlert(Alert.AlertType.WARNING, "Validation", "Character name is required.");
@@ -594,7 +685,7 @@ public class AdminController {
             String imagePath = txtImagePath.getText().trim();
             
             if (cosplay == null) {
-                Cosplay newCosplay = new Cosplay(character, category, size, "", imagePath);
+                Cosplay newCosplay = new Cosplay(character, category, size, description, imagePath);
                 newCosplay.setSeriesName(series);
                 newCosplay.setRentRate1Day(rate1Day);
                 newCosplay.setRentRate2Days(rate2Days);
@@ -607,6 +698,7 @@ public class AdminController {
                 cosplay.setCategory(category);
                 cosplay.setSeriesName(series);
                 cosplay.setSize(size);
+                cosplay.setDescription(description);
                 cosplay.setImagePath(imagePath);
                 cosplay.setRentRate1Day(rate1Day);
                 cosplay.setRentRate2Days(rate2Days);
@@ -626,11 +718,12 @@ public class AdminController {
         
         content.getChildren().addAll(header, lblCategory, txtCategory, lblSeries, txtSeries, 
                                      lblCharacter, txtCharacter, lblSize, txtSize,
+                                     lblDescription, txtDescription,
                                      lblRentRates, ratesGrid, lblImagePath, imagePathBox, 
                                      lblAddOns, txtAddOns, btnBox);
         
         scrollPane.setContent(content);
-        Scene scene = new Scene(scrollPane, 500, 650);
+        Scene scene = new Scene(scrollPane, 500, 700);
         dialog.setScene(scene);
         dialog.show();
     }
@@ -768,5 +861,343 @@ public class AdminController {
     @FXML 
     public void goHome() { 
         SceneNavigator.navigate(Views.HOME); 
+    }
+    
+    // ===========================
+    // Event Banner Management
+    // ===========================
+    
+    private void loadEventBanners() {
+        List<EventBanner> banners = eventBannerDAO.getAll();
+        
+        cosplayListView.setVisible(true);
+        cosplayListView.setItems(null);
+        
+        cosplayListView.setCellFactory(lv -> new ListCell<Object>() {
+            @Override
+            protected void updateItem(Object item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setGraphic(null);
+                } else if (item instanceof EventBanner) {
+                    EventBanner banner = (EventBanner) item;
+                    HBox row = createEventBannerRow(banner);
+                    setGraphic(row);
+                } else {
+                    setGraphic(null);
+                }
+            }
+        });
+        
+        cosplayListView.setItems(FXCollections.observableArrayList(banners));
+        cosplayListView.setStyle("-fx-background-color: transparent; -fx-border-color: transparent;");
+    }
+    
+    private HBox createEventBannerRow(EventBanner banner) {
+        HBox row = new HBox(20);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setPadding(new Insets(15));
+        row.setStyle("-fx-border-color: #e0e0e0; -fx-border-width: 0 0 1 0; -fx-background-color: " + 
+                     (banner.isActive() ? "#f0f8ff" : "white") + ";");
+        
+        VBox detailsBox = new VBox(5);
+        detailsBox.setMinWidth(300);
+        
+        Label lblTitle = new Label(banner.getTitle());
+        lblTitle.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        
+        Label lblMessage = new Label(banner.getMessage());
+        lblMessage.setWrapText(true);
+        lblMessage.setMaxWidth(280);
+        lblMessage.setStyle("-fx-font-size: 12px; -fx-text-fill: #666;");
+        
+        detailsBox.getChildren().addAll(lblTitle, lblMessage);
+        
+        VBox statusBox = new VBox(5);
+        statusBox.setAlignment(Pos.CENTER_LEFT);
+        statusBox.setMinWidth(100);
+        
+        Label lblStatus = new Label(banner.isActive() ? "✓ Active" : "Inactive");
+        lblStatus.setStyle("-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: " + 
+                          (banner.isActive() ? "#4CAF50" : "#999") + ";");
+        
+        statusBox.getChildren().add(lblStatus);
+        
+        VBox colorBox = new VBox(5);
+        colorBox.setAlignment(Pos.CENTER_LEFT);
+        colorBox.setMinWidth(150);
+        
+        HBox colorPreview = new HBox(10);
+        colorPreview.setAlignment(Pos.CENTER_LEFT);
+        
+        Region bgColorSquare = new Region();
+        bgColorSquare.setPrefSize(30, 30);
+        bgColorSquare.setStyle("-fx-background-color: " + banner.getBackgroundColor() + "; -fx-border-color: #ccc;");
+        
+        Region txtColorSquare = new Region();
+        txtColorSquare.setPrefSize(30, 30);
+        txtColorSquare.setStyle("-fx-background-color: " + banner.getTextColor() + "; -fx-border-color: #ccc;");
+        
+        colorPreview.getChildren().addAll(bgColorSquare, txtColorSquare);
+        
+        Label lblColors = new Label("BG / Text");
+        lblColors.setStyle("-fx-font-size: 10px; -fx-text-fill: #888;");
+        
+        colorBox.getChildren().addAll(colorPreview, lblColors);
+        
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        
+        HBox buttonsBox = new HBox(10);
+        buttonsBox.setAlignment(Pos.CENTER_RIGHT);
+        
+        Button btnToggleActive = new Button(banner.isActive() ? "Deactivate" : "Activate");
+        btnToggleActive.setStyle("-fx-background-color: " + (banner.isActive() ? "#FF9800" : "#4CAF50") + 
+                                "; -fx-text-fill: white; -fx-background-radius: 15; -fx-cursor: hand; -fx-padding: 5 12; -fx-font-size: 11px;");
+        btnToggleActive.setOnAction(e -> toggleEventBannerActive(banner));
+        
+        Button btnEdit = new Button("✏ Edit");
+        btnEdit.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 15; -fx-cursor: hand; -fx-padding: 5 12; -fx-font-size: 11px;");
+        btnEdit.setOnAction(e -> editEventBanner(banner));
+        
+        Button btnDelete = new Button("🗑 Delete");
+        btnDelete.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-background-radius: 15; -fx-cursor: hand; -fx-padding: 5 12; -fx-font-size: 11px;");
+        btnDelete.setOnAction(e -> deleteEventBanner(banner));
+        
+        buttonsBox.getChildren().addAll(btnToggleActive, btnEdit, btnDelete);
+        
+        row.getChildren().addAll(detailsBox, statusBox, colorBox, spacer, buttonsBox);
+        return row;
+    }
+    
+    private void addEventBanner() {
+        showEventBannerDialog(null);
+    }
+    
+    private void editEventBanner(EventBanner banner) {
+        showEventBannerDialog(banner);
+    }
+    
+    private void deleteEventBanner(EventBanner banner) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Delete Event Banner");
+        confirm.setHeaderText("Delete \"" + banner.getTitle() + "\"?");
+        confirm.setContentText("This action cannot be undone.");
+        
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                if (eventBannerDAO.delete(banner.getId())) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Event banner deleted successfully!");
+                    loadEventBanners();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete event banner.");
+                }
+            }
+        });
+    }
+    
+    private void toggleEventBannerActive(EventBanner banner) {
+        if (eventBannerDAO.toggleActive(banner.getId())) {
+            loadEventBanners();
+        } else {
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to update banner status.");
+        }
+    }
+    
+    private void showEventBannerDialog(EventBanner banner) {
+        Stage dialog = new Stage();
+        dialog.setTitle(banner == null ? "Add Event Banner" : "Edit Event Banner");
+        
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: white;");
+        
+        VBox content = new VBox(15);
+        content.setPadding(new Insets(20));
+        content.setStyle("-fx-background-color: white;");
+        
+        HBox header = new HBox();
+        header.setAlignment(Pos.CENTER_LEFT);
+        Label title = new Label(banner == null ? "New Event Banner" : "Edit Event Banner");
+        title.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;");
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+        Button closeBtn = new Button("✕");
+        closeBtn.setStyle("-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-font-size: 18px; -fx-cursor: hand;");
+        closeBtn.setOnAction(e -> dialog.close());
+        header.getChildren().addAll(title, spacer, closeBtn);
+        
+        Label lblTitle = new Label("Banner Title");
+        lblTitle.setStyle("-fx-font-weight: bold;");
+        TextField txtTitle = new TextField(banner != null ? banner.getTitle() : "");
+        txtTitle.setPromptText("Enter banner title");
+        txtTitle.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Label lblMessage = new Label("Banner Message");
+        lblMessage.setStyle("-fx-font-weight: bold;");
+        TextArea txtMessage = new TextArea(banner != null ? banner.getMessage() : "");
+        txtMessage.setPromptText("Enter banner message");
+        txtMessage.setPrefRowCount(3);
+        txtMessage.setWrapText(true);
+        txtMessage.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Label lblBgColor = new Label("Background Color");
+        lblBgColor.setStyle("-fx-font-weight: bold;");
+        
+        HBox bgColorBox = new HBox(10);
+        bgColorBox.setAlignment(Pos.CENTER_LEFT);
+        
+        TextField txtBgColor = new TextField(banner != null ? banner.getBackgroundColor() : "#fff4ed");
+        txtBgColor.setPromptText("#fff4ed");
+        txtBgColor.setPrefWidth(150);
+        txtBgColor.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        ColorPicker bgColorPicker = new ColorPicker();
+        bgColorPicker.setValue(parseColor(banner != null ? banner.getBackgroundColor() : "#fff4ed"));
+        bgColorPicker.setOnAction(e -> {
+            Color color = bgColorPicker.getValue();
+            txtBgColor.setText(toHexString(color));
+        });
+        
+        txtBgColor.textProperty().addListener((obs, oldVal, newVal) -> {
+            try {
+                Color color = parseColor(newVal);
+                bgColorPicker.setValue(color);
+            } catch (Exception ignored) {}
+        });
+        
+        bgColorBox.getChildren().addAll(txtBgColor, bgColorPicker);
+        
+        Label lblTextColor = new Label("Text Color");
+        lblTextColor.setStyle("-fx-font-weight: bold;");
+        
+        HBox textColorBox = new HBox(10);
+        textColorBox.setAlignment(Pos.CENTER_LEFT);
+        
+        TextField txtTextColor = new TextField(banner != null ? banner.getTextColor() : "#d47f47");
+        txtTextColor.setPromptText("#d47f47");
+        txtTextColor.setPrefWidth(150);
+        txtTextColor.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        ColorPicker textColorPicker = new ColorPicker();
+        textColorPicker.setValue(parseColor(banner != null ? banner.getTextColor() : "#d47f47"));
+        textColorPicker.setOnAction(e -> {
+            Color color = textColorPicker.getValue();
+            txtTextColor.setText(toHexString(color));
+        });
+        
+        txtTextColor.textProperty().addListener((obs, oldVal, newVal) -> {
+            try {
+                Color color = parseColor(newVal);
+                textColorPicker.setValue(color);
+            } catch (Exception ignored) {}
+        });
+        
+        textColorBox.getChildren().addAll(txtTextColor, textColorPicker);
+        
+        CheckBox chkActive = new CheckBox("Set as Active Banner");
+        chkActive.setSelected(banner != null && banner.isActive());
+        chkActive.setStyle("-fx-font-size: 13px;");
+        
+        HBox buttonBox = new HBox(10);
+        buttonBox.setAlignment(Pos.CENTER);
+        buttonBox.setPadding(new Insets(10, 0, 0, 0));
+        
+        Button btnSave = new Button("Save");
+        btnSave.setStyle("-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 40; -fx-background-radius: 20; -fx-cursor: hand;");
+        btnSave.setOnAction(e -> {
+            String bannerTitle = txtTitle.getText().trim();
+            String bannerMessage = txtMessage.getText().trim();
+            
+            if (bannerTitle.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Validation", "Banner title is required.");
+                return;
+            }
+            
+            if (bannerMessage.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "Validation", "Banner message is required.");
+                return;
+            }
+            
+            if (banner == null) {
+                EventBanner newBanner = new EventBanner();
+                newBanner.setTitle(bannerTitle);
+                newBanner.setMessage(bannerMessage);
+                newBanner.setBackgroundColor(txtBgColor.getText().trim());
+                newBanner.setTextColor(txtTextColor.getText().trim());
+                newBanner.setActive(chkActive.isSelected());
+                
+                if (eventBannerDAO.save(newBanner)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Event banner created successfully!");
+                    loadEventBanners();
+                    dialog.close();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to create event banner.");
+                }
+            } else {
+                banner.setTitle(bannerTitle);
+                banner.setMessage(bannerMessage);
+                banner.setBackgroundColor(txtBgColor.getText().trim());
+                banner.setTextColor(txtTextColor.getText().trim());
+                banner.setActive(chkActive.isSelected());
+                
+                if (eventBannerDAO.save(banner)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Event banner updated successfully!");
+                    loadEventBanners();
+                    dialog.close();
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to update event banner.");
+                }
+            }
+        });
+        
+        Button btnCancel = new Button("Cancel");
+        btnCancel.setStyle("-fx-background-color: #ccc; -fx-text-fill: #333; -fx-font-size: 14px; -fx-padding: 10 40; -fx-background-radius: 20; -fx-cursor: hand;");
+        btnCancel.setOnAction(e -> dialog.close());
+        
+        buttonBox.getChildren().addAll(btnSave, btnCancel);
+        
+        content.getChildren().addAll(
+            header,
+            new Separator(),
+            lblTitle, txtTitle,
+            lblMessage, txtMessage,
+            lblBgColor, bgColorBox,
+            lblTextColor, textColorBox,
+            chkActive,
+            buttonBox
+        );
+        
+        scrollPane.setContent(content);
+        Scene scene = new Scene(scrollPane, 550, 600);
+        dialog.setScene(scene);
+        dialog.show();
+    }
+    
+    /**
+     * Parse a hex color string to JavaFX Color
+     */
+    private Color parseColor(String hexColor) {
+        try {
+            if (hexColor == null || hexColor.isEmpty()) {
+                return Color.web("#fff4ed");
+            }
+            if (!hexColor.startsWith("#")) {
+                hexColor = "#" + hexColor;
+            }
+            return Color.web(hexColor);
+        } catch (Exception e) {
+            return Color.web("#fff4ed");
+        }
+    }
+    
+    /**
+     * Convert JavaFX Color to hex string
+     */
+    private String toHexString(Color color) {
+        return String.format("#%02X%02X%02X",
+            (int) (color.getRed() * 255),
+            (int) (color.getGreen() * 255),
+            (int) (color.getBlue() * 255));
     }
 }

@@ -9,6 +9,7 @@ public class NavController {
 	@FXML private Button btnHome;
 	@FXML private Button btnCatalog;
 	@FXML private Button btnAbout;
+	@FXML private Button btnMessages;
 	@FXML private Button btnAdmin;
 	@FXML private Button btnLogout;
 
@@ -24,6 +25,7 @@ public class NavController {
 		btnHome.getStyleClass().remove("active");
 		btnCatalog.getStyleClass().remove("active");
 		btnAbout.getStyleClass().remove("active");
+		btnMessages.getStyleClass().remove("active");
 	}
 
 	public void setActive(Views view) {
@@ -32,6 +34,7 @@ public class NavController {
 			case HOME -> btnHome.getStyleClass().add("active");
 			case CATALOG -> btnCatalog.getStyleClass().add("active");
 			case ABOUT -> btnAbout.getStyleClass().add("active");
+			case MESSAGES -> btnMessages.getStyleClass().add("active");
 			case ADMIN -> btnAdmin.getStyleClass().add("active");
 			default -> {}
 		}
@@ -41,6 +44,7 @@ public class NavController {
 	@FXML private void goHome() { SceneNavigator.navigate(Views.HOME); }
 	@FXML private void goCatalog() { SceneNavigator.navigate(Views.CATALOG); }
 	@FXML private void goAbout() { SceneNavigator.navigate(Views.ABOUT); }
+	@FXML private void goMessages() { SceneNavigator.navigate(Views.MESSAGES); }
 	@FXML private void goAdmin() { SceneNavigator.navigate(Views.ADMIN); }
 
 	@FXML private void logout() {
@@ -52,6 +56,10 @@ public class NavController {
 		var user = com.cosplay.util.Session.getCurrentUser();
 		boolean isLoggedIn = user != null;
 		boolean isAdmin = isLoggedIn && "admin".equalsIgnoreCase(user.getRole());
+		if (btnMessages != null) {
+			btnMessages.setVisible(isLoggedIn);
+			btnMessages.setManaged(isLoggedIn);
+		}
 		if (btnAdmin != null) {
 			btnAdmin.setVisible(isAdmin);
 			btnAdmin.setManaged(isAdmin);

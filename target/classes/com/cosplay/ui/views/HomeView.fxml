@@ -17,33 +17,22 @@
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
 
     <!-- ========================== -->
-    <!-- Information Banner Section -->
+    <!-- Event Banner Section -->
     <!-- ========================== -->
-    <HBox spacing="20" alignment="CENTER" style="-fx-background-color: #fff4ed; -fx-padding: 15;" HBox.hgrow="ALWAYS">
-        <!-- Mode of Delivery -->
-        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-            <Label text="Mode of Delivery" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
-            <HBox spacing="5" alignment="CENTER">
-                <ImageView fx:id="jtLogo" fitHeight="20" fitWidth="40" preserveRatio="true"/>
-                <ImageView fx:id="lalamoveLogo" fitHeight="20" fitWidth="40" preserveRatio="true"/>
-                <ImageView fx:id="lbcLogo" fitHeight="20" fitWidth="40" preserveRatio="true"/>
-            </HBox>
+    <HBox fx:id="eventBanner" spacing="15" alignment="CENTER_LEFT" managed="false" visible="false"
+          style="-fx-background-color: #fff4ed; -fx-padding: 15 20; -fx-border-color: #d47f47; -fx-border-width: 0 0 2 0;">
+        
+        <VBox spacing="3" HBox.hgrow="ALWAYS">
+            <Label fx:id="eventBannerTitle" text="Event Title" 
+                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
+            <Label fx:id="eventBannerMessage" text="Event message goes here" 
+                   wrapText="true" maxWidth="1000"
+                   style="-fx-font-size: 14px; -fx-text-fill: #b05e2f;"/>
         </VBox>
-
-        <!-- Location -->
-        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-            <Label text="Location" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
-            <Label text="Santa Cruz, Laguna" style="-fx-font-size: 14px; -fx-text-fill: #b05e2f;"/>
-        </VBox>
-
-        <!-- Mode of Payment -->
-        <VBox alignment="CENTER" HBox.hgrow="ALWAYS">
-            <Label text="Mode of Payment" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
-            <HBox spacing="5" alignment="CENTER">
-                <ImageView fx:id="gcashLogo" fitHeight="20" fitWidth="40" preserveRatio="true"/>
-                <ImageView fx:id="mayaLogo" fitHeight="20" fitWidth="40" preserveRatio="true"/>
-            </HBox>
-        </VBox>
+        
+        <Button fx:id="btnDismissBanner" text="✕" 
+                style="-fx-background-color: transparent; -fx-text-fill: #d47f47; -fx-font-size: 16px; -fx-cursor: hand; -fx-padding: 5 10;"
+                onAction="#dismissBanner"/>
     </HBox>
 
     <!-- ========================== -->
