@@ -10,6 +10,7 @@ com\cosplay\dao\CosplayDAO.class
 com\cosplay\util\PasswordUtil.class
 com\cosplay\ui\controllers\AdminController$3.class
 com\cosplay\ui\controllers\NavController$1.class
+com\cosplay\util\AddEventBanner.class
 com\cosplay\util\GoogleOAuthUtil$GoogleUserInfo.class
 com\cosplay\model\Cosplay.class
 com\cosplay\util\EmailUtil$1.class

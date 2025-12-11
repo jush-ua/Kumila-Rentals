@@ -7,6 +7,7 @@ import com.cosplay.model.Rental;
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
+import com.cosplay.util.ImageCache;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -16,6 +17,7 @@ import javafx.geometry.Pos;
 import javafx.geometry.Insets;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
+import javafx.application.Platform;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.YearMonth;
@@ -28,25 +30,40 @@ public class CosplayDetailsController {
     @FXML private NavController navBarController;
     @FXML private ImageView cosplayImage;
     @FXML private Label lblCosplayName;
-    @FXML private Label lblSeriesName;
-    @FXML private Label lblCategory;
+    @FXML private Label lblCategoryTag;
     @FXML private Label lblSize;
-    @FXML private Label lblDescription;
-    @FXML private VBox inclusionsBox;
-    @FXML private Label lblRate1Day;
-    @FXML private Label lblRate2Days;
-    @FXML private Label lblRate3Days;
-    @FXML private Button btnRentNow;
+    @FXML private FlowPane inclusionsFlow;
     @FXML private GridPane calendarGrid;
     @FXML private Label lblCalendarMonth;
     @FXML private Button btnPrevMonth;
     @FXML private Button btnNextMonth;
+    @FXML private ImageView addonImage;
+    @FXML private Label lblAddonName;
+    @FXML private Label lblAddonSize;
+    @FXML private VBox addonDisplay;
+    @FXML private StackPane btnOrderQuote;
+    @FXML private StackPane btnOrderForm;
+    @FXML private Label lblQuoteIcon;
+    @FXML private Label lblFormIcon;
+    @FXML private GridPane detailsGrid;
+    @FXML private VBox leftColumn;
+    @FXML private VBox middleColumn;
+    @FXML private VBox rightColumn;
+    @FXML private Button btnImagePrev;
+    @FXML private Button btnImageNext;
+    @FXML private ScrollPane scroll;
+    @FXML private VBox contentRoot;
+    @FXML private VBox addonsSection;
     
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
     private static Cosplay selectedCosplay;
     private YearMonth currentMonth;
     private Set<LocalDate> bookedDates;
+    private int currentAddonIndex = 0;
+    private int currentImageIndex = 0;
+    private List<String> cosplayImages = new java.util.ArrayList<>();
+    // No baseline cache; we compute natural preferred size each time to avoid drift
     
     public static void setSelectedCosplay(Cosplay cosplay) {
         selectedCosplay = cosplay;
@@ -58,12 +75,89 @@ public class CosplayDetailsController {
             navBarController.setActive(Views.CATALOG);
         }
         
+        // Set button icons programmatically to avoid FXML $ character issue
+        if (lblQuoteIcon != null) {
+            lblQuoteIcon.setText("$");
+        }
+        if (lblFormIcon != null) {
+            lblFormIcon.setText("📋");
+        }
+        
         currentMonth = YearMonth.now();
+
+        // Responsive bindings
+        if (leftColumn != null && cosplayImage != null) {
+            cosplayImage.fitWidthProperty().bind(leftColumn.widthProperty().subtract(24));
+        }
+        if (middleColumn != null && inclusionsFlow != null) {
+            inclusionsFlow.prefWrapLengthProperty().bind(middleColumn.widthProperty().subtract(20));
+        }
+        
+        // Bind image height to viewport to prevent excessive size
+        if (scroll != null && cosplayImage != null) {
+            scroll.viewportBoundsProperty().addListener((obs, oldVal, viewport) -> {
+                if (viewport != null && viewport.getHeight() > 0) {
+                    // Set max height based on viewport - more aggressive for smaller windows
+                    double viewportHeight = viewport.getHeight();
+                    double maxHeight;
+                    if (viewportHeight < 700) {
+                        maxHeight = viewportHeight * 0.5 - 80; // 50% for small windows
+                    } else if (viewportHeight < 900) {
+                        maxHeight = viewportHeight * 0.6 - 100; // 60% for medium windows
+                    } else {
+                        maxHeight = viewportHeight * 0.7 - 120; // 70% for large windows
+                    }
+                    cosplayImage.setFitHeight(Math.max(250, maxHeight));
+                }
+            });
+        }
+        
+        // Add click handlers for custom buttons
+        if (btnOrderQuote != null) {
+            btnOrderQuote.setOnMouseClicked(event -> handleOrderQuote());
+        }
+        if (btnOrderForm != null) {
+            btnOrderForm.setOnMouseClicked(event -> handleOrderForm());
+        }
         
         if (selectedCosplay != null) {
             loadCosplayDetails(selectedCosplay);
             loadBookedDates();
             updateCalendar();
+        }
+
+        // Scene width listener for responsive stacking
+        if (detailsGrid.getScene() != null) {
+            attachWidthListener(detailsGrid.getScene());
+        } else {
+            // Defer until scene is available
+            detailsGrid.sceneProperty().addListener((obs, oldScene, newScene) -> {
+                if (newScene != null) {
+                    attachWidthListener(newScene);
+                }
+            });
+        }
+    }
+
+    private void attachWidthListener(Scene scene) {
+        updateResponsiveLayout(scene.getWidth());
+        scene.widthProperty().addListener((obs, oldW, newW) -> {
+            updateResponsiveLayout(newW.doubleValue());
+        });
+    }
+
+    private void updateResponsiveLayout(double width) {
+        if (rightColumn == null || middleColumn == null) return;
+        if (width < 900) {
+            // Stack right column below middle, full width
+            GridPane.setColumnIndex(rightColumn, 0);
+            GridPane.setRowIndex(rightColumn, 1);
+            GridPane.setColumnSpan(rightColumn, 3);
+        } else {
+            // Restore to third column
+            GridPane.setRowIndex(rightColumn, 0);
+            GridPane.setColumnIndex(rightColumn, 2);
+            GridPane.setColumnSpan(rightColumn, 1);
         }
     }
     
@@ -95,14 +189,20 @@ public class CosplayDetailsController {
     private void updateCalendar() {
         calendarGrid.getChildren().clear();
         
-        lblCalendarMonth.setText(currentMonth.getMonth().toString() + " " + currentMonth.getYear());
+        // Set grid alignment
+        calendarGrid.setAlignment(Pos.CENTER);
+        
+        // Format: "DEC 2025"
+        lblCalendarMonth.setText(currentMonth.getMonth().toString().substring(0, 3).toUpperCase() + " " + currentMonth.getYear());
         
         // Add day headers
-        String[] days = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
+        String[] days = {"Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"};
         for (int i = 0; i < days.length; i++) {
             Label dayLabel = new Label(days[i]);
-            dayLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #666;");
-            dayLabel.setMaxWidth(Double.MAX_VALUE);
+            dayLabel.getStyleClass().add("calendar-day");
+            dayLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #666; -fx-padding: 8 0;");
+            dayLabel.setMinWidth(35);
+            dayLabel.setMaxWidth(35);
             dayLabel.setAlignment(Pos.CENTER);
             calendarGrid.add(dayLabel, i, 0);
         }
@@ -119,8 +219,9 @@ public class CosplayDetailsController {
         for (int day = 1; day <= daysInMonth; day++) {
             LocalDate date = currentMonth.atDay(day);
             Label dayCell = new Label(String.valueOf(day));
-            dayCell.setPrefSize(40, 40);
-            dayCell.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            dayCell.getStyleClass().add("calendar-day");
+            dayCell.setMinSize(35, 35);
+            dayCell.setMaxSize(35, 35);
             dayCell.setAlignment(Pos.CENTER);
             
             // Style based on availability
@@ -129,13 +230,13 @@ public class CosplayDetailsController {
             boolean isToday = date.equals(LocalDate.now());
             
             if (isPast) {
-                dayCell.setStyle("-fx-background-color: #f0f0f0; -fx-text-fill: #ccc; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+                dayCell.setStyle("-fx-background-color: #f0f0f0; -fx-text-fill: #bbb;");
             } else if (isBooked) {
-                dayCell.setStyle("-fx-background-color: #ffcdd2; -fx-text-fill: #c62828; -fx-font-weight: bold; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+                dayCell.setStyle("-fx-background-color: #f5d99f; -fx-text-fill: #333; -fx-font-weight: bold; -fx-background-radius: 4;");
             } else if (isToday) {
-                dayCell.setStyle("-fx-background-color: #fff9c4; -fx-text-fill: #333; -fx-font-weight: bold; -fx-border-color: #fbc02d; -fx-border-width: 2;");
+                dayCell.setStyle("-fx-background-color: white; -fx-text-fill: #333; -fx-font-weight: bold; -fx-border-color: #f5d99f; -fx-border-width: 2; -fx-background-radius: 4;");
             } else {
-                dayCell.setStyle("-fx-background-color: #c8e6c9; -fx-text-fill: #2e7d32; -fx-border-color: #e0e0e0; -fx-border-width: 1;");
+                dayCell.setStyle("-fx-background-color: white; -fx-text-fill: #666;");
             }
             
             calendarGrid.add(dayCell, col, row);
@@ -149,89 +250,124 @@ public class CosplayDetailsController {
     }
     
     private void loadCosplayDetails(Cosplay cosplay) {
-        // Load image
+        // Parse multiple images from image_path (separated by newline or semicolon)
+        cosplayImages.clear();
+        currentImageIndex = 0;
+        
         if (cosplay.getImagePath() != null && !cosplay.getImagePath().isBlank()) {
-            try {
-                String imagePath = cosplay.getImagePath();
-                Image image = null;
-                
-                if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-                    image = new Image(imagePath, true);
-                } else {
-                    File imageFile = new File(imagePath);
-                    if (imageFile.exists()) {
-                        image = new Image(imageFile.toURI().toString());
-                    }
+            String[] paths = cosplay.getImagePath().split("[\n;]");
+            for (String path : paths) {
+                String trimmed = path.trim();
+                if (!trimmed.isEmpty()) {
+                    cosplayImages.add(trimmed);
                 }
-                
-                if (image != null && !image.isError()) {
-                    cosplayImage.setImage(image);
-                }
-            } catch (Exception e) {
-                System.err.println("Failed to load image: " + e.getMessage());
             }
+        }
+        
+        // Load first image if available
+        if (!cosplayImages.isEmpty()) {
+            loadImageAtIndex(0);
+        }
+        
+        // Show/hide navigation buttons based on number of images
+        if (btnImagePrev != null && btnImageNext != null) {
+            boolean hasMultipleImages = cosplayImages.size() > 1;
+            btnImagePrev.setVisible(hasMultipleImages);
+            btnImagePrev.setManaged(hasMultipleImages);
+            btnImageNext.setVisible(hasMultipleImages);
+            btnImageNext.setManaged(hasMultipleImages);
         }
         
         // Set text fields
         lblCosplayName.setText(cosplay.getName());
         
-        if (cosplay.getSeriesName() != null && !cosplay.getSeriesName().isBlank()) {
-            lblSeriesName.setText(cosplay.getSeriesName());
-            lblSeriesName.setVisible(true);
-        } else {
-            lblSeriesName.setVisible(false);
-        }
-        
+        // Set category tag
         if (cosplay.getCategory() != null && !cosplay.getCategory().isBlank()) {
-            lblCategory.setText("Category: " + cosplay.getCategory());
+            lblCategoryTag.setText(cosplay.getCategory());
         } else {
-            lblCategory.setText("Category: N/A");
+            lblCategoryTag.setText("Cosplay");
         }
         
+        // Set size
         if (cosplay.getSize() != null && !cosplay.getSize().isBlank()) {
-            lblSize.setText("Size: " + cosplay.getSize());
+            lblSize.setText(cosplay.getSize());
         } else {
-            lblSize.setText("Size: N/A");
+            lblSize.setText("One Size");
         }
         
-        if (cosplay.getDescription() != null && !cosplay.getDescription().isBlank()) {
-            lblDescription.setText(cosplay.getDescription());
-            lblDescription.setVisible(true);
-        } else {
-            lblDescription.setVisible(false);
-        }
-        
-        // Load inclusions/add-ons
-        inclusionsBox.getChildren().clear();
+        // Load inclusions as pills
+        inclusionsFlow.getChildren().clear();
         if (cosplay.getAddOns() != null && !cosplay.getAddOns().isBlank()) {
             String[] addOns = cosplay.getAddOns().split("\n");
             for (String addOn : addOns) {
                 if (!addOn.trim().isEmpty()) {
-                    Label addOnLabel = new Label("• " + addOn.trim());
-                    addOnLabel.setStyle("-fx-font-size: 13px; -fx-text-fill: #666;");
-                    inclusionsBox.getChildren().add(addOnLabel);
+                    Label pill = new Label(addOn.trim());
+                    pill.getStyleClass().add("pill");
+                    inclusionsFlow.getChildren().add(pill);
                 }
+            }
+        } else {
+            // Add default inclusions if none specified
+            String[] defaultInclusions = {"Complete Costume Set"};
+            for (String inclusion : defaultInclusions) {
+                Label pill = new Label(inclusion);
+                pill.getStyleClass().add("pill");
+                inclusionsFlow.getChildren().add(pill);
             }
         }
         
-        // Set rental rates
-        if (cosplay.getRentRate1Day() != null) {
-            lblRate1Day.setText(String.format("₱%.2f", cosplay.getRentRate1Day()));
-        } else {
-            lblRate1Day.setText("N/A");
+        // Show add-ons section only if add-ons are available
+        if (addonsSection != null) {
+            boolean hasAddOns = cosplay.getAddOns() != null && !cosplay.getAddOns().isBlank();
+            addonsSection.setVisible(hasAddOns);
+            addonsSection.setManaged(hasAddOns);
+            
+            // Initialize addon display if available
+            if (hasAddOns && lblAddonName != null) {
+                // Get first add-on to display
+                String[] addOns = cosplay.getAddOns().split("\n");
+                if (addOns.length > 0 && !addOns[0].trim().isEmpty()) {
+                    lblAddonName.setText(addOns[0].trim());
+                    lblAddonSize.setText("Available");
+                }
+            }
         }
+    }
+
+    private void loadImageAtIndex(int index) {
+        if (index < 0 || index >= cosplayImages.size()) return;
         
-        if (cosplay.getRentRate2Days() != null) {
-            lblRate2Days.setText(String.format("₱%.2f", cosplay.getRentRate2Days()));
-        } else {
-            lblRate2Days.setText("N/A");
+        try {
+            String imagePath = cosplayImages.get(index);
+            // Use ImageCache with background loading
+            Image image = ImageCache.getImage(imagePath, true);
+            
+            if (image != null && !image.isError()) {
+                cosplayImage.setImage(image);
+            }
+        } catch (Exception e) {
+            System.err.println("Failed to load image: " + e.getMessage());
         }
-        
-        if (cosplay.getRentRate3Days() != null) {
-            lblRate3Days.setText(String.format("₱%.2f", cosplay.getRentRate3Days()));
-        } else {
-            lblRate3Days.setText("N/A");
+    }
+
+    @FXML
+    private void handlePrevImage() {
+        if (cosplayImages.isEmpty()) return;
+        currentImageIndex--;
+        if (currentImageIndex < 0) {
+            currentImageIndex = cosplayImages.size() - 1; // Wrap to last image
         }
+        loadImageAtIndex(currentImageIndex);
+    }
+
+    @FXML
+    private void handleNextImage() {
+        if (cosplayImages.isEmpty()) return;
+        currentImageIndex++;
+        if (currentImageIndex >= cosplayImages.size()) {
+            currentImageIndex = 0; // Wrap to first image
+        }
+        loadImageAtIndex(currentImageIndex);
     }
     
     @FXML
@@ -239,6 +375,31 @@ public class CosplayDetailsController {
         if (selectedCosplay != null) {
             showRentalDialog(selectedCosplay);
         }
+    }
+    
+    @FXML
+    private void handleOrderQuote() {
+        // Show order quote dialog
+        showAlert(Alert.AlertType.INFORMATION, "Order Quote", "Please contact us for a rental quote.\nEmail: info@kumilarentals.com\nPhone: +63 123 456 7890");
+    }
+    
+    @FXML
+    private void handleOrderForm() {
+        if (selectedCosplay != null) {
+            showRentalDialog(selectedCosplay);
+        }
+    }
+    
+    @FXML
+    private void handlePrevAddon() {
+        // Navigate to previous addon (placeholder functionality)
+        showAlert(Alert.AlertType.INFORMATION, "Add-ons", "Previous add-on will be shown here.");
+    }
+    
+    @FXML
+    private void handleNextAddon() {
+        // Navigate to next addon (placeholder functionality)
+        showAlert(Alert.AlertType.INFORMATION, "Add-ons", "Next add-on will be shown here.");
     }
     
     @FXML

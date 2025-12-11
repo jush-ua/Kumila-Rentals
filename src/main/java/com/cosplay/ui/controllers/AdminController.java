@@ -1033,15 +1033,69 @@ public class AdminController {
         txtTitle.setPromptText("Enter banner title");
         txtTitle.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
         
-        Label lblMessage = new Label("Banner Message");
+        Label lblSubtitle = new Label("Subtitle");
+        lblSubtitle.setStyle("-fx-font-weight: bold;");
+        TextField txtSubtitle = new TextField(banner != null ? banner.getSubtitle() : "");
+        txtSubtitle.setPromptText("Enter subtitle (optional)");
+        txtSubtitle.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Label lblImage = new Label("Background Image");
+        lblImage.setStyle("-fx-font-weight: bold;");
+        HBox imageBox = new HBox(10);
+        imageBox.setAlignment(Pos.CENTER_LEFT);
+        TextField txtImagePath = new TextField(banner != null ? banner.getImagePath() : "");
+        txtImagePath.setPromptText("Image path or URL");
+        txtImagePath.setPrefWidth(300);
+        txtImagePath.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        Button btnBrowseImage = new Button("Browse...");
+        btnBrowseImage.setStyle("-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-padding: 8 15; -fx-background-radius: 5; -fx-cursor: hand;");
+        btnBrowseImage.setOnAction(e -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Select Banner Image");
+            fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.gif")
+            );
+            File selectedFile = fileChooser.showOpenDialog(dialog);
+            if (selectedFile != null) {
+                txtImagePath.setText(selectedFile.getAbsolutePath());
+            }
+        });
+        imageBox.getChildren().addAll(txtImagePath, btnBrowseImage);
+        
+        Separator sep1 = new Separator();
+        
+        Label lblEventDetails = new Label("Event Details (shown when clicked)");
+        lblEventDetails.setStyle("-fx-font-weight: bold; -fx-font-size: 15px; -fx-text-fill: #e6a84c;");
+        
+        Label lblEventName = new Label("Event Name");
+        lblEventName.setStyle("-fx-font-weight: bold;");
+        TextField txtEventName = new TextField(banner != null ? banner.getEventName() : "");
+        txtEventName.setPromptText("Enter event name");
+        txtEventName.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Label lblVenue = new Label("Venue");
+        lblVenue.setStyle("-fx-font-weight: bold;");
+        TextField txtVenue = new TextField(banner != null ? banner.getVenue() : "");
+        txtVenue.setPromptText("Enter venue");
+        txtVenue.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Label lblOnsiteDate = new Label("Onsite Rent Date");
+        lblOnsiteDate.setStyle("-fx-font-weight: bold;");
+        TextField txtOnsiteDate = new TextField(banner != null ? banner.getOnsiteRentDate() : "");
+        txtOnsiteDate.setPromptText("e.g., December 20-22, 2025");
+        txtOnsiteDate.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
+        
+        Separator sep2 = new Separator();
+        
+        Label lblMessage = new Label("Banner Message (legacy - optional)");
         lblMessage.setStyle("-fx-font-weight: bold;");
         TextArea txtMessage = new TextArea(banner != null ? banner.getMessage() : "");
         txtMessage.setPromptText("Enter banner message");
-        txtMessage.setPrefRowCount(3);
+        txtMessage.setPrefRowCount(2);
         txtMessage.setWrapText(true);
         txtMessage.setStyle("-fx-border-color: #e6a84c; -fx-border-radius: 5; -fx-padding: 8;");
         
-        Label lblBgColor = new Label("Background Color");
+        Label lblBgColor = new Label("Background Color (if no image)");
         lblBgColor.setStyle("-fx-font-weight: bold;");
         
         HBox bgColorBox = new HBox(10);
@@ -1099,6 +1153,11 @@ public class AdminController {
         chkActive.setSelected(banner != null && banner.isActive());
         chkActive.setStyle("-fx-font-size: 13px;");
         
+        content.getChildren().addAll(header, lblTitle, txtTitle, lblSubtitle, txtSubtitle, 
+            lblImage, imageBox, sep1, lblEventDetails, lblEventName, txtEventName, 
+            lblVenue, txtVenue, lblOnsiteDate, txtOnsiteDate, sep2,
+            lblMessage, txtMessage, lblBgColor, bgColorBox, lblTextColor, textColorBox, chkActive);
+        
         HBox buttonBox = new HBox(10);
         buttonBox.setAlignment(Pos.CENTER);
         buttonBox.setPadding(new Insets(10, 0, 0, 0));
@@ -1114,15 +1173,15 @@ public class AdminController {
                 return;
             }
             
-            if (bannerMessage.isEmpty()) {
-                showAlert(Alert.AlertType.WARNING, "Validation", "Banner message is required.");
-                return;
-            }
-            
             if (banner == null) {
                 EventBanner newBanner = new EventBanner();
                 newBanner.setTitle(bannerTitle);
-                newBanner.setMessage(bannerMessage);
+                newBanner.setMessage(bannerMessage.isEmpty() ? " " : bannerMessage);
+                newBanner.setSubtitle(txtSubtitle.getText().trim());
+                newBanner.setImagePath(txtImagePath.getText().trim());
+                newBanner.setEventName(txtEventName.getText().trim());
+                newBanner.setVenue(txtVenue.getText().trim());
+                newBanner.setOnsiteRentDate(txtOnsiteDate.getText().trim());
                 newBanner.setBackgroundColor(txtBgColor.getText().trim());
                 newBanner.setTextColor(txtTextColor.getText().trim());
                 newBanner.setActive(chkActive.isSelected());
@@ -1136,7 +1195,12 @@ public class AdminController {
                 }
             } else {
                 banner.setTitle(bannerTitle);
-                banner.setMessage(bannerMessage);
+                banner.setMessage(bannerMessage.isEmpty() ? " " : bannerMessage);
+                banner.setSubtitle(txtSubtitle.getText().trim());
+                banner.setImagePath(txtImagePath.getText().trim());
+                banner.setEventName(txtEventName.getText().trim());
+                banner.setVenue(txtVenue.getText().trim());
+                banner.setOnsiteRentDate(txtOnsiteDate.getText().trim());
                 banner.setBackgroundColor(txtBgColor.getText().trim());
                 banner.setTextColor(txtTextColor.getText().trim());
                 banner.setActive(chkActive.isSelected());
@@ -1156,20 +1220,10 @@ public class AdminController {
         btnCancel.setOnAction(e -> dialog.close());
         
         buttonBox.getChildren().addAll(btnSave, btnCancel);
-        
-        content.getChildren().addAll(
-            header,
-            new Separator(),
-            lblTitle, txtTitle,
-            lblMessage, txtMessage,
-            lblBgColor, bgColorBox,
-            lblTextColor, textColorBox,
-            chkActive,
-            buttonBox
-        );
+        content.getChildren().add(buttonBox);
         
         scrollPane.setContent(content);
-        Scene scene = new Scene(scrollPane, 550, 600);
+        Scene scene = new Scene(scrollPane, 550, 700);
         dialog.setScene(scene);
         dialog.show();
     }

@@ -56,7 +56,7 @@
                 <!-- Cards Grid -->
                 <HBox alignment="CENTER" style="-fx-padding: 5;">
                     <!-- Each card is a VBox with image and caption -->
-                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                    <VBox fx:id="set1Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
                         <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
                             <ImageView fx:id="set1Image" fitHeight="260" fitWidth="180" preserveRatio="false">
                                 <clip>
@@ -70,7 +70,7 @@
                         </HBox.margin>
                     </VBox>
 
-                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                    <VBox fx:id="set2Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
                         <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
                             <ImageView fx:id="set2Image" fitHeight="260" fitWidth="180" preserveRatio="false">
                                 <clip>
@@ -84,7 +84,7 @@
                         </HBox.margin>
                     </VBox>
 
-                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                    <VBox fx:id="set3Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
                         <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
                             <ImageView fx:id="set3Image" fitHeight="260" fitWidth="180" preserveRatio="false">
                                 <clip>
@@ -98,7 +98,7 @@
                         </HBox.margin>
                     </VBox>
 
-                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                    <VBox fx:id="set4Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
                         <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
                             <ImageView fx:id="set4Image" fitHeight="260" fitWidth="180" preserveRatio="false">
                                 <clip>

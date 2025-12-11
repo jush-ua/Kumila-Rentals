@@ -11,6 +11,7 @@ import com.cosplay.model.Rental;
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
+import com.cosplay.util.ImageCache;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -43,6 +44,9 @@ public class CatalogController {
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
     private java.util.List<Cosplay> allCosplays;
+    private java.util.List<Cosplay> filteredCosplays;
+    private static final int ITEMS_PER_PAGE = com.cosplay.util.PerformanceConfig.CATALOG_ITEMS_PER_PAGE;
+    private int currentlyLoaded = 0;
 
     @FXML
     private void initialize() {
@@ -105,10 +109,11 @@ public class CatalogController {
     
     private void filterAndSortCosplays() {
         cosplayGrid.getChildren().clear();
+        currentlyLoaded = 0;
         
         // Filter by category
         String selectedCategory = categoryComboBox.getValue();
-        java.util.List<Cosplay> filteredCosplays = new java.util.ArrayList<>(allCosplays);
+        filteredCosplays = new java.util.ArrayList<>(allCosplays);
         
         if (selectedCategory != null && !selectedCategory.equals("All Categories")) {
             if (selectedCategory.equals("Anime")) {
@@ -155,10 +160,34 @@ public class CatalogController {
             }
         }
         
-        // Display filtered and sorted cosplays
-        for (Cosplay cosplay : filteredCosplays) {
-            VBox card = createCosplayCard(cosplay);
+        // Load first batch
+        loadMoreCosplays();
+    }
+    
+    private void loadMoreCosplays() {
+        int toLoad = Math.min(ITEMS_PER_PAGE, filteredCosplays.size() - currentlyLoaded);
+        
+        for (int i = currentlyLoaded; i < currentlyLoaded + toLoad; i++) {
+            VBox card = createCosplayCard(filteredCosplays.get(i));
             cosplayGrid.getChildren().add(card);
+        }
+        
+        currentlyLoaded += toLoad;
+        
+        // Add "Load More" button if there are more items
+        if (currentlyLoaded < filteredCosplays.size()) {
+            Button loadMoreBtn = new Button("Load More (" + (filteredCosplays.size() - currentlyLoaded) + " remaining)");
+            loadMoreBtn.setStyle("-fx-background-color: #f79e6b; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 15 30; -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 14px;");
+            loadMoreBtn.setOnAction(e -> {
+                cosplayGrid.getChildren().remove(loadMoreBtn);
+                loadMoreCosplays();
+            });
+            
+            // Center the button
+            VBox buttonContainer = new VBox(loadMoreBtn);
+            buttonContainer.setAlignment(Pos.CENTER);
+            buttonContainer.setPrefWidth(200);
+            cosplayGrid.getChildren().add(buttonContainer);
         }
     }
     
@@ -204,7 +233,8 @@ public class CatalogController {
         ImageView imageView = new ImageView();
         imageView.setFitWidth(194);
         imageView.setFitHeight(254);
-        imageView.setPreserveRatio(false);
+        imageView.setPreserveRatio(false); // Fill the container completely
+        imageView.setSmooth(true); // Enable smooth scaling for high quality
         
         // Clip for rounded corners
         javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(194, 254);
@@ -217,20 +247,8 @@ public class CatalogController {
         if (cosplay.getImagePath() != null && !cosplay.getImagePath().isBlank()) {
             try {
                 String imagePath = cosplay.getImagePath();
-                Image image = null;
-                
-                // Check if it's a file path or URL
-                if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-                    image = new Image(imagePath, true);
-                } else {
-                    // It's a file path - use file:// protocol
-                    File imageFile = new File(imagePath);
-                    if (imageFile.exists()) {
-                        image = new Image(imageFile.toURI().toString());
-                    } else {
-                        System.err.println("Image file not found: " + imagePath);
-                    }
-                }
+                // Use ImageCache with exact dimensions to fill card (194x254) with high quality
+                Image image = ImageCache.getImageScaled(imagePath, 194, 254, true);
                 
                 if (image != null && !image.isError()) {
                     imageView.setImage(image);

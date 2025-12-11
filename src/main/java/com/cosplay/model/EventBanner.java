@@ -9,6 +9,11 @@ public class EventBanner {
     private String textColor;
     private String linkUrl;
     private String linkText;
+    private String imagePath;
+    private String subtitle;
+    private String eventName;
+    private String venue;
+    private String onsiteRentDate;
     
     public EventBanner() {
         this.isActive = false;
@@ -85,6 +90,46 @@ public class EventBanner {
     
     public void setLinkText(String linkText) {
         this.linkText = linkText;
+    }
+    
+    public String getImagePath() {
+        return imagePath;
+    }
+    
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
+    }
+    
+    public String getSubtitle() {
+        return subtitle;
+    }
+    
+    public void setSubtitle(String subtitle) {
+        this.subtitle = subtitle;
+    }
+    
+    public String getEventName() {
+        return eventName;
+    }
+    
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+    
+    public String getVenue() {
+        return venue;
+    }
+    
+    public void setVenue(String venue) {
+        this.venue = venue;
+    }
+    
+    public String getOnsiteRentDate() {
+        return onsiteRentDate;
+    }
+    
+    public void setOnsiteRentDate(String onsiteRentDate) {
+        this.onsiteRentDate = onsiteRentDate;
     }
     
     @Override

@@ -88,8 +88,8 @@ public class EventBannerDAO {
      * Insert a new banner
      */
     private boolean insert(EventBanner banner) {
-        String sql = "INSERT INTO event_banners (title, message, is_active, background_color, text_color, link_url, link_text) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO event_banners (title, message, is_active, background_color, text_color, link_url, link_text, image_path, subtitle, event_name, venue, onsite_rent_date) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
         try (Connection conn = Database.connect();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -106,6 +106,11 @@ public class EventBannerDAO {
             pstmt.setString(5, banner.getTextColor());
             pstmt.setString(6, banner.getLinkUrl());
             pstmt.setString(7, banner.getLinkText());
+            pstmt.setString(8, banner.getImagePath());
+            pstmt.setString(9, banner.getSubtitle());
+            pstmt.setString(10, banner.getEventName());
+            pstmt.setString(11, banner.getVenue());
+            pstmt.setString(12, banner.getOnsiteRentDate());
             
             pstmt.executeUpdate();
             return true;
@@ -120,7 +125,8 @@ public class EventBannerDAO {
      */
     private boolean update(EventBanner banner) {
         String sql = "UPDATE event_banners SET title = ?, message = ?, is_active = ?, " +
-                     "background_color = ?, text_color = ?, link_url = ?, link_text = ? " +
+                     "background_color = ?, text_color = ?, link_url = ?, link_text = ?, " +
+                     "image_path = ?, subtitle = ?, event_name = ?, venue = ?, onsite_rent_date = ? " +
                      "WHERE id = ?";
         
         try (Connection conn = Database.connect();
@@ -138,7 +144,12 @@ public class EventBannerDAO {
             pstmt.setString(5, banner.getTextColor());
             pstmt.setString(6, banner.getLinkUrl());
             pstmt.setString(7, banner.getLinkText());
-            pstmt.setInt(8, banner.getId());
+            pstmt.setString(8, banner.getImagePath());
+            pstmt.setString(9, banner.getSubtitle());
+            pstmt.setString(10, banner.getEventName());
+            pstmt.setString(11, banner.getVenue());
+            pstmt.setString(12, banner.getOnsiteRentDate());
+            pstmt.setInt(13, banner.getId());
             
             pstmt.executeUpdate();
             return true;
@@ -223,6 +234,11 @@ public class EventBannerDAO {
         banner.setTextColor(rs.getString("text_color"));
         banner.setLinkUrl(rs.getString("link_url"));
         banner.setLinkText(rs.getString("link_text"));
+        banner.setImagePath(rs.getString("image_path"));
+        banner.setSubtitle(rs.getString("subtitle"));
+        banner.setEventName(rs.getString("event_name"));
+        banner.setVenue(rs.getString("venue"));
+        banner.setOnsiteRentDate(rs.getString("onsite_rent_date"));
         return banner;
     }
 }

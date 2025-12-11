@@ -34,6 +34,8 @@ public class Launcher extends Application {
             if (callbackServer != null) {
                 callbackServer.stop();
             }
+            // Close database connection pool
+            Database.close();
         });
     }
 

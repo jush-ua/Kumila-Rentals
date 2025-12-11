@@ -43,6 +43,53 @@
     -fx-text-fill: #e89b6d;
     -fx-padding: 0 20 0 0;
 }
+
+/* Cosplay Details Enhancements */
+.pill {
+    -fx-background-color: white;
+    -fx-border-color: #f5d99f;
+    -fx-border-width: 2;
+    -fx-border-radius: 20;
+    -fx-background-radius: 20;
+    -fx-padding: 8 16;
+    -fx-font-size: 13px;
+    -fx-text-fill: #444;
+}
+
+.section-card {
+    -fx-border-color: #f5d99f;
+    -fx-border-width: 3;
+    -fx-border-radius: 16;
+    -fx-background-color: white;
+    -fx-padding: 20;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+    -fx-background-color: #f5d99f;
+    -fx-padding: 8 14;
+    -fx-background-radius: 20;
+}
+
+.primary-tile {
+    -fx-background-color: #f5d99f;
+    -fx-background-radius: 18;
+    -fx-padding: 28 36;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.12), 12, 0, 0, 3);
+}
+
+.primary-tile:hover {
+    -fx-background-color: #f4d082;
+}
+
+.calendar-day {
+    -fx-pref-width: 32px;
+    -fx-pref-height: 28px;
+    -fx-alignment: center;
+    -fx-font-size: 11px;
+}
 /* Nav bar buttons */
 .nav-button {
     -fx-background-color: transparent;

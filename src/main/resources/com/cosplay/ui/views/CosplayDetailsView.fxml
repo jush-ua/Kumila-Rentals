@@ -5,135 +5,128 @@
 <?import javafx.geometry.Insets?>
 
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="com.cosplay.ui.controllers.CosplayDetailsController"
-      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #f5f5f5;"
-      minWidth="800" minHeight="600">
+    fx:controller="com.cosplay.ui.controllers.CosplayDetailsController"
+    spacing="0">
     
     <!-- Navigation Bar -->
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
     
     <!-- Main Content Area -->
-    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: #f5f5f5;">
-        <VBox spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+    <ScrollPane fx:id="scroll" fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: white;" pannable="false">
+        <VBox fx:id="contentRoot" spacing="20" style="-fx-padding: 30 30; -fx-background-color: white;">
             
-            <!-- Back Button -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button text="← Back to Catalog" onAction="#goBack" 
-                        style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-font-size: 14px; -fx-cursor: hand; -fx-underline: true;"/>
-            </HBox>
-            
-            <!-- Main Content Container -->
-            <HBox spacing="30" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 10;">
+            <!-- Responsive Three Column Layout -->
+            <GridPane fx:id="detailsGrid" hgap="30" vgap="15">
+                <columnConstraints>
+                    <!-- Left: 32%, Middle: 40%, Right: 28% -->
+                    <ColumnConstraints percentWidth="32" hgrow="SOMETIMES" />
+                    <ColumnConstraints percentWidth="40" hgrow="ALWAYS" />
+                    <ColumnConstraints percentWidth="28" hgrow="SOMETIMES" />
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints vgrow="ALWAYS" />
+                </rowConstraints>
                 
-                <!-- Left Side - Image -->
-                <VBox spacing="10" alignment="TOP_CENTER" style="-fx-min-width: 400; -fx-max-width: 400;">
-                    <ImageView fx:id="cosplayImage" fitWidth="380" fitHeight="450" preserveRatio="true"
-                               style="-fx-background-color: #f0f0f0; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.15), 10, 0, 0, 3);"/>
+                <!-- Left Column - Image with Category Tag -->
+                <VBox fx:id="leftColumn" spacing="18" GridPane.columnIndex="0">
+                    <!-- Category Tag -->
+                    <Label fx:id="lblCategoryTag" text="Mobile Legends: Bang Bang" 
+                           style="-fx-background-color: #f5d99f; -fx-text-fill: #333; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 22; -fx-background-radius: 24;"/>
+                    
+                    <!-- Cosplay Image with Rounded Border -->
+                    <StackPane style="-fx-background-color: #f5d99f; -fx-background-radius: 24; -fx-padding: 14;">
+                        <ImageView fx:id="cosplayImage" preserveRatio="true" fitWidth="420" fitHeight="500" />
+                        <!-- Overlay carousel arrows -->
+                        <Button fx:id="btnImagePrev" text="◀" onAction="#handlePrevImage"
+                                style="-fx-background-color: rgba(0,0,0,0.2); -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 4 10;" StackPane.alignment="CENTER_LEFT" />
+                        <Button fx:id="btnImageNext" text="▶" onAction="#handleNextImage"
+                                style="-fx-background-color: rgba(0,0,0,0.2); -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 4 10;" StackPane.alignment="CENTER_RIGHT" />
+                    </StackPane>
                 </VBox>
                 
-                <!-- Right Side - Details -->
-                <VBox spacing="15" HBox.hgrow="ALWAYS" style="-fx-min-width: 350;">
+                <!-- Middle Column - Product Details -->
+                <VBox fx:id="middleColumn" spacing="20" GridPane.columnIndex="1">
                     
-                    <!-- Title Section -->
-                    <VBox spacing="5">
-                        <Label fx:id="lblCosplayName" text="Cosplay Name" 
-                               style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <Label fx:id="lblSeriesName" text="Series Name" 
-                               style="-fx-font-size: 16px; -fx-text-fill: #888; -fx-font-style: italic;"/>
-                    </VBox>
+                    <!-- Product Title -->
+                    <Label fx:id="lblCosplayName" text="Angela Floral Elf Skin" 
+                           style="-fx-font-size: 34px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
                     
-                    <Separator/>
+                    <!-- Size Info -->
+                    <Label fx:id="lblSize" text="Medium" 
+                        style="-fx-font-size: 16px; -fx-text-fill: #333; -fx-background-color: white; -fx-border-color: #f5d99f; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 20;"/>
                     
-                    <!-- Basic Info -->
-                    <VBox spacing="8">
-                        <Label fx:id="lblCategory" text="Category: N/A" 
-                               style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-                        <Label fx:id="lblSize" text="Size: N/A" 
-                               style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-                    </VBox>
-                    
-                    <!-- Inclusions -->
-                    <VBox spacing="5">
+                    <!-- Inclusions Section -->
+                    <VBox spacing="15">
                         <Label text="Inclusions" 
-                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <FlowPane fx:id="inclusionsPillsBox" hgap="8" vgap="8" style="-fx-padding: 5 0;"/>
+                               style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                        <FlowPane fx:id="inclusionsFlow" hgap="10" vgap="10" prefWrapLength="560"/>
                     </VBox>
                     
-                    <Separator/>
+                    <!-- Action Buttons -->
+                    <HBox spacing="20" style="-fx-padding: 20 0 0 0;">
+                        <StackPane fx:id="btnOrderQuote" styleClass="primary-tile">
+                            <VBox spacing="10" alignment="CENTER">
+                                <Label fx:id="lblQuoteIcon" style="-fx-font-size: 56px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                                <Label text="Order Quote" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            </VBox>
+                        </StackPane>
+                        
+                        <StackPane fx:id="btnOrderForm" styleClass="primary-tile">
+                            <VBox spacing="10" alignment="CENTER">
+                                <Label fx:id="lblFormIcon" style="-fx-font-size: 48px; -fx-text-fill: white; -fx-font-weight: bold;"/>
+                                <Label text="Order Form" style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                            </VBox>
+                        </StackPane>
+                    </HBox>
                     
-                    <!-- Rental Rates -->
-                    <VBox spacing="10">
-                        <Label text="Rental Rates" 
-                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <GridPane hgap="20" vgap="10">
-                            <Label text="1 Day:" GridPane.columnIndex="0" GridPane.rowIndex="0"
-                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
-                            <Label fx:id="lblRate1Day" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="0"
-                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
-                            
-                            <Label text="2 Days:" GridPane.columnIndex="0" GridPane.rowIndex="1"
-                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
-                            <Label fx:id="lblRate2Days" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="1"
-                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
-                            
-                            <Label text="3 Days:" GridPane.columnIndex="0" GridPane.rowIndex="2"
-                                   style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
-                            <Label fx:id="lblRate3Days" text="₱0.00" GridPane.columnIndex="1" GridPane.rowIndex="2"
-                                   style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;"/>
-                        </GridPane>
-                    </VBox>
+                </VBox>
+                
+                <!-- Right Column - Reserved Dates & Add-ons -->
+                <VBox fx:id="rightColumn" spacing="30" GridPane.columnIndex="2">
                     
-                    <Separator/>
-                    
-                    <!-- Availability Calendar -->
-                    <VBox spacing="10">
-                        <Label text="Availability Calendar" 
-                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <Label text="Check available dates for rental" 
-                               style="-fx-font-size: 12px; -fx-text-fill: #888; -fx-font-style: italic;"/>
+                    <!-- Reserved Dates Section -->
+                    <VBox spacing="15" styleClass="section-card">
+                        <Label text="Reserved Dates" styleClass="section-title"/>
                         
                         <!-- Calendar Controls -->
                         <HBox spacing="10" alignment="CENTER">
                             <Button fx:id="btnPrevMonth" text="◀" onAction="#handlePrevMonth"
-                                    style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
-                            <Label fx:id="lblCalendarMonth" text="Month Year" HBox.hgrow="ALWAYS" alignment="CENTER"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
+                            <Label fx:id="lblCalendarMonth" text="DEC 2025" HBox.hgrow="ALWAYS" alignment="CENTER"
                                    style="-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
                             <Button fx:id="btnNextMonth" text="▶" onAction="#handleNextMonth"
-                                    style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-padding: 5 15; -fx-background-radius: 5; -fx-cursor: hand;"/>
+                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
                         </HBox>
                         
                         <!-- Calendar Grid -->
-                        <GridPane fx:id="calendarGrid" hgap="2" vgap="2" alignment="CENTER"
-                                  style="-fx-background-color: #e0e0e0; -fx-padding: 5; -fx-background-radius: 5;">
-                        </GridPane>
+                        <GridPane fx:id="calendarGrid" hgap="2" vgap="2" alignment="CENTER"/>
+                    </VBox>
+                    
+                    <!-- Add-ons Section -->
+                    <VBox fx:id="addonsSection" spacing="15" styleClass="section-card">
+                        <Label text="ADD ONS" styleClass="section-title"/>
                         
-                        <!-- Legend -->
-                        <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
-                            <HBox spacing="5" alignment="CENTER">
-                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #c8e6c9;"/>
-                                <Label text="Available" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                            </HBox>
-                            <HBox spacing="5" alignment="CENTER">
-                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #ffcdd2;"/>
-                                <Label text="Booked" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                            </HBox>
-                            <HBox spacing="5" alignment="CENTER">
-                                <Label text="■" style="-fx-font-size: 16px; -fx-text-fill: #fff9c4;"/>
-                                <Label text="Today" style="-fx-font-size: 11px; -fx-text-fill: #666;"/>
-                            </HBox>
+                        <!-- Add-ons Carousel Container -->
+                        <HBox spacing="12" alignment="CENTER">
+                            <Button text="◀" onAction="#handlePrevAddon"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
+                            
+                            <VBox fx:id="addonDisplay" spacing="10" HBox.hgrow="ALWAYS" alignment="CENTER">
+                                <ImageView fx:id="addonImage" fitWidth="180" fitHeight="180" preserveRatio="true"/>
+                                <Label fx:id="lblAddonName" text="Petticoat" 
+                                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                                <Label fx:id="lblAddonSize" text="Fits S-L" 
+                                       style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
+                            </VBox>
+                            
+                            <Button text="▶" onAction="#handleNextAddon"
+                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
                         </HBox>
                     </VBox>
                     
-                    <!-- Spacer -->
-                    <Region VBox.vgrow="ALWAYS"/>
-                    
-                    <!-- Rent Now Button -->
-                    <Button fx:id="btnRentNow" text="Rent Now" onAction="#handleRentNow" maxWidth="Infinity"
-                            style="-fx-background-color: #e6a84c; -fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: bold; -fx-padding: 15; -fx-background-radius: 8; -fx-cursor: hand;"/>
-                    
                 </VBox>
                 
-            </HBox>
+            </GridPane>
             
         </VBox>
     </ScrollPane>

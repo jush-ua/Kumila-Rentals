@@ -1,15 +1,41 @@
 package com.cosplay.util;
 
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
 public class Database {
     private static final String URL = "jdbc:sqlite:cosplay.db";
+    private static HikariDataSource dataSource;
+
+    static {
+        // Initialize connection pool
+        HikariConfig config = new HikariConfig();
+        config.setJdbcUrl(URL);
+        config.setMaximumPoolSize(10); // Limit concurrent connections for SQLite
+        config.setMinimumIdle(2);
+        config.setConnectionTimeout(30000);
+        config.setIdleTimeout(600000);
+        config.setMaxLifetime(1800000);
+        
+        // SQLite specific optimizations
+        config.addDataSourceProperty("cachePrepStmts", "true");
+        config.addDataSourceProperty("prepStmtCacheSize", "250");
+        config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        
+        dataSource = new HikariDataSource(config);
+    }
 
     public static Connection connect() throws SQLException {
-        return DriverManager.getConnection(URL);
+        return dataSource.getConnection();
+    }
+    
+    public static void close() {
+        if (dataSource != null && !dataSource.isClosed()) {
+            dataSource.close();
+        }
     }
 
     // Called at app startup to create tables if they don't exist
@@ -74,7 +100,12 @@ public class Database {
             "background_color TEXT DEFAULT '#fff4ed'," +
             "text_color TEXT DEFAULT '#d47f47'," +
             "link_url TEXT," +
-            "link_text TEXT" +
+            "link_text TEXT," +
+            "image_path TEXT," +
+            "subtitle TEXT," +
+            "event_name TEXT," +
+            "venue TEXT," +
+            "onsite_rent_date TEXT" +
             ");";
 
         String createMessages =
@@ -158,6 +189,23 @@ public class Database {
             } catch (SQLException ignored) { }
             try {
                 stmt.executeUpdate("ALTER TABLE cosplays ADD COLUMN add_ons TEXT");
+            } catch (SQLException ignored) { }
+
+            // Add new columns to event_banners table if they don't exist
+            try {
+                stmt.executeUpdate("ALTER TABLE event_banners ADD COLUMN image_path TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE event_banners ADD COLUMN subtitle TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE event_banners ADD COLUMN event_name TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE event_banners ADD COLUMN venue TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE event_banners ADD COLUMN onsite_rent_date TEXT");
             } catch (SQLException ignored) { }
 
             // Seed a default admin account (username: admin, password: admin)
