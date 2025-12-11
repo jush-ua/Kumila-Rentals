@@ -6,11 +6,11 @@
 <HBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
 	  fx:controller="com.cosplay.ui.controllers.NavController"
 	  spacing="20" alignment="CENTER_LEFT"
-	  style="-fx-padding: 15; -fx-background-color: #fffaf5; -fx-border-color: #f5c7a9;">
+	  style="-fx-padding: 15 35; -fx-background-color: white; -fx-border-width: 0 0 2 0; -fx-border-color: #f79e6b;">
 	<!-- Left: Logo and Brand Name -->
 	<HBox spacing="10" alignment="CENTER_LEFT">
-		<ImageView fitHeight="40" fitWidth="40" fx:id="logoImage" />
-		<Label text="Kumila Rentals" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
+		<ImageView fitHeight="35" fitWidth="35" fx:id="logoImage" preserveRatio="true" />
+		<Label text="Kumila Rentals" styleClass="label-title"/>
 	</HBox>
 
 	<!-- Spacer to push nav items right -->

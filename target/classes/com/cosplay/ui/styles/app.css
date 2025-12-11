@@ -37,15 +37,21 @@
     -fx-alignment: center;
 }
 
+.label-title {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #e89b6d;
+    -fx-padding: 0 20 0 0;
+}
 /* Nav bar buttons */
 .nav-button {
     -fx-background-color: transparent;
     background-color: transparent;
-    -fx-text-fill: #d47f47;
+    -fx-text-fill: #e89b6d;
     -fx-font-family: 'Segoe UI', sans-serif;
     -fx-font-size: 14px;
-    -fx-font-weight: normal;
-    font-weight: normal;
+    -fx-font-weight: bold;
+    font-weight: bold;
     -fx-padding: 10 20 10 20;
     -fx-background-radius: 20;
     -fx-cursor: hand;
@@ -58,11 +64,9 @@
 }
 
 .nav-button.active {
-    -fx-background-color: #f5c7a9;
-    background-color: #f5c7a9;
+    -fx-background-color: #e89b6d;
+    background-color: #e89b6d;
     -fx-text-fill: white;
-    -fx-font-weight: bold;
-    font-weight: bold;
     -fx-background-radius: 20;
 }
 
@@ -195,6 +199,23 @@
     -fx-border-width: 2;
 }
 
+.combo-box .list-cell {
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.combo-box-popup .list-view {
+    -fx-background-color: white;
+    -fx-border-color: #e89b6d;
+    -fx-border-width: 2;
+    -fx-border-radius: 8;
+    -fx-background-radius: 8;
+}
+
+.combo-box-popup .list-view .list-cell:hover {
+    -fx-background-color: #fef5ee;
+}
+
 /* ScrollPane styles */
 .scroll-pane {
     -fx-background-color: transparent;
@@ -265,7 +286,7 @@
 
 .list-view .list-cell {
     -fx-background-color: transparent;
-    -fx-padding: 0;
+    -fx-padding: 10 0;
 }
 
 .list-view .list-cell:hover {

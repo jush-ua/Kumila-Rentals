@@ -1,47 +1,168 @@
 package com.cosplay.ui.controllers;
 
-import com.cosplay.ui.SceneNavigator;
-import com.cosplay.ui.Views;
+import java.io.File;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+
 import com.cosplay.dao.CosplayDAO;
 import com.cosplay.dao.RentalDAO;
 import com.cosplay.model.Cosplay;
 import com.cosplay.model.Rental;
+import com.cosplay.ui.SceneNavigator;
+import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
+
 import javafx.fxml.FXML;
-import javafx.scene.layout.FlowPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.Region;
-import javafx.scene.control.*;
-import javafx.scene.image.ImageView;
-import javafx.scene.image.Image;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.geometry.Pos;
 import javafx.geometry.Insets;
-import java.io.File;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class CatalogController {
     // Included NavBar controller (from fx:include with fx:id="navBar")
     @FXML private NavController navBarController;
     @FXML private FlowPane cosplayGrid;
+    @FXML private ComboBox<String> categoryComboBox;
+    @FXML private ComboBox<String> sortByComboBox;
     
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
+    private java.util.List<Cosplay> allCosplays;
 
     @FXML
     private void initialize() {
         if (navBarController != null) {
             navBarController.setActive(Views.CATALOG);
         }
+        
+        // Initialize dropdowns
+        setupCategoryComboBox();
+        setupSortByComboBox();
+        
         loadCosplays();
     }
     
+    private void setupCategoryComboBox() {
+        categoryComboBox.getItems().add("All Categories");
+        
+        // Add subcategories (series) grouped by main category
+        var cosplays = cosplayDAO.getAll();
+        java.util.Set<String> animeSeriesSet = new java.util.LinkedHashSet<>();
+        java.util.Set<String> gameSeriesSet = new java.util.LinkedHashSet<>();
+        
+        for (Cosplay cosplay : cosplays) {
+            if (cosplay.getSeriesName() != null && !cosplay.getSeriesName().isBlank()) {
+                String mainCategory = cosplay.getCategory();
+                if ("Anime".equalsIgnoreCase(mainCategory)) {
+                    animeSeriesSet.add("  ▸ " + cosplay.getSeriesName());
+                } else if ("Game".equalsIgnoreCase(mainCategory)) {
+                    gameSeriesSet.add("  ▸ " + cosplay.getSeriesName());
+                }
+            }
+        }
+        
+        // Add Anime category and its subcategories
+        categoryComboBox.getItems().add("Anime");
+        for (String series : animeSeriesSet) {
+            categoryComboBox.getItems().add(series);
+        }
+        
+        // Add Game category and its subcategories
+        categoryComboBox.getItems().add("Game");
+        for (String series : gameSeriesSet) {
+            categoryComboBox.getItems().add(series);
+        }
+        
+        categoryComboBox.setValue("All Categories");
+        categoryComboBox.setOnAction(e -> filterAndSortCosplays());
+    }
+    
+    private void setupSortByComboBox() {
+        sortByComboBox.getItems().addAll("Default", "Name (A-Z)", "Name (Z-A)", "Price (Low to High)", "Price (High to Low)");
+        sortByComboBox.setValue("Default");
+        sortByComboBox.setOnAction(e -> filterAndSortCosplays());
+    }
+    
     private void loadCosplays() {
+        allCosplays = cosplayDAO.getAll();
+        filterAndSortCosplays();
+    }
+    
+    private void filterAndSortCosplays() {
+        cosplayGrid.getChildren().clear();
+        
+        // Filter by category
+        String selectedCategory = categoryComboBox.getValue();
+        java.util.List<Cosplay> filteredCosplays = new java.util.ArrayList<>(allCosplays);
+        
+        if (selectedCategory != null && !selectedCategory.equals("All Categories")) {
+            if (selectedCategory.equals("Anime")) {
+                filteredCosplays = filteredCosplays.stream()
+                    .filter(c -> "Anime".equalsIgnoreCase(c.getCategory()))
+                    .collect(java.util.stream.Collectors.toList());
+            } else if (selectedCategory.equals("Game")) {
+                filteredCosplays = filteredCosplays.stream()
+                    .filter(c -> "Game".equalsIgnoreCase(c.getCategory()))
+                    .collect(java.util.stream.Collectors.toList());
+            } else if (selectedCategory.startsWith("  ▸ ")) {
+                // Subcategory (series name)
+                String seriesName = selectedCategory.substring(4); // Remove "  ▸ "
+                filteredCosplays = filteredCosplays.stream()
+                    .filter(c -> seriesName.equals(c.getSeriesName()))
+                    .collect(java.util.stream.Collectors.toList());
+            }
+        }
+        
+        // Sort
+        String sortBy = sortByComboBox.getValue();
+        if (sortBy != null) {
+            switch (sortBy) {
+                case "Name (A-Z)":
+                    filteredCosplays.sort((a, b) -> a.getName().compareToIgnoreCase(b.getName()));
+                    break;
+                case "Name (Z-A)":
+                    filteredCosplays.sort((a, b) -> b.getName().compareToIgnoreCase(a.getName()));
+                    break;
+                case "Price (Low to High)":
+                    filteredCosplays.sort((a, b) -> {
+                        Double priceA = a.getRentRate1Day() != null ? a.getRentRate1Day() : Double.MAX_VALUE;
+                        Double priceB = b.getRentRate1Day() != null ? b.getRentRate1Day() : Double.MAX_VALUE;
+                        return priceA.compareTo(priceB);
+                    });
+                    break;
+                case "Price (High to Low)":
+                    filteredCosplays.sort((a, b) -> {
+                        Double priceA = a.getRentRate1Day() != null ? a.getRentRate1Day() : 0.0;
+                        Double priceB = b.getRentRate1Day() != null ? b.getRentRate1Day() : 0.0;
+                        return priceB.compareTo(priceA);
+                    });
+                    break;
+            }
+        }
+        
+        // Display filtered and sorted cosplays
+        for (Cosplay cosplay : filteredCosplays) {
+            VBox card = createCosplayCard(cosplay);
+            cosplayGrid.getChildren().add(card);
+        }
+    }
+    
+    private void loadCosplaysOld() {
         cosplayGrid.getChildren().clear();
         var cosplays = cosplayDAO.getAll();
         
@@ -52,10 +173,11 @@ public class CatalogController {
     }
     
     private VBox createCosplayCard(Cosplay cosplay) {
-        VBox card = new VBox(10);
-        card.setAlignment(Pos.CENTER);
-        card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2); -fx-cursor: hand;");
+        VBox card = new VBox(0);
+        card.setAlignment(Pos.TOP_CENTER);
+        card.setStyle("-fx-background-color: transparent; -fx-cursor: hand;");
         card.setPrefWidth(200);
+        card.setMaxWidth(200);
         
         // Make the entire card clickable to view details
         card.setOnMouseClicked(e -> {
@@ -63,16 +185,32 @@ public class CatalogController {
             SceneNavigator.navigate(Views.COSPLAY_DETAILS);
         });
         
-        // Add hover effect
-        card.setOnMouseEntered(e -> card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 8, 0, 0, 3); -fx-cursor: hand;"));
-        card.setOnMouseExited(e -> card.setStyle("-fx-padding: 15; -fx-background-color: white; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2); -fx-cursor: hand;"));
+        // Title label at the top with rounded top corners
+        Label nameLabel = new Label(cosplay.getName());
+        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: #f79e6b; -fx-padding: 10 15; -fx-background-radius: 15 15 0 0; -fx-text-fill: #333;");
+        nameLabel.setWrapText(true);
+        nameLabel.setMaxWidth(200);
+        nameLabel.setAlignment(Pos.CENTER);
+        nameLabel.setPrefWidth(200);
+        card.getChildren().add(nameLabel);
+        
+        // Image container with rounded bottom corners and border
+        javafx.scene.layout.StackPane imageContainer = new javafx.scene.layout.StackPane();
+        imageContainer.setPrefSize(200, 260);
+        imageContainer.setMaxSize(200, 260);
+        imageContainer.setStyle("-fx-background-color: white; -fx-background-radius: 0 0 15 15; -fx-border-color: #f79e6b; -fx-border-width: 3; -fx-border-radius: 0 0 15 15; -fx-effect: dropshadow(gaussian, rgba(247, 158, 107, 0.5), 10, 0.5, 0, 0);");
         
         // Image
         ImageView imageView = new ImageView();
-        imageView.setFitWidth(180);
-        imageView.setFitHeight(180);
-        imageView.setPreserveRatio(true);
-        imageView.setStyle("-fx-background-color: #f0f0f0;");
+        imageView.setFitWidth(194);
+        imageView.setFitHeight(254);
+        imageView.setPreserveRatio(false);
+        
+        // Clip for rounded corners
+        javafx.scene.shape.Rectangle clip = new javafx.scene.shape.Rectangle(194, 254);
+        clip.setArcWidth(0);
+        clip.setArcHeight(0);
+        imageView.setClip(clip);
         
         boolean imageLoaded = false;
         
@@ -105,64 +243,16 @@ public class CatalogController {
             }
         }
         
-        // If no image loaded, show placeholder text
+        // If no image loaded, show placeholder
         if (!imageLoaded) {
-            // Create a placeholder with text
-            javafx.scene.layout.StackPane placeholder = new javafx.scene.layout.StackPane();
-            placeholder.setPrefSize(180, 180);
-            placeholder.setStyle("-fx-background-color: #f0f0f0; -fx-border-color: #ddd; -fx-border-width: 1;");
             javafx.scene.control.Label placeholderText = new javafx.scene.control.Label("No Image");
             placeholderText.setStyle("-fx-text-fill: #999; -fx-font-size: 12px;");
-            placeholder.getChildren().add(placeholderText);
-            card.getChildren().add(placeholder);
+            imageContainer.getChildren().add(placeholderText);
         } else {
-            card.getChildren().add(imageView);
+            imageContainer.getChildren().add(imageView);
         }
         
-        // Name
-        Label nameLabel = new Label(cosplay.getName());
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        nameLabel.setWrapText(true);
-        nameLabel.setMaxWidth(180);
-        
-        if (!imageLoaded) {
-            // Already added placeholder above
-        }
-        
-        card.getChildren().add(nameLabel);
-        
-        // Series Name
-        if (cosplay.getSeriesName() != null && !cosplay.getSeriesName().isBlank()) {
-            Label seriesLabel = new Label(cosplay.getSeriesName());
-            seriesLabel.setStyle("-fx-text-fill: #888; -fx-font-size: 11px; -fx-font-style: italic;");
-            card.getChildren().add(seriesLabel);
-        }
-        
-        // Category
-        if (cosplay.getCategory() != null && !cosplay.getCategory().isBlank()) {
-            Label categoryLabel = new Label(cosplay.getCategory());
-            categoryLabel.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
-            card.getChildren().add(categoryLabel);
-        }
-        
-        // Size
-        if (cosplay.getSize() != null && !cosplay.getSize().isBlank()) {
-            Label sizeLabel = new Label("Size: " + cosplay.getSize());
-            sizeLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888;");
-            card.getChildren().add(sizeLabel);
-        }
-        
-        // Rent Rate (show 1 day rate if available)
-        if (cosplay.getRentRate1Day() != null) {
-            Label priceLabel = new Label(String.format("₱%.2f/day", cosplay.getRentRate1Day()));
-            priceLabel.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #e6a84c;");
-            card.getChildren().add(priceLabel);
-        }
-        
-        // View Details label
-        Label viewDetailsLabel = new Label("Click to view details");
-        viewDetailsLabel.setStyle("-fx-font-size: 11px; -fx-text-fill: #888; -fx-font-style: italic;");
-        card.getChildren().add(viewDetailsLabel);
+        card.getChildren().add(imageContainer);
         
         return card;
     }

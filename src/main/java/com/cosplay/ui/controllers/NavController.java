@@ -2,8 +2,11 @@ package com.cosplay.ui.controllers;
 
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 
 public class NavController {
 	@FXML private Button btnHome;
@@ -12,9 +15,18 @@ public class NavController {
 	@FXML private Button btnMessages;
 	@FXML private Button btnAdmin;
 	@FXML private Button btnLogout;
+	@FXML private ImageView logoImage;
 
 	@FXML
 	private void initialize() {
+		// Load logo
+		try {
+			Image logo = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/logo.PNG"));
+			logoImage.setImage(logo);
+		} catch (Exception e) {
+			System.err.println("Failed to load logo: " + e.getMessage());
+		}
+		
 		// Ensure base class is applied once when loaded (FXML already sets it)
 		// Active highlight will be set by parent controller via setActive(...)
 		clearActive();

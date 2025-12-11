@@ -6,12 +6,21 @@
       spacing="12" alignment="TOP_LEFT" style="-fx-padding: 20;"
       minWidth="600" minHeight="400">
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
-    <Label text="Catalog" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    <Label text="Browse all available cosplays for rent." styleClass="muted"/>
+    
+    <!-- Filter Section -->
+    <HBox spacing="15" alignment="CENTER_LEFT" style="-fx-padding: 10 5;">
+        <Label text="Category:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+        <ComboBox fx:id="categoryComboBox" promptText="All Categories" 
+                  style="-fx-background-color: transparent; -fx-border-color: #f79e6b; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+        
+        <Region prefWidth="10"/>
+        
+        <Label text="Sort By:" style="-fx-font-weight: bold; -fx-font-size: 14px;"/>
+        <ComboBox fx:id="sortByComboBox" promptText="Default" 
+                  style="-fx-background-color: transparent; -fx-border-color: #f79e6b; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 5 15; -fx-font-weight: bold; -fx-font-size: 13px;"/>
+    </HBox>
     
     <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
         <FlowPane fx:id="cosplayGrid" hgap="20" vgap="20" style="-fx-padding: 10;" alignment="TOP_LEFT"/>
     </ScrollPane>
-    
-    <Button text="Back to Home" onAction="#goHome" minWidth="120"/>
 </VBox>

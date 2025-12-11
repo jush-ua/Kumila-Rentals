@@ -6,64 +6,115 @@
 <!-- Root container: vertical layout for all sections -->
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.HomeController"
-      spacing="10" alignment="TOP_CENTER" style="-fx-background-color: #FFF;"
+      spacing="0" alignment="TOP_CENTER" style="-fx-background-color: #FFF;"
       minWidth="600" minHeight="400">
 
     <!-- ========================== -->
-    <!-- Navigation Bar (Top Menu) -->
+    <!-- Navigation Bar (Top Menu) - Sticky -->
     <!-- ========================== -->
-
-
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
 
     <!-- ========================== -->
-    <!-- Event Banner Section -->
+    <!-- Scrollable Content Area -->
     <!-- ========================== -->
-    <HBox fx:id="eventBanner" spacing="15" alignment="CENTER_LEFT" managed="false" visible="false"
-          style="-fx-background-color: #fff4ed; -fx-padding: 15 20; -fx-border-color: #d47f47; -fx-border-width: 0 0 2 0;">
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" 
+                style="-fx-background-color: #FFF; -fx-background: #FFF;"
+                hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+        <VBox spacing="20" alignment="TOP_CENTER" style="-fx-background-color: #FFF;">
+            
+            <!-- ========================== -->
+            <!-- Hero Banner Section -->
+            <!-- ========================== -->
+            <VBox alignment="CENTER" style="-fx-background-color: #FFF; -fx-padding: 30 40 10 40;">
+                <StackPane fx:id="heroBanner" managed="true" visible="true" 
+                           prefHeight="180" minHeight="180" maxHeight="180" prefWidth="600" minWidth="600" maxWidth="600"
+                           style="-fx-background-color: linear-gradient(to right, #e89f77 0%, #db8e6a 50%, #e89f77 100%); -fx-padding: 15 40; -fx-background-radius: 15; -fx-border-radius: 20;">
+                    
+                    <!-- Decorative background elements -->
+                    <VBox alignment="CENTER" spacing="5">
+                        <!-- Decorative cats and stars would go here - using labels as placeholders -->
+                        <Label text="✧  ₍ᐢ._.ᐢ₎  ✧     ₍ᐢ._.ᐢ₎  ✧" 
+                               style="-fx-font-size: 32px; -fx-text-fill: rgba(255, 255, 255, 0.3); -fx-padding: 0;"/>
+                        <Label fx:id="heroBannerTitle" text="" 
+                               wrapText="true" alignment="CENTER" maxWidth="800"
+                               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 5 20;"/>
+                        <Label fx:id="heroBannerMessage" text="" 
+                               wrapText="true" alignment="CENTER" maxWidth="800"
+                               style="-fx-font-size: 14px; -fx-text-fill: white; -fx-padding: 0 20;"/>
+                        <Label text="✦  ✧  ·  ✧  ✦" 
+                               style="-fx-font-size: 24px; -fx-text-fill: rgba(255, 255, 255, 0.3); -fx-padding: 5 0 0 0;"/>
+                    </VBox>
+                </StackPane>
+            </VBox>
+
+            <!-- ========================== -->
+            <!-- Featured Sets Section -->
+            <!-- ========================== -->
+            <VBox alignment="TOP_CENTER" spacing="20" style="-fx-background-color: #f79e6b; -fx-padding: 30 40;" VBox.vgrow="ALWAYS" minHeight="500">
+                <Label text="Featured Sets" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+                <!-- Cards Grid -->
+                <HBox alignment="CENTER" style="-fx-padding: 5;">
+                    <!-- Each card is a VBox with image and caption -->
+                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set1Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set1Title" text="Featured #1" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set2Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set2Title" text="Featured #2" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10" right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set3Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set3Title" text="Featured #3" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10" right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: transparent;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set4Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set4Title" text="Featured #4" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10"/>
+                        </HBox.margin>
+                    </VBox>
+                </HBox>
+            </VBox>
         
-        <VBox spacing="3" HBox.hgrow="ALWAYS">
-            <Label fx:id="eventBannerTitle" text="Event Title" 
-                   style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
-            <Label fx:id="eventBannerMessage" text="Event message goes here" 
-                   wrapText="true" maxWidth="1000"
-                   style="-fx-font-size: 14px; -fx-text-fill: #b05e2f;"/>
         </VBox>
-        
-        <Button fx:id="btnDismissBanner" text="✕" 
-                style="-fx-background-color: transparent; -fx-text-fill: #d47f47; -fx-font-size: 16px; -fx-cursor: hand; -fx-padding: 5 10;"
-                onAction="#dismissBanner"/>
-    </HBox>
-
-    <!-- ========================== -->
-    <!-- Featured Sets Section -->
-    <!-- ========================== -->
-    <VBox alignment="CENTER" spacing="10" style="-fx-background-color: #f5c7a9; -fx-padding: 20;" VBox.vgrow="ALWAYS">
-        <Label text="Featured Sets" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-
-        <!-- Cards Grid -->
-        <HBox spacing="15" alignment="CENTER" HBox.hgrow="ALWAYS" style="-fx-padding: 10;">
-            <!-- Each card is a VBox with image and caption -->
-            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;" HBox.hgrow="ALWAYS" maxWidth="250" minWidth="150">
-                <ImageView fx:id="set1Image" fitHeight="180" fitWidth="120" preserveRatio="true"/>
-                <Label fx:id="set1Title" text="Featured #1" style="-fx-text-fill: #d47f47; -fx-font-weight: bold;" wrapText="true" maxWidth="200" alignment="CENTER"/>
-            </VBox>
-
-            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;" HBox.hgrow="ALWAYS" maxWidth="250" minWidth="150">
-                <ImageView fx:id="set2Image" fitHeight="180" fitWidth="120" preserveRatio="true"/>
-                <Label fx:id="set2Title" text="Featured #2" style="-fx-text-fill: #d47f47; -fx-font-weight: bold;" wrapText="true" maxWidth="200" alignment="CENTER"/>
-            </VBox>
-
-            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;" HBox.hgrow="ALWAYS" maxWidth="250" minWidth="150">
-                <ImageView fx:id="set3Image" fitHeight="180" fitWidth="120" preserveRatio="true"/>
-                <Label fx:id="set3Title" text="Featured #3" style="-fx-text-fill: #d47f47; -fx-font-weight: bold;" wrapText="true" maxWidth="200" alignment="CENTER"/>
-            </VBox>
-
-            <VBox alignment="CENTER" spacing="5" style="-fx-background-color: white; -fx-padding: 10; -fx-border-radius: 10; -fx-background-radius: 10;" HBox.hgrow="ALWAYS" maxWidth="250" minWidth="150">
-                <ImageView fx:id="set4Image" fitHeight="180" fitWidth="120" preserveRatio="true"/>
-                <Label fx:id="set4Title" text="Featured #4" style="-fx-text-fill: #d47f47; -fx-font-weight: bold;" wrapText="true" maxWidth="200" alignment="CENTER"/>
-            </VBox>
-        </HBox>
-    </VBox>
+    </ScrollPane>
 
 </VBox>

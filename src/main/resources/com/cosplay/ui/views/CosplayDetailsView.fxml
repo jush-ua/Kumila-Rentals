@@ -52,23 +52,11 @@
                                style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
                     </VBox>
                     
-                    <!-- Description -->
-                    <VBox spacing="5">
-                        <Label text="Description" 
-                               style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <Label fx:id="lblDescription" text="No description available" wrapText="true"
-                               style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
-                    </VBox>
-                    
-                    <Separator/>
-                    
                     <!-- Inclusions -->
-                    <VBox spacing="8">
+                    <VBox spacing="5">
                         <Label text="Inclusions" 
                                style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                        <VBox fx:id="inclusionsBox" spacing="5">
-                            <!-- Add-ons will be dynamically added here -->
-                        </VBox>
+                        <FlowPane fx:id="inclusionsPillsBox" hgap="8" vgap="8" style="-fx-padding: 5 0;"/>
                     </VBox>
                     
                     <Separator/>
