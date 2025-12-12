@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.AboutController"
-      spacing="12" alignment="TOP_LEFT" style="-fx-padding: 20;">
+      spacing="0" alignment="TOP_CENTER" style="-fx-background-color: #FFF;">
   <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
-    <Label text="About Us" style="-fx-font-size: 20px; -fx-font-weight: bold;"/>
-    <Label text="This is a blueprint placeholder for the About screen." styleClass="muted"/>
-    <Button text="Back to Home" onAction="#goHome"/>
+  
+  <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: #FFF; -fx-background: #FFF;" hbarPolicy="NEVER">
+    <VBox spacing="30" alignment="TOP_CENTER" style="-fx-padding: 50 80;">
+      
+      <!-- Header Section -->
+      <VBox spacing="12" alignment="CENTER" style="-fx-padding: 0 0 20 0;">
+        <Label text="About Kumila Rentals" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #F7A84C;"/>
+        <Label text="Your premier destination for cosplay costume rentals" 
+               style="-fx-font-size: 16px; -fx-text-fill: #7F8C8D;" wrapText="true" alignment="CENTER"/>
+      </VBox>
+      
+      <!-- Content Cards -->
+      <VBox spacing="25" maxWidth="800">
+        
+        <!-- Mission Card -->
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);">
+          <Label text="Our Mission" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #E89530;"/>
+          <Label text="At Kumila Rentals, we're passionate about making cosplay accessible to everyone. Whether you're attending your first convention or you're a seasoned cosplayer, we provide high-quality costume rentals that bring your favorite characters to life." 
+                 wrapText="true" style="-fx-font-size: 15px; -fx-text-fill: #555; -fx-line-spacing: 4px;"/>
+        </VBox>
+        
+        <!-- Services Card -->
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);">
+          <Label text="What We Offer" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #E89530;"/>
+          <VBox spacing="10">
+            <Label text="• Wide selection of anime, game, and movie character costumes" 
+                   style="-fx-font-size: 15px; -fx-text-fill: #555;"/>
+            <Label text="• Flexible rental periods to suit your event schedule" 
+                   style="-fx-font-size: 15px; -fx-text-fill: #555;"/>
+            <Label text="• Professional cleaning and maintenance of all costumes" 
+                   style="-fx-font-size: 15px; -fx-text-fill: #555;"/>
+            <Label text="• Featured sets showcasing popular and seasonal costumes" 
+                   style="-fx-font-size: 15px; -fx-text-fill: #555;"/>
+          </VBox>
+        </VBox>
+        
+        <!-- Contact Card -->
+        <VBox spacing="12" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 10, 0, 0, 2);">
+          <Label text="Get in Touch" style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #E89530;"/>
+          <Label text="Have questions? Our team is here to help you find the perfect costume for your next event. Feel free to reach out through our messaging system or visit our catalog to browse our collection." 
+                 wrapText="true" style="-fx-font-size: 15px; -fx-text-fill: #555; -fx-line-spacing: 4px;"/>
+          <HBox spacing="15" alignment="CENTER" style="-fx-padding: 10 0 0 0;">
+            <Button text="Browse Catalog" onAction="#goHome" 
+                    style="-fx-background-color: #F7A84C; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 600; -fx-padding: 12 30; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 1);"/>
+          </HBox>
+        </VBox>
+        
+      </VBox>
+      
+    </VBox>
+  </ScrollPane>
 </VBox>

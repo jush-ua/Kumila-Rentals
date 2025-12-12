@@ -7,6 +7,7 @@ import com.cosplay.model.Rental;
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
+import com.cosplay.util.StyledAlert;
 import com.cosplay.util.ImageCache;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
@@ -37,10 +38,7 @@ public class CosplayDetailsController {
     @FXML private Label lblCalendarMonth;
     @FXML private Button btnPrevMonth;
     @FXML private Button btnNextMonth;
-    @FXML private ImageView addonImage;
-    @FXML private Label lblAddonName;
-    @FXML private Label lblAddonSize;
-    @FXML private VBox addonDisplay;
+
     @FXML private StackPane btnOrderQuote;
     @FXML private StackPane btnOrderForm;
     @FXML private Label lblQuoteIcon;
@@ -53,14 +51,12 @@ public class CosplayDetailsController {
     @FXML private Button btnImageNext;
     @FXML private ScrollPane scroll;
     @FXML private VBox contentRoot;
-    @FXML private VBox addonsSection;
     
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
     private static Cosplay selectedCosplay;
     private YearMonth currentMonth;
     private Set<LocalDate> bookedDates;
-    private int currentAddonIndex = 0;
     private int currentImageIndex = 0;
     private List<String> cosplayImages = new java.util.ArrayList<>();
     // No baseline cache; we compute natural preferred size each time to avoid drift
@@ -85,31 +81,15 @@ public class CosplayDetailsController {
         
         currentMonth = YearMonth.now();
 
-        // Responsive bindings
+        // Responsive bindings - limit image size while preserving aspect ratio
         if (leftColumn != null && cosplayImage != null) {
-            cosplayImage.fitWidthProperty().bind(leftColumn.widthProperty().subtract(24));
+            cosplayImage.fitWidthProperty().bind(leftColumn.widthProperty().subtract(28));
+            // Set max height to prevent images from being too tall, preserveRatio handles orientation
+            cosplayImage.setPreserveRatio(true);
+            cosplayImage.setFitHeight(600);
         }
         if (middleColumn != null && inclusionsFlow != null) {
             inclusionsFlow.prefWrapLengthProperty().bind(middleColumn.widthProperty().subtract(20));
-        }
-        
-        // Bind image height to viewport to prevent excessive size
-        if (scroll != null && cosplayImage != null) {
-            scroll.viewportBoundsProperty().addListener((obs, oldVal, viewport) -> {
-                if (viewport != null && viewport.getHeight() > 0) {
-                    // Set max height based on viewport - more aggressive for smaller windows
-                    double viewportHeight = viewport.getHeight();
-                    double maxHeight;
-                    if (viewportHeight < 700) {
-                        maxHeight = viewportHeight * 0.5 - 80; // 50% for small windows
-                    } else if (viewportHeight < 900) {
-                        maxHeight = viewportHeight * 0.6 - 100; // 60% for medium windows
-                    } else {
-                        maxHeight = viewportHeight * 0.7 - 120; // 70% for large windows
-                    }
-                    cosplayImage.setFitHeight(Math.max(250, maxHeight));
-                }
-            });
         }
         
         // Add click handlers for custom buttons
@@ -295,43 +275,48 @@ public class CosplayDetailsController {
             lblSize.setText("One Size");
         }
         
-        // Load inclusions as pills
+        // Load inclusions as pills from description
+        inclusionsFlow.getChildren().clear();
+        // Load inclusions as pills from add-ons
         inclusionsFlow.getChildren().clear();
         if (cosplay.getAddOns() != null && !cosplay.getAddOns().isBlank()) {
             String[] addOns = cosplay.getAddOns().split("\n");
             for (String addOn : addOns) {
-                if (!addOn.trim().isEmpty()) {
-                    Label pill = new Label(addOn.trim());
+                String trimmed = addOn.trim();
+                if (!trimmed.isEmpty()) {
+                    Label pill = new Label(toTitleCase(trimmed));
                     pill.getStyleClass().add("pill");
                     inclusionsFlow.getChildren().add(pill);
                 }
             }
         } else {
-            // Add default inclusions if none specified
-            String[] defaultInclusions = {"Complete Costume Set"};
-            for (String inclusion : defaultInclusions) {
-                Label pill = new Label(inclusion);
-                pill.getStyleClass().add("pill");
-                inclusionsFlow.getChildren().add(pill);
-            }
+            // Add default inclusion if no add-ons specified
+            Label pill = new Label("Complete Costume Set");
+            pill.getStyleClass().add("pill");
+            inclusionsFlow.getChildren().add(pill);
         }
+    }
+    
+    private String toTitleCase(String text) {
+        if (text == null || text.isEmpty()) return text;
         
-        // Show add-ons section only if add-ons are available
-        if (addonsSection != null) {
-            boolean hasAddOns = cosplay.getAddOns() != null && !cosplay.getAddOns().isBlank();
-            addonsSection.setVisible(hasAddOns);
-            addonsSection.setManaged(hasAddOns);
-            
-            // Initialize addon display if available
-            if (hasAddOns && lblAddonName != null) {
-                // Get first add-on to display
-                String[] addOns = cosplay.getAddOns().split("\n");
-                if (addOns.length > 0 && !addOns[0].trim().isEmpty()) {
-                    lblAddonName.setText(addOns[0].trim());
-                    lblAddonSize.setText("Available");
+        String[] words = text.split("\\s+");
+        StringBuilder titleCase = new StringBuilder();
+        
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            if (!word.isEmpty()) {
+                titleCase.append(Character.toUpperCase(word.charAt(0)));
+                if (word.length() > 1) {
+                    titleCase.append(word.substring(1).toLowerCase());
+                }
+                if (i < words.length - 1) {
+                    titleCase.append(" ");
                 }
             }
         }
+        
+        return titleCase.toString();
     }
 
     private void loadImageAtIndex(int index) {
@@ -344,6 +329,8 @@ public class CosplayDetailsController {
             
             if (image != null && !image.isError()) {
                 cosplayImage.setImage(image);
+                // Preserve ratio is already set, fitWidth and fitHeight constraints will handle sizing
+                cosplayImage.setPreserveRatio(true);
             }
         } catch (Exception e) {
             System.err.println("Failed to load image: " + e.getMessage());
@@ -663,6 +650,11 @@ public class CosplayDetailsController {
             else if (rbOnsite.isSelected()) deliveryMode = "Onsite";
             else if (rbOthers.isSelected()) deliveryMode = "Others";
             
+            // Get selected rent days
+            int rentDays = 1;
+            if (rb2Days.isSelected()) rentDays = 2;
+            else if (rb3Days.isSelected()) rentDays = 3;
+            
             // Create rental
             Rental rental = new Rental();
             rental.setCosplayId(cosplay.getId());
@@ -672,8 +664,12 @@ public class CosplayDetailsController {
             rental.setFacebookLink(txtFacebook.getText().trim());
             rental.setStartDate(start);
             rental.setEndDate(end);
+            rental.setRentDays(rentDays);
+            rental.setCustomerAddOns(txtAddOns.getText().trim());
             rental.setPaymentMethod(deliveryMode);
             rental.setProofOfPayment(uploadedFiles[2] != null ? uploadedFiles[2] : "");
+            rental.setSelfiePhoto(uploadedFiles[0] != null ? uploadedFiles[0] : "");
+            rental.setIdPhoto(uploadedFiles[1] != null ? uploadedFiles[1] : "");
             rental.setStatus("Pending");
             
             boolean success = rentalDAO.createRental(rental);
@@ -734,10 +730,21 @@ public class CosplayDetailsController {
     }
     
     private void showAlert(Alert.AlertType type, String title, String message) {
-        Alert alert = new Alert(type);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+        Alert alert;
+        switch (type) {
+            case ERROR:
+                alert = StyledAlert.createError(title, message);
+                break;
+            case WARNING:
+                alert = StyledAlert.createWarning(title, message);
+                break;
+            case CONFIRMATION:
+                alert = StyledAlert.createConfirmation(title, null, message);
+                break;
+            default:
+                alert = StyledAlert.createInfo(title, message);
+                break;
+        }
         alert.show();
     }
 }

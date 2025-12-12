@@ -12,71 +12,95 @@
     <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
 
     <!-- Main Content Area -->
-    <VBox VBox.vgrow="ALWAYS" spacing="20" style="-fx-padding: 30;">
+    <VBox VBox.vgrow="ALWAYS" spacing="0" style="-fx-padding: 0;">
         
-        <!-- Header -->
-        <HBox alignment="CENTER_LEFT" spacing="15">
-            <Label text="Messages" style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: #d47f47;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Label fx:id="lblUnreadCount" text="0 unread" style="-fx-font-size: 14px; -fx-text-fill: #666;"/>
-        </HBox>
-
-        <!-- User View: Send Message Form -->
-        <VBox fx:id="userMessageSection" spacing="15" style="-fx-background-color: #f9f9f9; -fx-padding: 20; -fx-border-radius: 8; -fx-background-radius: 8;">
-            <Label text="Send a Message to Admin" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+        <!-- ========== USER VIEW: Chat with Admin ========== -->
+        <VBox fx:id="userChatSection" VBox.vgrow="ALWAYS" spacing="0" style="-fx-background-color: #f5f5f5;">
             
-            <VBox spacing="8">
-                <Label text="Subject:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
-                <TextField fx:id="txtSubject" promptText="Enter message subject" style="-fx-font-size: 14px;"/>
-            </VBox>
-            
-            <VBox spacing="8">
-                <Label text="Message:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
-                <TextArea fx:id="txtMessage" promptText="Enter your message here..." 
-                          wrapText="true" prefRowCount="6" style="-fx-font-size: 14px;"/>
-            </VBox>
-            
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Button fx:id="btnSendMessage" text="Send Message" onAction="#sendMessage"
-                        style="-fx-background-color: #d47f47; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 25; -fx-cursor: hand;"/>
-                <Label fx:id="lblSendStatus" text="" style="-fx-text-fill: #4CAF50; -fx-font-size: 13px;"/>
-            </HBox>
-        </VBox>
-
-        <!-- User View: Message History -->
-        <VBox fx:id="userHistorySection" spacing="10" VBox.vgrow="ALWAYS">
-            <Label text="Your Message History" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
-                <VBox fx:id="userMessagesContainer" spacing="10" style="-fx-padding: 5;"/>
-            </ScrollPane>
-        </VBox>
-
-        <!-- Admin View: All Messages -->
-        <VBox fx:id="adminMessageSection" spacing="15" VBox.vgrow="ALWAYS" managed="false" visible="false">
-            <HBox alignment="CENTER_LEFT" spacing="15">
-                <Label text="All User Messages" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+            <!-- Chat Header -->
+            <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);">
+                <Label text="Chat with Admin" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #F7A84C;"/>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button text="Refresh" onAction="#loadMessages" 
-                        style="-fx-background-color: #6c757d; -fx-text-fill: white; -fx-font-size: 13px; -fx-padding: 8 15; -fx-cursor: hand;"/>
+                <Button text="↻ Refresh" onAction="#refreshMessages" 
+                        style="-fx-background-color: #F8F9FA; -fx-text-fill: #666; -fx-font-size: 14px; -fx-cursor: hand; -fx-border-color: #ddd; -fx-border-width: 1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-padding: 8 16; -fx-font-weight: 600;"/>
             </HBox>
             
-            <!-- Filter Buttons -->
-            <HBox spacing="10" alignment="CENTER_LEFT">
-                <Label text="Filter:" style="-fx-font-weight: bold; -fx-text-fill: #555;"/>
-                <ToggleButton fx:id="btnFilterAll" text="All" selected="true" onAction="#filterMessages"
-                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
-                <ToggleButton fx:id="btnFilterUnread" text="Unread" onAction="#filterMessages"
-                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
-                <ToggleButton fx:id="btnFilterRead" text="Read" onAction="#filterMessages"
-                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
-                <ToggleButton fx:id="btnFilterReplied" text="Replied" onAction="#filterMessages"
-                             style="-fx-font-size: 13px; -fx-padding: 6 15;"/>
-            </HBox>
-            
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent;">
-                <VBox fx:id="adminMessagesContainer" spacing="10" style="-fx-padding: 5;"/>
+            <!-- Chat Messages Area -->
+            <ScrollPane fx:id="userChatScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" 
+                       style="-fx-background-color: #f5f5f5; -fx-background: #f5f5f5;" hbarPolicy="NEVER">
+                <VBox fx:id="userChatContainer" spacing="8" style="-fx-padding: 15; -fx-background-color: #f5f5f5;"/>
             </ScrollPane>
+            
+            <!-- Message Input Area -->
+            <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #E0E0E0; -fx-border-width: 1 0 0 0;">
+                <Label fx:id="lblChatStatus" text="" style="-fx-text-fill: #4CAF50; -fx-font-size: 13px; -fx-font-weight: 600;"/>
+                <HBox spacing="12" alignment="CENTER">
+                    <TextField fx:id="txtUserMessage" promptText="Type your message..." 
+                              HBox.hgrow="ALWAYS" style="-fx-font-size: 15px; -fx-padding: 12 16; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Button fx:id="btnUserSend" text="Send" onAction="#sendUserMessage"
+                           style="-fx-background-color: #F7A84C; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 600; -fx-padding: 12 30; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 1);"/>
+                </HBox>
+            </VBox>
+            
         </VBox>
+        
+        <!-- ========== ADMIN VIEW: Conversations and Chat ========== -->
+        <HBox fx:id="adminChatSection" VBox.vgrow="ALWAYS" spacing="0" managed="false" visible="false">
+            
+            <!-- Left Sidebar: Conversation List -->
+            <VBox spacing="0" prefWidth="300" style="-fx-border-color: #ddd; -fx-border-width: 0 1 0 0;">
+                
+                <!-- Sidebar Header -->
+                <HBox alignment="CENTER_LEFT" spacing="10" style="-fx-background-color: white; -fx-padding: 20 18; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0;">
+                    <Label text="Conversations" style="-fx-font-size: 17px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="↻" onAction="#refreshMessages" 
+                           style="-fx-background-color: #F8F9FA; -fx-text-fill: #666; -fx-font-size: 16px; -fx-cursor: hand; -fx-padding: 6 8; -fx-background-radius: 6; -fx-border-color: #E0E0E0; -fx-border-width: 1; -fx-border-radius: 6;"/>
+                </HBox>
+                
+                <!-- Unread Count -->
+                <HBox alignment="CENTER" style="-fx-background-color: #fff3e0; -fx-padding: 8;">
+                    <Label fx:id="lblUnreadCount" text="0 unread messages" 
+                          style="-fx-text-fill: #e65100; -fx-font-size: 12px; -fx-font-weight: bold;"/>
+                </HBox>
+                
+                <!-- Conversation List -->
+                <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" 
+                           style="-fx-background-color: #fafafa; -fx-background: #fafafa;" hbarPolicy="NEVER">
+                    <VBox fx:id="conversationListContainer" spacing="0" style="-fx-background-color: #fafafa;"/>
+                </ScrollPane>
+                
+            </VBox>
+            
+            <!-- Right Panel: Chat Area -->
+            <VBox HBox.hgrow="ALWAYS" spacing="0" style="-fx-background-color: #f5f5f5;">
+                
+                <!-- Chat Header -->
+                <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #E0E0E0; -fx-border-width: 0 0 1 0; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.05), 4, 0, 0, 1);">
+                    <Label fx:id="lblSelectedConversation" text="Select a conversation" 
+                          style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
+                    <Region HBox.hgrow="ALWAYS"/>
+                    <Button text="Delete" onAction="#deleteConversation" 
+                           style="-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 13px; -fx-font-weight: 600; -fx-padding: 8 18; -fx-cursor: hand; -fx-background-radius: 6; -fx-effect: dropshadow(gaussian, rgba(244, 67, 54, 0.3), 4, 0, 0, 1);"/>
+                </HBox>
+                
+                <!-- Chat Messages Area -->
+                <ScrollPane fx:id="adminChatScrollPane" VBox.vgrow="ALWAYS" fitToWidth="true" 
+                           style="-fx-background-color: #f5f5f5; -fx-background: #f5f5f5;" hbarPolicy="NEVER">
+                    <VBox fx:id="adminChatContainer" spacing="8" style="-fx-padding: 15; -fx-background-color: #f5f5f5;"/>
+                </ScrollPane>
+                
+                <!-- Admin Reply Input -->
+                <HBox spacing="12" alignment="CENTER" style="-fx-background-color: white; -fx-padding: 20; -fx-border-color: #E0E0E0; -fx-border-width: 1 0 0 0;">
+                    <TextField fx:id="txtAdminReply" promptText="Type your reply..." 
+                              HBox.hgrow="ALWAYS" style="-fx-font-size: 15px; -fx-padding: 12 16; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8;"/>
+                    <Button fx:id="btnAdminSend" text="Send Reply" onAction="#sendAdminReply"
+                           style="-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: 600; -fx-padding: 12 30; -fx-cursor: hand; -fx-background-radius: 8; -fx-effect: dropshadow(gaussian, rgba(33, 150, 243, 0.3), 4, 0, 0, 1);"/>
+                </HBox>
+                
+            </VBox>
+            
+        </HBox>
 
     </VBox>
 </VBox>

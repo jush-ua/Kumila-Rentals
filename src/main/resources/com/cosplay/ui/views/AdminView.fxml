@@ -4,69 +4,101 @@
 <?import javafx.geometry.Insets?>
 <VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="com.cosplay.ui.controllers.AdminController"
-      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #f5f5f5;"
+      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #FAFAFA;"
       minWidth="800" minHeight="600">
     
     <!-- Main Content Area -->
     <HBox VBox.vgrow="ALWAYS" spacing="0">
         <!-- Sidebar Navigation -->
-        <VBox spacing="0" style="-fx-background-color: #f79e6b; -fx-padding: 20;" minWidth="250">
-            <HBox spacing="10" alignment="CENTER_LEFT" style="-fx-padding: 20;">
-                <Label text="👑" style="-fx-font-size: 24px;"/>
-                <Label text="Kumila Rentals" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            </HBox>
+        <VBox spacing="8" style="-fx-background-color: linear-gradient(to bottom, #F7A84C 0%, #E89530 100%); -fx-padding: 0;" minWidth="280">
+            <!-- Logo/Brand Section -->
+            <VBox spacing="0" style="-fx-padding: 30 20 25 20; -fx-background-color: rgba(0, 0, 0, 0.1);">
+                <HBox spacing="12" alignment="CENTER_LEFT">
+                    <Label text="👑" style="-fx-font-size: 32px;"/>
+                    <VBox spacing="2">
+                        <Label text="Kumila Rentals" style="-fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+                        <Label text="Admin Dashboard" style="-fx-font-size: 13px; -fx-text-fill: rgba(255, 255, 255, 0.8);"/>
+                    </VBox>
+                </HBox>
+            </VBox>
             
-            <Button fx:id="btnHome" text="🏠 Home" onAction="#goHome" 
-                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT" 
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
+            <!-- Navigation Section -->
+            <VBox spacing="6" style="-fx-padding: 20 15;">
+                <Label text="NAVIGATION" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: rgba(255, 255, 255, 0.6); -fx-padding: 8 10 5 10;"/>
+                
+                <Button fx:id="btnHome" text="🏠 Home" onAction="#goHome" 
+                        styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT" 
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 14 18; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                
+                <Button fx:id="btnCatalog" text="👗 Inventory" onAction="#showCatalog" 
+                        styleClass="sidebar-button active" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: rgba(255, 255, 255, 0.2); -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 14 18; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                
+                <Button fx:id="btnOrders" text="📋 Orders" onAction="#showOrders" 
+                        styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 14 18; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                
+                <Button fx:id="btnFeatured" text="⭐ Featured" onAction="#showFeatured" 
+                        styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 14 18; -fx-background-radius: 10; -fx-cursor: hand;"/>
+                
+                <Button fx:id="btnEvents" text="📢 Event Banners" onAction="#showEventBanners" 
+                        styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 14 18; -fx-background-radius: 10; -fx-cursor: hand;"/>
+            </VBox>
             
-            <Button fx:id="btnCatalog" text="👗 Inventory" onAction="#showCatalog" 
-                    styleClass="sidebar-button active" maxWidth="Infinity" alignment="CENTER_LEFT"
-                    style="-fx-background-color: #d4a574; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-font-weight: bold; -fx-cursor: hand;"/>
+            <!-- Spacer to push logout to bottom -->
+            <Region VBox.vgrow="ALWAYS"/>
             
-            <Button fx:id="btnOrders" text="📋 Orders" onAction="#showOrders" 
-                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
-            
-            <Button fx:id="btnFeatured" text="⭐ Featured" onAction="#showFeatured" 
-                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
-            
-            <Button fx:id="btnEvents" text="📢 Event Banners" onAction="#showEventBanners" 
-                    styleClass="sidebar-button" maxWidth="Infinity" alignment="CENTER_LEFT"
-                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 16px; -fx-padding: 15; -fx-cursor: hand;"/>
+            <!-- Logout Section -->
+            <VBox spacing="0" style="-fx-padding: 15 15 25 15;">
+                <Separator style="-fx-background-color: rgba(255, 255, 255, 0.2);"/>
+                <Button text="🚪 Logout" onAction="#logout" 
+                        maxWidth="Infinity" alignment="CENTER_LEFT"
+                        style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-padding: 14 18; -fx-background-radius: 10; -fx-cursor: hand; -fx-opacity: 0.8;"/>
+            </VBox>
         </VBox>
         
         <!-- Content Area -->
-        <VBox HBox.hgrow="ALWAYS" spacing="20" style="-fx-padding: 30; -fx-background-color: #f5f5f5;">
+        <VBox HBox.hgrow="ALWAYS" spacing="0" style="-fx-background-color: #FAFAFA;">
             
-            <!-- Header Section -->
-            <HBox alignment="CENTER_LEFT" spacing="20">
-                <Label fx:id="lblSectionTitle" text="Catalog" 
-                       style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #f79e6b;"/>
+            <!-- Header Bar -->
+            <HBox alignment="CENTER_LEFT" spacing="20" style="-fx-padding: 25 35; -fx-background-color: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.08), 8, 0, 0, 2);">
+                <VBox spacing="3">
+                    <Label fx:id="lblSectionTitle" text="Catalog" 
+                           style="-fx-font-size: 28px; -fx-font-weight: bold; -fx-text-fill: #2C3E50;"/>
+                    <Label text="Manage your inventory and products" 
+                           style="-fx-font-size: 14px; -fx-text-fill: #7F8C8D;"/>
+                </VBox>
                 <Region HBox.hgrow="ALWAYS"/>
-                <Button fx:id="btnAddRental" text="Add Rental" onAction="#addCosplay"
-                        style="-fx-background-color: #f79e6b; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 10 20; -fx-background-radius: 20; -fx-cursor: hand;"/>
+                <TextField fx:id="searchField" promptText="🔍 Search..." prefWidth="300"
+                           style="-fx-background-color: white; -fx-border-color: #E0E0E0; -fx-border-width: 2; -fx-border-radius: 8; -fx-background-radius: 8; -fx-padding: 10 16; -fx-font-size: 14px;"/>
+                <Button fx:id="btnAddRental" text="+ Add New" onAction="#addCosplay"
+                        style="-fx-background-color: #F7A84C; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-padding: 12 28; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(gaussian, rgba(247, 168, 76, 0.3), 8, 0, 0, 2);"/>
             </HBox>
             
-            <!-- Table Section -->
-            <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" 
-                        style="-fx-background-color: transparent; -fx-border-color: transparent;">
-                <VBox spacing="10" style="-fx-background-color: white; -fx-padding: 20; -fx-background-radius: 8;">
+            <!-- Content Area with Padding -->
+            <VBox spacing="0" VBox.vgrow="ALWAYS" style="-fx-padding: 25 35 35 35;">
+                <!-- Table Section with Card Design -->
+                <VBox spacing="0" VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.06), 10, 0, 0, 2);">
                     
                     <!-- Table Header (Dynamic) -->
-                    <HBox fx:id="tableHeader" spacing="20" alignment="CENTER_LEFT" style="-fx-padding: 10; -fx-background-color: #f9f9f9;">
+                    <HBox fx:id="tableHeader" spacing="20" alignment="CENTER_LEFT" 
+                          style="-fx-padding: 18 25; -fx-background-color: #F8F9FA; -fx-background-radius: 12 12 0 0;">
                         <!-- Header labels will be dynamically added based on current section -->
                     </HBox>
                     
-                    <Separator/>
+                    <Separator style="-fx-background-color: #E9ECEF;"/>
                     
-                    <!-- Table Rows -->
-                    <ListView fx:id="cosplayListView" VBox.vgrow="ALWAYS" 
-                              style="-fx-background-color: transparent; -fx-border-color: transparent;"/>
+                    <!-- Table Rows in ScrollPane -->
+                    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" 
+                                style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-background: white; -fx-background-radius: 0 0 12 12;">
+                        <ListView fx:id="cosplayListView" VBox.vgrow="ALWAYS" 
+                                  style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-background-insets: 0; -fx-padding: 10 15;"/>
+                    </ScrollPane>
                     
                 </VBox>
-            </ScrollPane>
+            </VBox>
             
         </VBox>
     </HBox>

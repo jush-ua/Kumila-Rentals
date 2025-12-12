@@ -104,32 +104,69 @@ public class ImageCache {
     }
     
     private static Image loadImage(String imagePath, boolean backgroundLoading) {
+        // Handle HTTP/HTTPS URLs
         if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
             return new Image(imagePath, backgroundLoading);
-        } else {
-            java.io.File imageFile = new java.io.File(imagePath);
-            if (imageFile.exists()) {
-                return new Image(imageFile.toURI().toString(), backgroundLoading);
-            } else {
-                System.err.println("Image file not found: " + imagePath);
+        }
+        
+        // Handle resource paths (paths starting with /)
+        if (imagePath.startsWith("/")) {
+            try {
+                var stream = ImageCache.class.getResourceAsStream(imagePath);
+                if (stream != null) {
+                    return new Image(stream);
+                } else {
+                    System.err.println("Resource not found: " + imagePath);
+                    return null;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load resource: " + imagePath + " - " + e.getMessage());
                 return null;
             }
+        }
+        
+        // Handle file system paths
+        java.io.File imageFile = new java.io.File(imagePath);
+        if (imageFile.exists()) {
+            return new Image(imageFile.toURI().toString(), backgroundLoading);
+        } else {
+            System.err.println("Image file not found: " + imagePath);
+            return null;
         }
     }
     
     private static Image loadImageScaled(String imagePath, double requestedWidth, double requestedHeight, boolean backgroundLoading) {
         // Use smooth=true (5th parameter) for high-quality scaling
         // preserveRatio=true (4th parameter) maintains aspect ratio
+        
+        // Handle HTTP/HTTPS URLs
         if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
             return new Image(imagePath, requestedWidth, requestedHeight, true, true, backgroundLoading);
-        } else {
-            java.io.File imageFile = new java.io.File(imagePath);
-            if (imageFile.exists()) {
-                return new Image(imageFile.toURI().toString(), requestedWidth, requestedHeight, true, true, backgroundLoading);
-            } else {
-                System.err.println("Image file not found: " + imagePath);
+        }
+        
+        // Handle resource paths (paths starting with /)
+        if (imagePath.startsWith("/")) {
+            try {
+                var stream = ImageCache.class.getResourceAsStream(imagePath);
+                if (stream != null) {
+                    return new Image(stream, requestedWidth, requestedHeight, true, true);
+                } else {
+                    System.err.println("Resource not found: " + imagePath);
+                    return null;
+                }
+            } catch (Exception e) {
+                System.err.println("Failed to load resource: " + imagePath + " - " + e.getMessage());
                 return null;
             }
+        }
+        
+        // Handle file system paths
+        java.io.File imageFile = new java.io.File(imagePath);
+        if (imageFile.exists()) {
+            return new Image(imageFile.toURI().toString(), requestedWidth, requestedHeight, true, true, backgroundLoading);
+        } else {
+            System.err.println("Image file not found: " + imagePath);
+            return null;
         }
     }
     

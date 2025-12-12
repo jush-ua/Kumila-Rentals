@@ -2,6 +2,7 @@ package com.cosplay.ui.controllers;
 
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
+import com.cosplay.util.AnimationUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -26,6 +27,14 @@ public class NavController {
 		} catch (Exception e) {
 			System.err.println("Failed to load logo: " + e.getMessage());
 		}
+		
+		// Add button hover effects
+		AnimationUtil.addButtonHoverEffect(btnHome);
+		AnimationUtil.addButtonHoverEffect(btnCatalog);
+		AnimationUtil.addButtonHoverEffect(btnAbout);
+		AnimationUtil.addButtonHoverEffect(btnMessages);
+		AnimationUtil.addButtonHoverEffect(btnAdmin);
+		AnimationUtil.addButtonHoverEffect(btnLogout);
 		
 		// Ensure base class is applied once when loaded (FXML already sets it)
 		// Active highlight will be set by parent controller via setActive(...)

@@ -77,33 +77,34 @@ HBox > AnchorPane {
 /* Title label (Magnolia Script look) - adjusted for right panel */
 .title-label {
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 30px;
+    -fx-font-size: 42px;
     -fx-font-weight: bold;
-    -fx-text-fill: #F7CD82;
-    -fx-padding: 2 0 1 0;
+    -fx-text-fill: #F7A84C;
+    -fx-padding: 2 0 10 0;
 }
 
 /* Field labels - updated for right panel */
 .field-label {
     -fx-font-family: "Poppins";
     font-family: "Poppins";
-    -fx-font-size: 14px;
-    -fx-text-fill: #F7CD82;
+    -fx-font-size: 16px;
+    -fx-font-weight: 600;
+    -fx-text-fill: #E8A04E;
 }
 
 /* Forgot password style (right-aligned) - updated for right panel */
 .forgot-label {
     -fx-font-family: "Poppins";
-    -fx-font-size: 12px;
-    -fx-text-fill: #F7CD82;
+    -fx-font-size: 14px;
+    -fx-text-fill: #E8A04E;
     -fx-cursor: hand;
 }
 
 /* Normal text for right panel */
 .normal-text {
     -fx-font-family: "Poppins";
-    -fx-font-size: 12px;
-    -fx-text-fill: #F7CD82;
+    -fx-font-size: 14px;
+    -fx-text-fill: #E8A04E;
 }
 
 /* Rounded text fields (pixel matched radius 14) */
@@ -111,10 +112,10 @@ HBox > AnchorPane {
     -fx-background-color: white;
     -fx-background-radius: 4;
     -fx-border-radius: 4;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 1;
-    -fx-padding: 8 12 8 12;
-    -fx-font-size: 14px;
+    -fx-border-color: #E8A04E;
+    -fx-border-width: 2;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 16px;
     -fx-text-fill: #333333;
 }
 
@@ -123,36 +124,36 @@ TextField.rounded-field, PasswordField.rounded-field {
     -fx-background-color: white;
     -fx-background-radius: 4;
     -fx-border-radius: 4;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 1;
-    -fx-padding: 8 12 8 12;
-    -fx-font-size: 14px;
+    -fx-border-color: #E8A04E;
+    -fx-border-width: 2;
+    -fx-padding: 10 14 10 14;
+    -fx-font-size: 16px;
     -fx-text-fill: #333333;
 }
 
 /* Accent button (LOGIN / REGISTER style) */
 .accent-button {
-    -fx-background-color: white;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 2;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-text-fill: #F7CD82;
+    -fx-background-color: #F7A84C;
+    -fx-border-color: #F7A84C;
+    -fx-border-width: 0;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-text-fill: white;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
 }
 
 .reg-accent-button {
-    -fx-background-color: white;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 2;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-text-fill: #F7CD82;
+    -fx-background-color: #F7A84C;
+    -fx-border-color: #F7A84C;
+    -fx-border-width: 0;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-text-fill: white;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-cursor: hand;
     -fx-margin: 8 16 8 16;
@@ -160,94 +161,105 @@ TextField.rounded-field, PasswordField.rounded-field {
 
 /* Specific Button selector to increase specificity and ensure it's applied */
 Button.accent-button {
-    -fx-background-color: white;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 2;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-text-fill: #F7CD82;
+    -fx-background-color: #F7A84C;
+    -fx-border-color: #F7A84C;
+    -fx-border-width: 0;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-text-fill: white;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
+    -fx-font-size: 16px;
     -fx-font-weight: bold;
     -fx-margin: 8 16 8 16;
 }
 
-/* Hover state: bg -> #F7CD82, text -> white, border -> white */
+/* Hover state: bg -> darker, keep white text */
 .accent-button:hover {
-    -fx-background-color: #F7CD82;
+    -fx-background-color: #E89530;
     -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-width: 2;
+    -fx-border-color: #E89530;
+    -fx-border-width: 0;
 }
 
 .reg-accent-button:hover {
-    -fx-background-color: #F7CD82;
+    -fx-background-color: #E89530;
     -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-width: 2;
+    -fx-border-color: #E89530;
+    -fx-border-width: 0;
 }
 
 /* Or label */
 .or-label {
     -fx-font-family: "Poppins";
-    -fx-font-size: 12px;
-    -fx-text-fill: #F7CD82;
+    -fx-font-size: 14px;
+    -fx-text-fill: #999999;
     -fx-padding: 7 6 7 6;
 }
 
-/* Google button style (matches Swing painting) */
+/* Google button style (proper Google branding) */
 .google-btn {
     -fx-background-color: white;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 2;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 14px;
-    -fx-text-fill: #F7CD82;
-    -fx-font-weight: bold;
+    -fx-border-color: #DADCE0;
+    -fx-border-width: 1;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 15px;
+    -fx-text-fill: #3C4043;
+    -fx-font-weight: 500;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
 }
 
 Button.google-btn {
     -fx-background-color: white;
-    -fx-border-color: #F7CD82;
-    -fx-border-width: 2;
-    -fx-background-radius: 20;
-    -fx-border-radius: 20;
-    -fx-font-family: "Poppins-Bold";
-    -fx-text-fill: #F7CD82;
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
+    -fx-border-color: #DADCE0;
+    -fx-border-width: 1;
+    -fx-background-radius: 25;
+    -fx-border-radius: 25;
+    -fx-font-family: "Poppins";
+    -fx-text-fill: #3C4043;
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 2, 0, 0, 1);
 }
 
-/* Google hover */
+/* Google hover - subtle elevation effect */
 .google-btn:hover {
-    -fx-background-color: #F7CD82;
-    -fx-text-fill: white;
-    -fx-border-color: white;
-    -fx-border-width: 2;
+    -fx-background-color: #F8F9FA;
+    -fx-text-fill: #3C4043;
+    -fx-border-color: #DADCE0;
+    -fx-border-width: 1;
+    -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 4, 0, 0, 2);
+}
+
+/* Google label inside button */
+.google-label {
+    -fx-text-fill: #3C4043;
+    -fx-font-family: "Poppins";
+    -fx-font-size: 15px;
+    -fx-font-weight: 500;
 }
 /* Create account link styling (matches underline-on-hover) - updated for right panel */
 .create-account-link {
-    -fx-text-fill: #F7CD82;
+    -fx-text-fill: #E8A04E;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 Hyperlink.create-account-link {
-    -fx-text-fill: #F7CD82;
+    -fx-text-fill: #E8A04E;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }
 .create-account-link:hover {
     -fx-underline: true;
-    -fx-text-fill: #F7CD82;
+    -fx-text-fill: #E8A04E;
     -fx-font-family: "Poppins-Bold";
-    -fx-font-size: 12px;
+    -fx-font-size: 14px;
     -fx-background-color: transparent;
     -fx-border-width: 0;
 }

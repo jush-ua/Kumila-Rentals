@@ -30,7 +30,7 @@
                 <VBox fx:id="textFieldPanel" spacing="8" alignment="TOP_LEFT" prefWidth="450" maxWidth="550">
                     <Label fx:id="errorLabel" text="" style="-fx-text-fill: transparent; -fx-font-size:12px;" />
 
-                    <Label text="Email" styleClass="field-label"/>
+                    <Label text="Username" styleClass="field-label"/>
                     <TextField fx:id="usernameField" promptText="" prefHeight="45" styleClass="rounded-field"/>
 
                     <Region prefHeight="8"/>
@@ -40,7 +40,7 @@
 
                     <HBox>
                         <Region HBox.hgrow="ALWAYS"/>
-                        <Label text="Forgot Password?" styleClass="forgot-label"/>
+                        <Hyperlink text="Forgot Password?" onAction="#handleForgotPassword" styleClass="forgot-label"/>
                     </HBox>
                 </VBox>
 

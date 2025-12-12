@@ -14,6 +14,8 @@ C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cospla
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\ui\controllers\RegisterController.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\dao\MessageDAO.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\ui\controllers\AboutController.java
+C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\AnimationUtil.java
+C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\model\Conversation.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\model\Rental.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\model\Message.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\dao\RentalDAO.java
@@ -26,8 +28,10 @@ C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cospla
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\Database.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\PasswordUtil.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\Session.java
+C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\DataExporter.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\ui\Views.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\PerformanceConfig.java
+C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\StyledAlert.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\dao\UserDAO.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\util\ImageCache.java
 C:\Users\JOSH\OneDrive\Documents\VSCode\cosplay-backend\src\main\java\com\cosplay\ui\controllers\MessagesController.java

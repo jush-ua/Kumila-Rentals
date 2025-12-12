@@ -12,6 +12,7 @@ import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
 import com.cosplay.util.ImageCache;
+import com.cosplay.util.AnimationUtil;
 
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -22,6 +23,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.control.TextArea;
@@ -31,8 +33,11 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
 
 public class CatalogController {
     // Included NavBar controller (from fx:include with fx:id="navBar")
@@ -40,6 +45,7 @@ public class CatalogController {
     @FXML private FlowPane cosplayGrid;
     @FXML private ComboBox<String> categoryComboBox;
     @FXML private ComboBox<String> sortByComboBox;
+    @FXML private TextField searchField;
     
     private final CosplayDAO cosplayDAO = new CosplayDAO();
     private final RentalDAO rentalDAO = new RentalDAO();
@@ -57,6 +63,11 @@ public class CatalogController {
         // Initialize dropdowns
         setupCategoryComboBox();
         setupSortByComboBox();
+        
+        // Setup search field listener
+        if (searchField != null) {
+            searchField.textProperty().addListener((obs, oldVal, newVal) -> filterAndSortCosplays());
+        }
         
         loadCosplays();
     }
@@ -111,10 +122,22 @@ public class CatalogController {
         cosplayGrid.getChildren().clear();
         currentlyLoaded = 0;
         
-        // Filter by category
-        String selectedCategory = categoryComboBox.getValue();
+        // Start with all cosplays
         filteredCosplays = new java.util.ArrayList<>(allCosplays);
         
+        // Apply search filter
+        String searchText = searchField != null ? searchField.getText() : null;
+        if (searchText != null && !searchText.trim().isEmpty()) {
+            String search = searchText.trim().toLowerCase();
+            filteredCosplays = filteredCosplays.stream()
+                .filter(c -> c.getName().toLowerCase().contains(search) ||
+                           (c.getSeriesName() != null && c.getSeriesName().toLowerCase().contains(search)) ||
+                           (c.getCategory() != null && c.getCategory().toLowerCase().contains(search)))
+                .collect(java.util.stream.Collectors.toList());
+        }
+        
+        // Filter by category
+        String selectedCategory = categoryComboBox.getValue();
         if (selectedCategory != null && !selectedCategory.equals("All Categories")) {
             if (selectedCategory.equals("Anime")) {
                 filteredCosplays = filteredCosplays.stream()
@@ -170,6 +193,9 @@ public class CatalogController {
         for (int i = currentlyLoaded; i < currentlyLoaded + toLoad; i++) {
             VBox card = createCosplayCard(filteredCosplays.get(i));
             cosplayGrid.getChildren().add(card);
+            // Stagger the card animations based on their index
+            int relativeIndex = i - currentlyLoaded;
+            AnimationUtil.fadeInScaleDelayed(card, 300, relativeIndex * 50);
         }
         
         currentlyLoaded += toLoad;
@@ -214,6 +240,9 @@ public class CatalogController {
             SceneNavigator.navigate(Views.COSPLAY_DETAILS);
         });
         
+        // Add hover animation
+        AnimationUtil.addCardHoverEffect(card);
+        
         // Title label at the top with rounded top corners
         Label nameLabel = new Label(cosplay.getName());
         nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: #f79e6b; -fx-padding: 10 15; -fx-background-radius: 15 15 0 0; -fx-text-fill: #333;");
@@ -224,7 +253,7 @@ public class CatalogController {
         card.getChildren().add(nameLabel);
         
         // Image container with rounded bottom corners and border
-        javafx.scene.layout.StackPane imageContainer = new javafx.scene.layout.StackPane();
+        StackPane imageContainer = new StackPane();
         imageContainer.setPrefSize(200, 260);
         imageContainer.setMaxSize(200, 260);
         imageContainer.setStyle("-fx-background-color: white; -fx-background-radius: 0 0 15 15; -fx-border-color: #f79e6b; -fx-border-width: 3; -fx-border-radius: 0 0 15 15; -fx-effect: dropshadow(gaussian, rgba(247, 158, 107, 0.5), 10, 0.5, 0, 0);");
@@ -242,37 +271,72 @@ public class CatalogController {
         clip.setArcHeight(0);
         imageView.setClip(clip);
         
-        boolean imageLoaded = false;
+        // Loading indicator
+        ProgressIndicator loadingIndicator = new ProgressIndicator();
+        loadingIndicator.setMaxSize(40, 40);
+        loadingIndicator.setStyle("-fx-progress-color: #f79e6b;");
+        imageContainer.getChildren().add(loadingIndicator);
         
+        // Load image asynchronously if path exists
         if (cosplay.getImagePath() != null && !cosplay.getImagePath().isBlank()) {
-            try {
-                String imagePath = cosplay.getImagePath();
-                // Use ImageCache with exact dimensions to fill card (194x254) with high quality
-                Image image = ImageCache.getImageScaled(imagePath, 194, 254, true);
-                
+            String imagePath = cosplay.getImagePath();
+            
+            // Create background task to load image
+            Task<Image> loadImageTask = new Task<Image>() {
+                @Override
+                protected Image call() throws Exception {
+                    // Load image in background thread with caching
+                    return ImageCache.getImageScaled(imagePath, 194, 254, true);
+                }
+            };
+            
+            // Handle success
+            loadImageTask.setOnSucceeded(event -> {
+                Image image = loadImageTask.getValue();
                 if (image != null && !image.isError()) {
                     imageView.setImage(image);
-                    imageLoaded = true;
+                    imageContainer.getChildren().clear();
+                    imageContainer.getChildren().add(imageView);
+                    
+                    // Fade in effect
+                    imageView.setOpacity(0);
+                    javafx.animation.FadeTransition fade = new javafx.animation.FadeTransition(javafx.util.Duration.millis(300), imageView);
+                    fade.setFromValue(0);
+                    fade.setToValue(1);
+                    fade.play();
                 } else {
-                    System.err.println("Failed to load image for " + cosplay.getName());
+                    // Show placeholder on error
+                    showImagePlaceholder(imageContainer);
                 }
-            } catch (Exception e) {
-                System.err.println("Failed to load image for " + cosplay.getName() + ": " + e.getMessage());
-            }
-        }
-        
-        // If no image loaded, show placeholder
-        if (!imageLoaded) {
-            javafx.scene.control.Label placeholderText = new javafx.scene.control.Label("No Image");
-            placeholderText.setStyle("-fx-text-fill: #999; -fx-font-size: 12px;");
-            imageContainer.getChildren().add(placeholderText);
+            });
+            
+            // Handle failure
+            loadImageTask.setOnFailed(event -> {
+                System.err.println("Failed to load image for " + cosplay.getName() + ": " + loadImageTask.getException().getMessage());
+                showImagePlaceholder(imageContainer);
+            });
+            
+            // Start the task in background thread
+            Thread loadThread = new Thread(loadImageTask);
+            loadThread.setDaemon(true);
+            loadThread.start();
         } else {
-            imageContainer.getChildren().add(imageView);
+            // No image path, show placeholder immediately
+            showImagePlaceholder(imageContainer);
         }
         
         card.getChildren().add(imageContainer);
         
         return card;
+    }
+    
+    private void showImagePlaceholder(StackPane container) {
+        Platform.runLater(() -> {
+            container.getChildren().clear();
+            Label placeholderText = new Label("No Image");
+            placeholderText.setStyle("-fx-text-fill: #999; -fx-font-size: 12px;");
+            container.getChildren().add(placeholderText);
+        });
     }
     
     private void showRentalDialog(Cosplay cosplay) {

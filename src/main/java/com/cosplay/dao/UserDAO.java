@@ -215,6 +215,64 @@ public class UserDAO {
 	}
 
 	/**
+	 * Get user by email address.
+	 * @param email the email address
+	 * @return User object if found, null otherwise
+	 */
+	public User getUserByEmail(String email) {
+		String sql = "SELECT * FROM users WHERE email = ? LIMIT 1";
+		try (Connection conn = Database.connect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, email);
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return mapUser(rs);
+				}
+			}
+		} catch (SQLException e) { 
+			e.printStackTrace(); 
+		}
+		return null;
+	}
+
+	/**
+	 * Set password reset token for a user.
+	 * @param email the user's email
+	 * @param resetToken the password reset token
+	 * @return true if successful, false otherwise
+	 */
+	public boolean setPasswordResetToken(String email, String resetToken) {
+		String sql = "UPDATE users SET verification_token = ? WHERE email = ?";
+		try (Connection conn = Database.connect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, resetToken);
+			ps.setString(2, email);
+			int rowsAffected = ps.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) { 
+			e.printStackTrace(); 
+			return false; 
+		}
+	}
+
+	/**
+	 * Reset password using reset token.
+	 * @param resetToken the password reset token
+	 * @param newPassword the new plain text password
+	 * @return true if successful, false otherwise
+	 */
+	public boolean resetPassword(String resetToken, String newPassword) {
+		String sql = "UPDATE users SET password = ?, verification_token = NULL WHERE verification_token = ?";
+		try (Connection conn = Database.connect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, PasswordUtil.hashPassword(newPassword));
+			ps.setString(2, resetToken);
+			int rowsAffected = ps.executeUpdate();
+			return rowsAffected > 0;
+		} catch (SQLException e) { 
+			e.printStackTrace(); 
+			return false; 
+		}
+	}
+
+	/**
 	 * Helper method to map ResultSet to User object.
 	 */
 	private User mapUser(ResultSet rs) throws SQLException {

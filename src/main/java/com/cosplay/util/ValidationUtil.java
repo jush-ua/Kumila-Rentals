@@ -78,6 +78,19 @@ public class ValidationUtil {
     }
     
     /**
+     * Validates if a string is a valid email address format.
+     * 
+     * @param email the email string to validate
+     * @return true if the email format is valid, false otherwise
+     */
+    public static boolean isValidEmail(String email) {
+        if (isEmpty(email)) {
+            return false;
+        }
+        return EMAIL_PATTERN.matcher(email.trim()).matches();
+    }
+    
+    /**
      * Check if a string is null or empty.
      * @param str the string to check
      * @return true if null or empty, false otherwise

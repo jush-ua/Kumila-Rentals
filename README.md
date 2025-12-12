@@ -123,6 +123,46 @@ Right now there is no visual form in the Admin screen to add costumes (only to s
 - JDK 21 is required (enforced by Maven Enforcer).
 - Clean build: `mvn -DskipTests=true clean package`
 
+## Database Import/Export
+
+### Export Database (Before Pushing to Git)
+When you want to share your database with other devices:
+
+**Option 1: Quick Export**
+```powershell
+.\export_db.ps1
+```
+Creates a timestamped backup file (e.g., `cosplay_backup_20251213_031126.db`)
+
+**Option 2: Export to SQL (for Git)**
+```powershell
+mvn compile exec:java -Dexec.mainClass="com.cosplay.util.DataExporter"
+```
+Updates `src/main/resources/db/seed_data.sql` which can be committed to Git
+
+### Import Database (After Pulling from Git)
+When setting up on a new device:
+
+**Option 1: Interactive Import**
+```powershell
+.\import_db.ps1
+```
+Follow prompts to import from SQL or backup file
+
+**Option 2: Quick SQL Import**
+```powershell
+mvn compile exec:java -Dexec.mainClass="com.cosplay.util.DataImporter"
+```
+Automatically loads data from `seed_data.sql`
+
+**Option 3: Direct File Copy**
+If you have a `.db` backup file:
+```powershell
+Copy-Item cosplay_backup.db cosplay.db
+```
+
+📖 **See [DATABASE_GUIDE.md](DATABASE_GUIDE.md) for detailed instructions**
+
 ## Housekeeping
 - Build outputs are ignored via `.gitignore`.
 - SQLite DB file `cosplay.db` is also ignored so you can reset freely.

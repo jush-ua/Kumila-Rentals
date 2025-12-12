@@ -5,8 +5,10 @@ import com.cosplay.model.User;
 import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.EmailUtil;
+import com.cosplay.util.StyledAlert;
 import com.cosplay.util.TokenUtil;
 import com.cosplay.util.ValidationUtil;
+import com.cosplay.util.AnimationUtil;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -42,6 +44,11 @@ public class RegisterController {
 		// Clear error label initially
 		if (errorLabel != null) {
 			errorLabel.setText("");
+		}
+		
+		// Add button hover effect
+		if (registerButton != null) {
+			AnimationUtil.addButtonHoverEffect(registerButton);
 		}
 
 		// Load logo and background similar to LoginView
@@ -201,11 +208,7 @@ public class RegisterController {
 			errorLabel.setText(message);
 			errorLabel.setStyle("-fx-text-fill: red;");
 		} else {
-			Alert alert = new Alert(Alert.AlertType.ERROR);
-			alert.setTitle("Registration Error");
-			alert.setHeaderText(null);
-			alert.setContentText(message);
-			alert.showAndWait();
+			StyledAlert.showError("Registration Error", message);
 		}
 	}
 
@@ -213,10 +216,7 @@ public class RegisterController {
 	 * Show success message and navigate to login view.
 	 */
 	private void showSuccessAndNavigate(String message) {
-		Alert alert = new Alert(Alert.AlertType.INFORMATION);
-		alert.setTitle("Registration Successful");
-		alert.setHeaderText(null);
-		alert.setContentText(message);
+		Alert alert = StyledAlert.createSuccess("Registration Successful", message);
 		alert.setOnHidden(evt -> SceneNavigator.navigate(Views.LOGIN));
 		alert.show();
 	}

@@ -37,7 +37,7 @@ public class RentalDAO {
 
     // Create a rental safely: check availability inside a transaction and insert
     public boolean createRental(Rental r) {
-        String insert = "INSERT INTO rentals(cosplay_id, customer_name, contact_number, address, facebook_link, start_date, end_date, payment_method, proof_of_payment, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String insert = "INSERT INTO rentals(cosplay_id, customer_name, contact_number, address, facebook_link, start_date, end_date, rent_days, customer_addons, payment_method, proof_of_payment, selfie_photo, id_photo, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = Database.connect()) {
             conn.setAutoCommit(false);
             // check availability with the same connection
@@ -54,9 +54,13 @@ public class RentalDAO {
                 ps.setString(5, r.getFacebookLink());
                 ps.setString(6, r.getStartDate().toString());
                 ps.setString(7, r.getEndDate().toString());
-                ps.setString(8, r.getPaymentMethod());
-                ps.setString(9, r.getProofOfPayment());
-                ps.setString(10, r.getStatus() == null ? "Pending" : r.getStatus());
+                ps.setInt(8, r.getRentDays());
+                ps.setString(9, r.getCustomerAddOns());
+                ps.setString(10, r.getPaymentMethod());
+                ps.setString(11, r.getProofOfPayment());
+                ps.setString(12, r.getSelfiePhoto());
+                ps.setString(13, r.getIdPhoto());
+                ps.setString(14, r.getStatus() == null ? "Pending" : r.getStatus());
                 ps.executeUpdate();
                 try (ResultSet rs = ps.getGeneratedKeys()) {
                     if (rs.next()) r.setId(rs.getInt(1));
@@ -91,8 +95,12 @@ public class RentalDAO {
                 r.setFacebookLink(rs.getString("facebook_link"));
                 r.setStartDate(LocalDate.parse(rs.getString("start_date")));
                 r.setEndDate(LocalDate.parse(rs.getString("end_date")));
+                r.setRentDays(rs.getInt("rent_days"));
+                r.setCustomerAddOns(rs.getString("customer_addons"));
                 r.setPaymentMethod(rs.getString("payment_method"));
                 r.setProofOfPayment(rs.getString("proof_of_payment"));
+                r.setSelfiePhoto(rs.getString("selfie_photo"));
+                r.setIdPhoto(rs.getString("id_photo"));
                 r.setStatus(rs.getString("status"));
                 list.add(r);
             }
@@ -130,8 +138,12 @@ public class RentalDAO {
                     r.setFacebookLink(rs.getString("facebook_link"));
                     r.setStartDate(LocalDate.parse(rs.getString("start_date")));
                     r.setEndDate(LocalDate.parse(rs.getString("end_date")));
+                    r.setRentDays(rs.getInt("rent_days"));
+                    r.setCustomerAddOns(rs.getString("customer_addons"));
                     r.setPaymentMethod(rs.getString("payment_method"));
                     r.setProofOfPayment(rs.getString("proof_of_payment"));
+                    r.setSelfiePhoto(rs.getString("selfie_photo"));
+                    r.setIdPhoto(rs.getString("id_photo"));
                     r.setStatus(rs.getString("status"));
                     list.add(r);
                 }

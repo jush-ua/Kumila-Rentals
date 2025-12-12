@@ -3,12 +3,14 @@ package com.cosplay.ui;
 import java.io.IOException;
 import java.util.Objects;
 
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXMLLoader;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Simple navigator to switch between JavaFX views.
@@ -66,6 +68,13 @@ public final class SceneNavigator {
             
             primaryStage.setTitle(view.getTitle());
             primaryStage.setScene(scene);
+            
+            // Add fade transition to root
+            root.setOpacity(0);
+            FadeTransition fade = new FadeTransition(Duration.millis(300), root);
+            fade.setFromValue(0.0);
+            fade.setToValue(1.0);
+            fade.play();
             
             // Set minimum window size based on the FXML preferred dimensions
             primaryStage.setMinWidth(sceneW);

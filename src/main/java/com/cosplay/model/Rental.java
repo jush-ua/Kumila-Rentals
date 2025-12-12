@@ -11,8 +11,12 @@ public class Rental {
     private String facebookLink;
     private LocalDate startDate;
     private LocalDate endDate;
+    private int rentDays;
+    private String customerAddOns;
     private String paymentMethod;
     private String proofOfPayment;
+    private String selfiePhoto;
+    private String idPhoto;
     private String status;
 
     public Rental() {}
@@ -38,6 +42,14 @@ public class Rental {
     public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
     public String getProofOfPayment() { return proofOfPayment; }
     public void setProofOfPayment(String proofOfPayment) { this.proofOfPayment = proofOfPayment; }
+    public int getRentDays() { return rentDays; }
+    public void setRentDays(int rentDays) { this.rentDays = rentDays; }
+    public String getCustomerAddOns() { return customerAddOns; }
+    public void setCustomerAddOns(String customerAddOns) { this.customerAddOns = customerAddOns; }
+    public String getSelfiePhoto() { return selfiePhoto; }
+    public void setSelfiePhoto(String selfiePhoto) { this.selfiePhoto = selfiePhoto; }
+    public String getIdPhoto() { return idPhoto; }
+    public void setIdPhoto(String idPhoto) { this.idPhoto = idPhoto; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
 

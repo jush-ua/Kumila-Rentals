@@ -15,11 +15,13 @@ import com.cosplay.model.FeaturedItem;
 import com.cosplay.dao.CosplayDAO;
 import com.cosplay.model.Cosplay;
 import com.cosplay.util.ImageCache;
+import com.cosplay.util.AnimationUtil;
 
 public class HomeController {
     // Included NavBar controller (from fx:include with fx:id="navBar")
     @FXML private NavController navBarController;
     @FXML private StackPane heroBanner;
+    @FXML private ImageView bannerImageView;
     @FXML private Label heroBannerTitle;
     @FXML private Label heroBannerMessage;
     @FXML private ImageView set1Image;
@@ -34,8 +36,11 @@ public class HomeController {
     @FXML private VBox set2Card;
     @FXML private VBox set3Card;
     @FXML private VBox set4Card;
+    @FXML private HBox featuredCardsContainer;
+    @FXML private Label emptyFeaturedLabel;
     
     private FeaturedItem[] featuredItems = new FeaturedItem[4];
+    private StackPane[] imageContainers = new StackPane[4];
 
     @FXML
     private void initialize() {
@@ -57,15 +62,19 @@ public class HomeController {
     private void setupFeaturedCardHandlers() {
         if (set1Card != null) {
             set1Card.setOnMouseClicked(e -> openFeaturedCosplay(0));
+            AnimationUtil.addCardHoverEffect(set1Card);
         }
         if (set2Card != null) {
             set2Card.setOnMouseClicked(e -> openFeaturedCosplay(1));
+            AnimationUtil.addCardHoverEffect(set2Card);
         }
         if (set3Card != null) {
             set3Card.setOnMouseClicked(e -> openFeaturedCosplay(2));
+            AnimationUtil.addCardHoverEffect(set3Card);
         }
         if (set4Card != null) {
             set4Card.setOnMouseClicked(e -> openFeaturedCosplay(3));
+            AnimationUtil.addCardHoverEffect(set4Card);
         }
     }
     
@@ -84,7 +93,7 @@ public class HomeController {
         EventBannerDAO bannerDAO = new EventBannerDAO();
         bannerDAO.getActiveBanner().ifPresentOrElse(
             banner -> {
-                // Set the banner content
+                // Set the banner title
                 heroBannerTitle.setText(banner.getTitle());
                 
                 // Show subtitle if available
@@ -99,22 +108,7 @@ public class HomeController {
                     try {
                         javafx.scene.image.Image bgImage = ImageCache.getImage(banner.getImagePath(), true);
                         if (bgImage != null && !bgImage.isError()) {
-                            // Create ImageView for background
-                            javafx.scene.image.ImageView bgImageView = new javafx.scene.image.ImageView(bgImage);
-                            bgImageView.setFitWidth(heroBanner.getWidth() > 0 ? heroBanner.getWidth() : 800);
-                            bgImageView.setPreserveRatio(false);
-                            bgImageView.setSmooth(true);
-                            
-                            // Bind to heroBanner width
-                            bgImageView.fitWidthProperty().bind(heroBanner.widthProperty());
-                            bgImageView.setFitHeight(200);
-                            
-                            // Add image as background (first child)
-                            if (heroBanner.getChildren().isEmpty()) {
-                                heroBanner.getChildren().add(0, bgImageView);
-                            } else {
-                                heroBanner.getChildren().set(0, bgImageView);
-                            }
+                            bannerImageView.setImage(bgImage);
                         }
                     } catch (Exception e) {
                         System.err.println("Failed to load banner image: " + e.getMessage());
@@ -125,9 +119,10 @@ public class HomeController {
                 heroBanner.setOnMouseClicked(e -> showEventDetails(banner));
                 heroBanner.setStyle(heroBanner.getStyle() + "; -fx-cursor: hand;");
                 
-                // Show the banner
+                // Show the banner with animation
                 heroBanner.setVisible(true);
                 heroBanner.setManaged(true);
+                AnimationUtil.slideInFromBottom(heroBanner, 600);
             },
             () -> {
                 // No active banner - hide it
@@ -228,14 +223,75 @@ public class HomeController {
         featuredItems[2] = dao.get(3);
         featuredItems[3] = dao.get(4);
         
-        setFromItem(set1Image, set1Title, featuredItems[0]);
-        setFromItem(set2Image, set2Title, featuredItems[1]);
-        setFromItem(set3Image, set3Title, featuredItems[2]);
-        setFromItem(set4Image, set4Title, featuredItems[3]);
+        // Check if all featured items are empty
+        boolean allEmpty = true;
+        for (FeaturedItem item : featuredItems) {
+            if (item != null && (item.getCosplayId() != null || 
+                (item.getImageUrl() != null && !item.getImageUrl().isBlank()))) {
+                allEmpty = false;
+                break;
+            }
+        }
+        
+        // Show appropriate UI based on whether all items are empty
+        if (allEmpty) {
+            // Hide all cards and show empty state message
+            if (featuredCardsContainer != null) {
+                featuredCardsContainer.setVisible(false);
+                featuredCardsContainer.setManaged(false);
+            }
+            if (emptyFeaturedLabel != null) {
+                emptyFeaturedLabel.setVisible(true);
+                emptyFeaturedLabel.setManaged(true);
+            }
+        } else {
+            // Show cards and hide empty state message
+            if (featuredCardsContainer != null) {
+                featuredCardsContainer.setVisible(true);
+                featuredCardsContainer.setManaged(true);
+            }
+            if (emptyFeaturedLabel != null) {
+                emptyFeaturedLabel.setVisible(false);
+                emptyFeaturedLabel.setManaged(false);
+            }
+            
+            // Get StackPane containers from the card VBoxes
+            imageContainers[0] = (StackPane) set1Card.getChildren().get(0);
+            imageContainers[1] = (StackPane) set2Card.getChildren().get(0);
+            imageContainers[2] = (StackPane) set3Card.getChildren().get(0);
+            imageContainers[3] = (StackPane) set4Card.getChildren().get(0);
+            
+            setFromItem(set1Image, set1Title, featuredItems[0], imageContainers[0]);
+            setFromItem(set2Image, set2Title, featuredItems[1], imageContainers[1]);
+            setFromItem(set3Image, set3Title, featuredItems[2], imageContainers[2]);
+            setFromItem(set4Image, set4Title, featuredItems[3], imageContainers[3]);
+            
+            // Animate cards with staggered effect
+            AnimationUtil.fadeInScaleDelayed(set1Card, 400, 100);
+            AnimationUtil.fadeInScaleDelayed(set2Card, 400, 200);
+            AnimationUtil.fadeInScaleDelayed(set3Card, 400, 300);
+            AnimationUtil.fadeInScaleDelayed(set4Card, 400, 400);
+        }
     }
 
-    private void setFromItem(ImageView view, javafx.scene.control.Label titleLabel, FeaturedItem item) {
-        if (view == null || item == null) return;
+    private void setFromItem(ImageView view, javafx.scene.control.Label titleLabel, FeaturedItem item, StackPane container) {
+        if (view == null) return;
+        
+        // Check if there's no featured item
+        if (item == null || (item.getCosplayId() == null && (item.getImageUrl() == null || item.getImageUrl().isBlank()))) {
+            // Show placeholder with gray background on the StackPane
+            view.setImage(null); // Clear any existing image
+            if (container != null) {
+                // Set gray background on the container
+                container.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 15; -fx-border-radius: 15;");
+            }
+            if (titleLabel != null) {
+                titleLabel.setText("No Featured Set");
+                titleLabel.setStyle("-fx-text-fill: #999; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;");
+            }
+            return;
+        }
+        
         // Prefer cosplay-based image
         if (item.getCosplayId() != null) {
             new CosplayDAO().findById(item.getCosplayId()).ifPresent(c -> {
@@ -246,12 +302,20 @@ public class HomeController {
                         Image image = ImageCache.getImageScaled(path, 280, 400, true);
                         if (image != null && !image.isError()) {
                             view.setImage(image);
+                            // Reset container style when image loads successfully
+                            if (container != null) {
+                                container.setStyle("-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);");
+                            }
                         } else {
                             System.err.println("Failed to load image for " + c.getName());
+                            setPlaceholderImage(view, titleLabel, container);
                         }
                     } catch (Exception e) {
                         System.err.println("Failed to load image: " + e.getMessage());
+                        setPlaceholderImage(view, titleLabel, container);
                     }
+                } else {
+                    setPlaceholderImage(view, titleLabel, container);
                 }
                 String ttl = (item.getTitle() != null && !item.getTitle().isBlank()) ? item.getTitle() : c.getName();
                 if (titleLabel != null && ttl != null) titleLabel.setText(ttl);
@@ -265,15 +329,37 @@ public class HomeController {
                 Image image = ImageCache.getImageScaled(url, 280, 400, true);
                 if (image != null && !image.isError()) {
                     view.setImage(image);
+                    // Reset container style when image loads successfully
+                    if (container != null) {
+                        container.setStyle("-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);");
+                    }
                 } else {
                     System.err.println("Failed to load image from URL: " + url);
+                    setPlaceholderImage(view, titleLabel, container);
                 }
             } catch (Exception e) {
                 System.err.println("Failed to load image: " + e.getMessage());
+                setPlaceholderImage(view, titleLabel, container);
             }
+        } else {
+            setPlaceholderImage(view, titleLabel, container);
         }
         if (titleLabel != null && item.getTitle() != null && !item.getTitle().isBlank()) {
             titleLabel.setText(item.getTitle());
+        }
+    }
+    
+    private void setPlaceholderImage(ImageView view, javafx.scene.control.Label titleLabel, StackPane container) {
+        if (view != null) {
+            view.setImage(null);
+        }
+        if (container != null) {
+            // Set gray background on the container
+            container.setStyle("-fx-background-color: #e8e8e8; -fx-background-radius: 15; -fx-border-radius: 15;");
+        }
+        if (titleLabel != null) {
+            titleLabel.setText("No Featured Set");
+            titleLabel.setStyle("-fx-text-fill: #999; -fx-font-weight: bold; -fx-font-size: 13px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 8 20;");
         }
     }
 }

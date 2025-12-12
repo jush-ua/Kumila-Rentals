@@ -35,7 +35,7 @@
                     
                     <!-- Cosplay Image with Rounded Border -->
                     <StackPane style="-fx-background-color: #f5d99f; -fx-background-radius: 24; -fx-padding: 14;">
-                        <ImageView fx:id="cosplayImage" preserveRatio="true" fitWidth="420" fitHeight="500" />
+                        <ImageView fx:id="cosplayImage" preserveRatio="true" />
                         <!-- Overlay carousel arrows -->
                         <Button fx:id="btnImagePrev" text="◀" onAction="#handlePrevImage"
                                 style="-fx-background-color: rgba(0,0,0,0.2); -fx-text-fill: white; -fx-background-radius: 20; -fx-padding: 4 10;" StackPane.alignment="CENTER_LEFT" />
@@ -100,28 +100,6 @@
                         
                         <!-- Calendar Grid -->
                         <GridPane fx:id="calendarGrid" hgap="2" vgap="2" alignment="CENTER"/>
-                    </VBox>
-                    
-                    <!-- Add-ons Section -->
-                    <VBox fx:id="addonsSection" spacing="15" styleClass="section-card">
-                        <Label text="ADD ONS" styleClass="section-title"/>
-                        
-                        <!-- Add-ons Carousel Container -->
-                        <HBox spacing="12" alignment="CENTER">
-                            <Button text="◀" onAction="#handlePrevAddon"
-                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
-                            
-                            <VBox fx:id="addonDisplay" spacing="10" HBox.hgrow="ALWAYS" alignment="CENTER">
-                                <ImageView fx:id="addonImage" fitWidth="180" fitHeight="180" preserveRatio="true"/>
-                                <Label fx:id="lblAddonName" text="Petticoat" 
-                                       style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #333;"/>
-                                <Label fx:id="lblAddonSize" text="Fits S-L" 
-                                       style="-fx-font-size: 13px; -fx-text-fill: #666;"/>
-                            </VBox>
-                            
-                            <Button text="▶" onAction="#handleNextAddon"
-                                    style="-fx-background-color: transparent; -fx-text-fill: #e6a84c; -fx-cursor: hand; -fx-border-width: 0; -fx-font-size: 14px;"/>
-                        </HBox>
                     </VBox>
                     
                 </VBox>

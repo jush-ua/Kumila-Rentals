@@ -66,6 +66,14 @@ public class FeaturedDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return false;
     }
+    
+    public boolean delete(int slot) {
+        String sql = "DELETE FROM featured_images WHERE slot = ?";
+        try (Connection conn = Database.connect(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, slot);
+            ps.executeUpdate();
+            return true;
+        } catch (SQLException e) { e.printStackTrace(); }
+        return false;
+    }
 }
-
-

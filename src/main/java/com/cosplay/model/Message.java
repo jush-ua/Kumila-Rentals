@@ -4,16 +4,20 @@ import java.time.LocalDateTime;
 
 public class Message {
     private int messageId;
+    private int conversationId;
     private int senderId;
     private String senderName;
     private String senderEmail;
-    private String subject;
     private String message;
     private LocalDateTime timestamp;
-    private String status; // "unread", "read", "replied"
+    private boolean isAdminReply;
+    private String status; // "unread", "read"
     
     public int getMessageId() { return messageId; }
     public void setMessageId(int messageId) { this.messageId = messageId; }
+    
+    public int getConversationId() { return conversationId; }
+    public void setConversationId(int conversationId) { this.conversationId = conversationId; }
     
     public int getSenderId() { return senderId; }
     public void setSenderId(int senderId) { this.senderId = senderId; }
@@ -24,14 +28,14 @@ public class Message {
     public String getSenderEmail() { return senderEmail; }
     public void setSenderEmail(String senderEmail) { this.senderEmail = senderEmail; }
     
-    public String getSubject() { return subject; }
-    public void setSubject(String subject) { this.subject = subject; }
-    
     public String getMessage() { return message; }
     public void setMessage(String message) { this.message = message; }
     
     public LocalDateTime getTimestamp() { return timestamp; }
     public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
+    
+    public boolean isAdminReply() { return isAdminReply; }
+    public void setAdminReply(boolean adminReply) { isAdminReply = adminReply; }
     
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -40,8 +44,9 @@ public class Message {
     public String toString() {
         return "Message{" +
                 "messageId=" + messageId +
+                ", conversationId=" + conversationId +
                 ", senderName='" + senderName + '\'' +
-                ", subject='" + subject + '\'' +
+                ", isAdminReply=" + isAdminReply +
                 ", status='" + status + '\'' +
                 '}';
     }

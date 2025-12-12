@@ -1,14 +1,16 @@
 package com.cosplay.ui.controllers;
 
 import com.cosplay.dao.MessageDAO;
+import com.cosplay.model.Conversation;
 import com.cosplay.model.Message;
 import com.cosplay.model.User;
 import com.cosplay.ui.Views;
-import com.cosplay.util.EmailUtil;
 import com.cosplay.util.Session;
+import com.cosplay.util.StyledAlert;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
@@ -19,33 +21,32 @@ import java.util.List;
 public class MessagesController {
     @FXML private NavController navBarController;
     
-    // User components
-    @FXML private VBox userMessageSection;
-    @FXML private VBox userHistorySection;
-    @FXML private TextField txtSubject;
-    @FXML private TextArea txtMessage;
-    @FXML private Button btnSendMessage;
-    @FXML private Label lblSendStatus;
-    @FXML private VBox userMessagesContainer;
+    // User view components
+    @FXML private VBox userChatSection;
+    @FXML private ScrollPane userChatScrollPane;
+    @FXML private VBox userChatContainer;
+    @FXML private TextField txtUserMessage;
+    @FXML private Button btnUserSend;
+    @FXML private Label lblChatStatus;
     
-    // Admin components
-    @FXML private VBox adminMessageSection;
-    @FXML private VBox adminMessagesContainer;
+    // Admin view components
+    @FXML private HBox adminChatSection;
+    @FXML private VBox conversationListContainer;
+    @FXML private ScrollPane adminChatScrollPane;
+    @FXML private VBox adminChatContainer;
+    @FXML private TextField txtAdminReply;
+    @FXML private Button btnAdminSend;
     @FXML private Label lblUnreadCount;
-    @FXML private ToggleButton btnFilterAll;
-    @FXML private ToggleButton btnFilterUnread;
-    @FXML private ToggleButton btnFilterRead;
-    @FXML private ToggleButton btnFilterReplied;
+    @FXML private Label lblSelectedConversation;
     
     private MessageDAO messageDAO;
     private User currentUser;
     private boolean isAdmin;
-    private String currentFilter = "all";
-    private ToggleGroup filterGroup;
+    private int currentConversationId = -1;
+    private int selectedUserId = -1;
 
     @FXML
     private void initialize() {
-        // Set active highlight for nav bar
         if (navBarController != null) {
             navBarController.setActive(Views.MESSAGES);
         }
@@ -54,288 +55,383 @@ public class MessagesController {
         currentUser = Session.getCurrentUser();
         isAdmin = currentUser != null && "admin".equalsIgnoreCase(currentUser.getRole());
         
-        // Setup filter toggle group
-        filterGroup = new ToggleGroup();
-        btnFilterAll.setToggleGroup(filterGroup);
-        btnFilterUnread.setToggleGroup(filterGroup);
-        btnFilterRead.setToggleGroup(filterGroup);
-        btnFilterReplied.setToggleGroup(filterGroup);
-        
         setupView();
-        loadMessages();
-        updateUnreadCount();
+        loadContent();
     }
     
     private void setupView() {
         if (isAdmin) {
             // Show admin view
-            userMessageSection.setManaged(false);
-            userMessageSection.setVisible(false);
-            userHistorySection.setManaged(false);
-            userHistorySection.setVisible(false);
-            adminMessageSection.setManaged(true);
-            adminMessageSection.setVisible(true);
+            userChatSection.setManaged(false);
+            userChatSection.setVisible(false);
+            adminChatSection.setManaged(true);
+            adminChatSection.setVisible(true);
         } else {
             // Show user view
-            userMessageSection.setManaged(true);
-            userMessageSection.setVisible(true);
-            userHistorySection.setManaged(true);
-            userHistorySection.setVisible(true);
-            adminMessageSection.setManaged(false);
-            adminMessageSection.setVisible(false);
+            userChatSection.setManaged(true);
+            userChatSection.setVisible(true);
+            adminChatSection.setManaged(false);
+            adminChatSection.setVisible(false);
         }
     }
     
-    @FXML
-    private void sendMessage() {
-        String subject = txtSubject.getText().trim();
-        String messageText = txtMessage.getText().trim();
+    private void loadContent() {
+        if (isAdmin) {
+            loadConversationList();
+            updateUnreadCount();
+        } else {
+            loadUserChat();
+        }
+    }
+    
+    /**
+     * USER VIEW: Load chat with admin
+     */
+    private void loadUserChat() {
+        userChatContainer.getChildren().clear();
         
-        // Validation
-        if (subject.isEmpty()) {
-            showStatus("Please enter a subject", "error");
+        // Get or create conversation
+        currentConversationId = messageDAO.getOrCreateConversation(
+            currentUser.getUserId(), 
+            currentUser.getUsername(), 
+            currentUser.getEmail()
+        );
+        
+        if (currentConversationId == -1) {
+            showUserStatus("Error loading chat", "error");
             return;
         }
         
+        // Load messages
+        List<Message> messages = messageDAO.getMessagesByConversation(currentConversationId);
+        
+        if (messages.isEmpty()) {
+            Label welcomeMsg = new Label("Start a conversation with the admin!");
+            welcomeMsg.setStyle("-fx-text-fill: #999; -fx-font-size: 14px; -fx-padding: 20;");
+            userChatContainer.getChildren().add(welcomeMsg);
+        } else {
+            for (Message msg : messages) {
+                userChatContainer.getChildren().add(createChatBubble(msg, !msg.isAdminReply()));
+            }
+        }
+        
+        // Scroll to bottom
+        Platform.runLater(() -> userChatScrollPane.setVvalue(1.0));
+    }
+    
+    /**
+     * USER ACTION: Send message
+     */
+    @FXML
+    private void sendUserMessage() {
+        String messageText = txtUserMessage.getText().trim();
+        
         if (messageText.isEmpty()) {
-            showStatus("Please enter a message", "error");
+            showUserStatus("Please enter a message", "error");
             return;
         }
         
         // Create message
         Message message = new Message();
+        message.setConversationId(currentConversationId);
         message.setSenderId(currentUser.getUserId());
         message.setSenderName(currentUser.getUsername());
         message.setSenderEmail(currentUser.getEmail());
-        message.setSubject(subject);
         message.setMessage(messageText);
         message.setTimestamp(LocalDateTime.now());
+        message.setAdminReply(false);
         message.setStatus("unread");
         
-        // Save to database
         if (messageDAO.sendMessage(message)) {
-            showStatus("Message sent successfully!", "success");
-            
-            // Clear form
-            txtSubject.clear();
-            txtMessage.clear();
-            
-            // Reload user messages
-            loadMessages();
-            
-            // Optional: Send email notification to admin (disabled for now)
-            // notifyAdminByEmail(message);
+            txtUserMessage.clear();
+            loadUserChat();
         } else {
-            showStatus("Failed to send message. Please try again.", "error");
+            showUserStatus("Failed to send message", "error");
         }
     }
     
-    @FXML
-    private void loadMessages() {
-        if (isAdmin) {
-            loadAdminMessages();
+    /**
+     * ADMIN VIEW: Load conversation list
+     */
+    private void loadConversationList() {
+        conversationListContainer.getChildren().clear();
+        List<Conversation> conversations = messageDAO.getAllConversations();
+        
+        if (conversations.isEmpty()) {
+            Label noConv = new Label("No conversations yet");
+            noConv.setStyle("-fx-text-fill: #999; -fx-font-size: 14px; -fx-padding: 15;");
+            conversationListContainer.getChildren().add(noConv);
         } else {
-            loadUserMessages();
+            for (Conversation conv : conversations) {
+                conversationListContainer.getChildren().add(createConversationCard(conv));
+            }
         }
+    }
+    
+    /**
+     * ADMIN VIEW: Create conversation card
+     */
+    private VBox createConversationCard(Conversation conv) {
+        VBox card = new VBox(5);
+        card.setStyle("-fx-background-color: white; -fx-padding: 12; -fx-border-color: #ddd; " +
+                     "-fx-border-width: 0 0 1 0; -fx-cursor: hand;");
+        
+        // Highlight if selected
+        if (conv.getConversationId() == currentConversationId) {
+            card.setStyle(card.getStyle() + " -fx-background-color: #e3f2fd;");
+        }
+        
+        // User name with unread badge
+        HBox header = new HBox(10);
+        header.setAlignment(Pos.CENTER_LEFT);
+        
+        Label userName = new Label(conv.getUserName());
+        userName.setStyle("-fx-font-size: 14px; -fx-font-weight: bold; -fx-text-fill: #333;");
+        HBox.setHgrow(userName, Priority.ALWAYS);
+        
+        if (conv.getUnreadCount() > 0) {
+            Label unreadBadge = new Label(String.valueOf(conv.getUnreadCount()));
+            unreadBadge.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; " +
+                               "-fx-padding: 2 6; -fx-background-radius: 10; -fx-font-size: 11px; -fx-font-weight: bold;");
+            header.getChildren().addAll(userName, unreadBadge);
+        } else {
+            header.getChildren().add(userName);
+        }
+        
+        // Last message preview
+        if (conv.getLastMessage() != null) {
+            Label lastMsg = new Label(conv.getLastMessage());
+            lastMsg.setStyle("-fx-text-fill: #666; -fx-font-size: 12px;");
+            lastMsg.setMaxWidth(Double.MAX_VALUE);
+            lastMsg.setWrapText(false);
+            
+            card.getChildren().addAll(header, lastMsg);
+        } else {
+            card.getChildren().add(header);
+        }
+        
+        // Click to select conversation
+        card.setOnMouseClicked(e -> selectConversation(conv));
+        
+        // Hover effect
+        card.setOnMouseEntered(e -> {
+            if (conv.getConversationId() != currentConversationId) {
+                card.setStyle(card.getStyle().replace("white", "#f5f5f5"));
+            }
+        });
+        card.setOnMouseExited(e -> {
+            if (conv.getConversationId() != currentConversationId) {
+                card.setStyle(card.getStyle().replace("#f5f5f5", "white"));
+            }
+        });
+        
+        return card;
+    }
+    
+    /**
+     * ADMIN ACTION: Select a conversation
+     */
+    private void selectConversation(Conversation conv) {
+        currentConversationId = conv.getConversationId();
+        selectedUserId = conv.getUserId();
+        
+        lblSelectedConversation.setText("Chat with " + conv.getUserName());
+        
+        // Mark as read
+        messageDAO.markConversationAsRead(currentConversationId);
+        
+        // Reload lists
+        loadConversationList();
+        loadAdminChat();
         updateUnreadCount();
     }
     
-    private void loadUserMessages() {
-        userMessagesContainer.getChildren().clear();
-        List<Message> messages = messageDAO.getMessagesByUser(currentUser.getUserId());
+    /**
+     * ADMIN VIEW: Load chat messages for selected conversation
+     */
+    private void loadAdminChat() {
+        adminChatContainer.getChildren().clear();
+        
+        if (currentConversationId == -1) {
+            Label selectMsg = new Label("Select a conversation to view messages");
+            selectMsg.setStyle("-fx-text-fill: #999; -fx-font-size: 14px; -fx-padding: 20;");
+            adminChatContainer.getChildren().add(selectMsg);
+            return;
+        }
+        
+        List<Message> messages = messageDAO.getMessagesByConversation(currentConversationId);
         
         if (messages.isEmpty()) {
-            Label noMessages = new Label("No messages yet");
-            noMessages.setStyle("-fx-text-fill: #999; -fx-font-size: 14px;");
-            userMessagesContainer.getChildren().add(noMessages);
+            Label noMsg = new Label("No messages in this conversation");
+            noMsg.setStyle("-fx-text-fill: #999; -fx-font-size: 14px; -fx-padding: 20;");
+            adminChatContainer.getChildren().add(noMsg);
         } else {
             for (Message msg : messages) {
-                userMessagesContainer.getChildren().add(createUserMessageCard(msg));
+                adminChatContainer.getChildren().add(createChatBubble(msg, msg.isAdminReply()));
             }
         }
+        
+        // Scroll to bottom
+        Platform.runLater(() -> adminChatScrollPane.setVvalue(1.0));
     }
     
-    private void loadAdminMessages() {
-        adminMessagesContainer.getChildren().clear();
-        List<Message> messages = messageDAO.getAllMessages();
-        
-        // Apply filter
-        messages = messages.stream()
-            .filter(msg -> {
-                switch (currentFilter) {
-                    case "unread": return "unread".equals(msg.getStatus());
-                    case "read": return "read".equals(msg.getStatus());
-                    case "replied": return "replied".equals(msg.getStatus());
-                    default: return true;
-                }
-            })
-            .toList();
-        
-        if (messages.isEmpty()) {
-            Label noMessages = new Label("No messages found");
-            noMessages.setStyle("-fx-text-fill: #999; -fx-font-size: 14px;");
-            adminMessagesContainer.getChildren().add(noMessages);
-        } else {
-            for (Message msg : messages) {
-                adminMessagesContainer.getChildren().add(createAdminMessageCard(msg));
-            }
-        }
-    }
-    
-    private VBox createUserMessageCard(Message msg) {
-        VBox card = new VBox(8);
-        card.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-border-color: #ddd; " +
-                     "-fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;");
-        
-        // Header with subject and status
-        HBox header = new HBox(10);
-        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        
-        Label subject = new Label(msg.getSubject());
-        subject.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #333;");
-        HBox.setHgrow(subject, Priority.ALWAYS);
-        
-        Label status = new Label(msg.getStatus().toUpperCase());
-        status.setStyle(getStatusStyle(msg.getStatus()));
-        
-        Label timestamp = new Label(formatTimestamp(msg.getTimestamp()));
-        timestamp.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
-        
-        header.getChildren().addAll(subject, status, timestamp);
-        
-        // Message content
-        Label content = new Label(msg.getMessage());
-        content.setWrapText(true);
-        content.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
-        
-        card.getChildren().addAll(header, content);
-        return card;
-    }
-    
-    private VBox createAdminMessageCard(Message msg) {
-        VBox card = new VBox(10);
-        card.setStyle("-fx-background-color: white; -fx-padding: 15; -fx-border-color: #ddd; " +
-                     "-fx-border-width: 1; -fx-border-radius: 5; -fx-background-radius: 5;");
-        
-        // Header
-        HBox header = new HBox(10);
-        header.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        
-        Label sender = new Label("From: " + msg.getSenderName() + " (" + msg.getSenderEmail() + ")");
-        sender.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: #555;");
-        HBox.setHgrow(sender, Priority.ALWAYS);
-        
-        Label timestamp = new Label(formatTimestamp(msg.getTimestamp()));
-        timestamp.setStyle("-fx-font-size: 12px; -fx-text-fill: #999;");
-        
-        header.getChildren().addAll(sender, timestamp);
-        
-        // Subject
-        Label subject = new Label(msg.getSubject());
-        subject.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #333;");
-        
-        // Message content
-        Label content = new Label(msg.getMessage());
-        content.setWrapText(true);
-        content.setStyle("-fx-font-size: 13px; -fx-text-fill: #555;");
-        
-        // Action buttons
-        HBox actions = new HBox(10);
-        actions.setAlignment(javafx.geometry.Pos.CENTER_LEFT);
-        
-        Label statusLabel = new Label("Status: " + msg.getStatus().toUpperCase());
-        statusLabel.setStyle(getStatusStyle(msg.getStatus()));
-        HBox.setHgrow(statusLabel, Priority.ALWAYS);
-        
-        if ("unread".equals(msg.getStatus())) {
-            Button markRead = new Button("Mark as Read");
-            markRead.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-cursor: hand;");
-            markRead.setOnAction(e -> {
-                messageDAO.markAsRead(msg.getMessageId());
-                loadMessages();
-            });
-            actions.getChildren().add(markRead);
-        }
-        
-        if (!"replied".equals(msg.getStatus())) {
-            Button markReplied = new Button("Mark as Replied");
-            markReplied.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-cursor: hand;");
-            markReplied.setOnAction(e -> {
-                messageDAO.markAsReplied(msg.getMessageId());
-                loadMessages();
-            });
-            actions.getChildren().add(markReplied);
-        }
-        
-        Button delete = new Button("Delete");
-        delete.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-font-size: 12px; -fx-padding: 5 10; -fx-cursor: hand;");
-        delete.setOnAction(e -> {
-            Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
-            confirm.setTitle("Confirm Delete");
-            confirm.setHeaderText("Delete this message?");
-            confirm.setContentText("This action cannot be undone.");
-            confirm.showAndWait().ifPresent(response -> {
-                if (response == ButtonType.OK) {
-                    messageDAO.deleteMessage(msg.getMessageId());
-                    loadMessages();
-                }
-            });
-        });
-        actions.getChildren().add(delete);
-        
-        actions.getChildren().add(0, statusLabel);
-        
-        card.getChildren().addAll(header, subject, content, actions);
-        return card;
-    }
-    
+    /**
+     * ADMIN ACTION: Send reply
+     */
     @FXML
-    private void filterMessages() {
-        if (btnFilterAll.isSelected()) {
-            currentFilter = "all";
-        } else if (btnFilterUnread.isSelected()) {
-            currentFilter = "unread";
-        } else if (btnFilterRead.isSelected()) {
-            currentFilter = "read";
-        } else if (btnFilterReplied.isSelected()) {
-            currentFilter = "replied";
+    private void sendAdminReply() {
+        if (currentConversationId == -1) {
+            return;
         }
-        loadMessages();
+        
+        String messageText = txtAdminReply.getText().trim();
+        
+        if (messageText.isEmpty()) {
+            return;
+        }
+        
+        // Create admin reply
+        Message message = new Message();
+        message.setConversationId(currentConversationId);
+        message.setSenderId(currentUser.getUserId());
+        message.setSenderName("Admin");
+        message.setSenderEmail(currentUser.getEmail());
+        message.setMessage(messageText);
+        message.setTimestamp(LocalDateTime.now());
+        message.setAdminReply(true);
+        message.setStatus("read");
+        
+        if (messageDAO.sendMessage(message)) {
+            txtAdminReply.clear();
+            loadAdminChat();
+            loadConversationList();
+        }
     }
     
+    /**
+     * Create a chat bubble for a message
+     */
+    private HBox createChatBubble(Message msg, boolean alignRight) {
+        HBox container = new HBox();
+        container.setPadding(new Insets(5, 10, 5, 10));
+        
+        VBox bubble = new VBox(5);
+        bubble.setMaxWidth(400);
+        bubble.setPadding(new Insets(10, 15, 10, 15));
+        
+        if (alignRight) {
+            // User's own messages (right side, blue)
+            bubble.setStyle("-fx-background-color: #d47f47; -fx-background-radius: 15 15 5 15; " +
+                          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 3, 0, 0, 1);");
+            container.setAlignment(Pos.CENTER_RIGHT);
+        } else {
+            // Other's messages (left side, gray)
+            bubble.setStyle("-fx-background-color: #f1f1f1; -fx-background-radius: 15 15 15 5; " +
+                          "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 3, 0, 0, 1);");
+            container.setAlignment(Pos.CENTER_LEFT);
+        }
+        
+        // Message text
+        Label messageLabel = new Label(msg.getMessage());
+        messageLabel.setWrapText(true);
+        messageLabel.setStyle("-fx-text-fill: " + (alignRight ? "white" : "#333") + "; " +
+                             "-fx-font-size: 13px;");
+        
+        // Timestamp
+        Label timeLabel = new Label(formatTime(msg.getTimestamp()));
+        timeLabel.setStyle("-fx-text-fill: " + (alignRight ? "rgba(255,255,255,0.8)" : "#999") + "; " +
+                          "-fx-font-size: 11px;");
+        
+        bubble.getChildren().addAll(messageLabel, timeLabel);
+        container.getChildren().add(bubble);
+        
+        return container;
+    }
+    
+    /**
+     * Update unread count for admin
+     */
     private void updateUnreadCount() {
         if (isAdmin) {
-            int count = messageDAO.getUnreadCount();
-            Platform.runLater(() -> lblUnreadCount.setText(count + " unread"));
+            int count = messageDAO.getTotalUnreadCount();
+            Platform.runLater(() -> 
+                lblUnreadCount.setText(count + " unread message" + (count != 1 ? "s" : ""))
+            );
         }
     }
     
-    private String getStatusStyle(String status) {
-        return switch (status.toLowerCase()) {
-            case "unread" -> "-fx-background-color: #ff5252; -fx-text-fill: white; -fx-padding: 3 8; -fx-border-radius: 3; -fx-background-radius: 3; -fx-font-size: 11px; -fx-font-weight: bold;";
-            case "read" -> "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-padding: 3 8; -fx-border-radius: 3; -fx-background-radius: 3; -fx-font-size: 11px; -fx-font-weight: bold;";
-            case "replied" -> "-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 3 8; -fx-border-radius: 3; -fx-background-radius: 3; -fx-font-size: 11px; -fx-font-weight: bold;";
-            default -> "-fx-background-color: #999; -fx-text-fill: white; -fx-padding: 3 8; -fx-border-radius: 3; -fx-background-radius: 3; -fx-font-size: 11px;";
-        };
+    /**
+     * Refresh button action
+     */
+    @FXML
+    private void refreshMessages() {
+        if (isAdmin) {
+            loadConversationList();
+            if (currentConversationId != -1) {
+                loadAdminChat();
+            }
+            updateUnreadCount();
+        } else {
+            loadUserChat();
+        }
     }
     
-    private void showStatus(String message, String type) {
-        lblSendStatus.setText(message);
-        lblSendStatus.setStyle("-fx-text-fill: " + ("error".equals(type) ? "#f44336" : "#4CAF50") + "; -fx-font-size: 13px;");
+    /**
+     * Delete conversation (admin only)
+     */
+    @FXML
+    private void deleteConversation() {
+        if (currentConversationId == -1) {
+            return;
+        }
         
-        // Clear status after 3 seconds
+        Alert confirm = StyledAlert.createConfirmation(
+            "Delete Conversation",
+            "Delete this entire conversation?",
+            "This will delete all messages and cannot be undone."
+        );
+        
+        confirm.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                if (messageDAO.deleteConversation(currentConversationId)) {
+                    currentConversationId = -1;
+                    selectedUserId = -1;
+                    lblSelectedConversation.setText("Select a conversation");
+                    loadConversationList();
+                    loadAdminChat();
+                    updateUnreadCount();
+                }
+            }
+        });
+    }
+    
+    private void showUserStatus(String message, String type) {
+        lblChatStatus.setText(message);
+        lblChatStatus.setStyle("-fx-text-fill: " + ("error".equals(type) ? "#f44336" : "#4CAF50") + 
+                              "; -fx-font-size: 13px;");
+        
         new Thread(() -> {
             try {
                 Thread.sleep(3000);
-                Platform.runLater(() -> lblSendStatus.setText(""));
+                Platform.runLater(() -> lblChatStatus.setText(""));
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
         }).start();
     }
     
-    private String formatTimestamp(LocalDateTime timestamp) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd, yyyy h:mm a");
-        return timestamp.format(formatter);
+    private String formatTime(LocalDateTime timestamp) {
+        LocalDateTime now = LocalDateTime.now();
+        
+        if (timestamp.toLocalDate().equals(now.toLocalDate())) {
+            // Today - show time only
+            return timestamp.format(DateTimeFormatter.ofPattern("h:mm a"));
+        } else if (timestamp.toLocalDate().equals(now.toLocalDate().minusDays(1))) {
+            // Yesterday
+            return "Yesterday " + timestamp.format(DateTimeFormatter.ofPattern("h:mm a"));
+        } else {
+            // Older - show date and time
+            return timestamp.format(DateTimeFormatter.ofPattern("MMM dd, h:mm a"));
+        }
     }
 }

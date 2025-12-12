@@ -12,7 +12,9 @@ import com.cosplay.ui.Views;
 import com.cosplay.util.CallbackServer;
 import com.cosplay.util.GoogleOAuthUtil;
 import com.cosplay.util.Session;
+import com.cosplay.util.StyledAlert;
 import com.cosplay.util.ValidationUtil;
+import com.cosplay.util.AnimationUtil;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -47,6 +49,14 @@ public class LoginController {
         // Clear error label initially
         if (errorLabel != null) {
             errorLabel.setText("");
+        }
+        
+        // Add button hover effects
+        if (loginButton != null) {
+            AnimationUtil.addButtonHoverEffect(loginButton);
+        }
+        if (googleLoginButton != null) {
+            AnimationUtil.addButtonHoverEffect(googleLoginButton);
         }
         
         // Google login button is always visible
@@ -224,6 +234,95 @@ public class LoginController {
         SceneNavigator.navigate(Views.REGISTER);
     }
 
+    @FXML
+    private void handleForgotPassword() {
+        // Create dialog for forgot password
+        javafx.scene.control.Dialog<String> dialog = new javafx.scene.control.Dialog<>();
+        dialog.setTitle("Forgot Password");
+        dialog.setHeaderText("Reset Your Password");
+        dialog.setContentText("Enter your email address and we'll send you a password reset link.");
+
+        // Set the button types
+        javafx.scene.control.ButtonType sendButtonType = new javafx.scene.control.ButtonType("Send Reset Link", javafx.scene.control.ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(sendButtonType, javafx.scene.control.ButtonType.CANCEL);
+
+        // Create email input field
+        javafx.scene.control.TextField emailField = new javafx.scene.control.TextField();
+        emailField.setPromptText("Email address");
+        emailField.setPrefWidth(300);
+
+        javafx.scene.layout.VBox content = new javafx.scene.layout.VBox(10);
+        content.getChildren().addAll(new Label("Email:"), emailField);
+        dialog.getDialogPane().setContent(content);
+
+        // Request focus on email field
+        Platform.runLater(() -> emailField.requestFocus());
+
+        // Convert result to email when send button is clicked
+        dialog.setResultConverter(dialogButton -> {
+            if (dialogButton == sendButtonType) {
+                return emailField.getText();
+            }
+            return null;
+        });
+
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(email -> {
+            if (ValidationUtil.isEmpty(email)) {
+                showError("Please enter your email address");
+                return;
+            }
+
+            if (!ValidationUtil.isValidEmail(email)) {
+                showError("Please enter a valid email address");
+                return;
+            }
+
+            // Process password reset
+            processPasswordReset(email.trim());
+        });
+    }
+
+    private void processPasswordReset(String email) {
+        try {
+            // Check if user exists
+            User user = userDAO.getUserByEmail(email);
+            if (user == null) {
+                // Don't reveal if email exists for security
+                showInfo("If an account exists with this email, you will receive a password reset link shortly.");
+                return;
+            }
+
+            // Don't allow password reset for OAuth users
+            if (user.getOauthProvider() != null && !"local".equals(user.getOauthProvider())) {
+                showError("This account uses " + user.getOauthProvider() + " login. Please use " + user.getOauthProvider() + " to sign in.");
+                return;
+            }
+
+            // Generate reset token
+            String resetToken = com.cosplay.util.TokenUtil.generateToken();
+            
+            // Save reset token to database
+            if (!userDAO.setPasswordResetToken(email, resetToken)) {
+                showError("Failed to process password reset. Please try again.");
+                return;
+            }
+
+            // Send reset email
+            boolean emailSent = com.cosplay.util.EmailUtil.sendPasswordResetEmail(email, user.getUsername(), resetToken);
+            
+            if (emailSent) {
+                showInfo("Password reset instructions have been sent to your email address.\n\nPlease check your inbox and follow the link to reset your password.");
+            } else {
+                showError("Failed to send reset email. Please try again later.");
+            }
+
+        } catch (Exception e) {
+            showError("An error occurred. Please try again.");
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Show error message to user.
      */
@@ -232,11 +331,7 @@ public class LoginController {
             errorLabel.setText(message);
             errorLabel.setStyle("-fx-text-fill: red;");
         } else {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Login Error");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
+            StyledAlert.showError("Login Error", message);
         }
     }
 
@@ -244,11 +339,12 @@ public class LoginController {
      * Show email not verified error with resend option.
      */
     private void showEmailNotVerifiedError(User user) {
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Email Not Verified");
-        alert.setHeaderText("Please verify your email");
-        alert.setContentText("Your email address has not been verified. Please check your email for the verification link.\n\nDidn't receive the email?");
+        Alert alert = StyledAlert.createWarning(
+            "Email Not Verified",
+            "Your email address has not been verified. Please check your email for the verification link.\n\nDidn't receive the email?"
+        );
         
+        alert.setHeaderText("Please verify your email");
         alert.getButtonTypes().clear();
         alert.getButtonTypes().addAll(
             javafx.scene.control.ButtonType.OK,
@@ -266,10 +362,7 @@ public class LoginController {
      * Show success message and navigate to another view.
      */
     private void showSuccessAndNavigate(String message, Views view) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Login Successful");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
+        Alert alert = StyledAlert.createSuccess("Login Successful", message);
         alert.setOnHidden(evt -> SceneNavigator.navigate(view));
         alert.show();
     }
@@ -278,10 +371,6 @@ public class LoginController {
      * Show info message to user.
      */
     private void showInfo(String message) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Information");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        StyledAlert.showInfo("Information", message);
     }
 }

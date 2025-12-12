@@ -2,7 +2,11 @@ package com.cosplay.util;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -111,17 +115,49 @@ public class Database {
         String createMessages =
             "CREATE TABLE IF NOT EXISTS messages (" +
             "message_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "conversation_id INTEGER NOT NULL," +
             "sender_id INTEGER NOT NULL," +
             "sender_name TEXT NOT NULL," +
             "sender_email TEXT," +
-            "subject TEXT NOT NULL," +
             "message TEXT NOT NULL," +
             "timestamp TEXT NOT NULL," +
+            "is_admin_reply INTEGER DEFAULT 0," +
             "status TEXT DEFAULT 'unread'," +
             "FOREIGN KEY(sender_id) REFERENCES users(user_id)" +
             ");";
 
+        String createConversations =
+            "CREATE TABLE IF NOT EXISTS conversations (" +
+            "conversation_id INTEGER PRIMARY KEY AUTOINCREMENT," +
+            "user_id INTEGER NOT NULL," +
+            "user_name TEXT NOT NULL," +
+            "user_email TEXT," +
+            "last_message TEXT," +
+            "last_message_time TEXT," +
+            "unread_count INTEGER DEFAULT 0," +
+            "created_at TEXT NOT NULL," +
+            "FOREIGN KEY(user_id) REFERENCES users(user_id)" +
+            ");";
+
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
+            // Drop old messages table if it has the wrong schema (subject column)
+            try {
+                ResultSet rs = stmt.executeQuery("PRAGMA table_info(messages)");
+                boolean hasSubject = false;
+                while (rs.next()) {
+                    if ("subject".equals(rs.getString("name"))) {
+                        hasSubject = true;
+                        break;
+                    }
+                }
+                if (hasSubject) {
+                    stmt.executeUpdate("DROP TABLE IF EXISTS messages");
+                    System.out.println("Dropped old messages table with incompatible schema.");
+                }
+            } catch (SQLException ignored) {
+                // Table doesn't exist yet
+            }
+            
             // Migrate old 'costumes' table to 'cosplays' if it exists
             try {
                 stmt.executeUpdate("ALTER TABLE costumes RENAME TO cosplays");
@@ -151,6 +187,7 @@ public class Database {
             stmt.execute(createUsers);
             stmt.execute(createFeatured);
             stmt.execute(createEventBanners);
+            stmt.execute(createConversations);
             stmt.execute(createMessages);
             
             // Add new columns if they don't exist (for existing databases)
@@ -165,6 +202,31 @@ public class Database {
             } catch (SQLException ignored) { }
             try {
                 stmt.executeUpdate("ALTER TABLE users ADD COLUMN oauth_id VARCHAR(255)");
+            } catch (SQLException ignored) { }
+            
+            // Add new rental columns if they don't exist
+            try {
+                stmt.executeUpdate("ALTER TABLE rentals ADD COLUMN rent_days INTEGER DEFAULT 1");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE rentals ADD COLUMN customer_addons TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE rentals ADD COLUMN selfie_photo TEXT");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE rentals ADD COLUMN id_photo TEXT");
+            } catch (SQLException ignored) { }
+            
+            // Add conversation_id to messages table if it doesn't exist (for older databases)
+            try {
+                stmt.executeUpdate("ALTER TABLE messages ADD COLUMN conversation_id INTEGER");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE messages ADD COLUMN is_admin_reply INTEGER DEFAULT 0");
+            } catch (SQLException ignored) { }
+            try {
+                stmt.executeUpdate("ALTER TABLE messages ADD COLUMN status TEXT DEFAULT 'unread'");
             } catch (SQLException ignored) { }
             
             // Try to add cosplay_id column for linking featured slots to cosplays
@@ -221,6 +283,139 @@ public class Database {
             System.err.println("Failed to initialize DB: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    
+    /**
+     * Load seed data from SQL file. This is useful for sharing sample data via repository.
+     * Call this method after init() if you want to populate the database with test data.
+     * 
+     * Usage: Database.loadSeedData();
+     */
+    public static void loadSeedData() {
+        try (Connection conn = connect();
+             Statement stmt = conn.createStatement();
+             InputStream is = Database.class.getResourceAsStream("/db/seed_data.sql");
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+            
+            if (is == null) {
+                System.out.println("No seed data file found at /db/seed_data.sql");
+                return;
+            }
+            
+            StringBuilder sql = new StringBuilder();
+            String line;
+            
+            while ((line = reader.readLine()) != null) {
+                line = line.trim();
+                // Skip comments and empty lines
+                if (line.isEmpty() || line.startsWith("--")) {
+                    continue;
+                }
+                sql.append(line).append(" ");
+                
+                // Execute when we hit a semicolon (end of statement)
+                if (line.endsWith(";")) {
+                    try {
+                        stmt.execute(sql.toString());
+                    } catch (SQLException e) {
+                        System.err.println("Error executing seed statement: " + e.getMessage());
+                    }
+                    sql.setLength(0); // Clear for next statement
+                }
+            }
+            
+            System.out.println("Seed data loaded successfully.");
+            
+        } catch (Exception e) {
+            System.err.println("Failed to load seed data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    /**
+     * Export current database data to SQL format (for sharing).
+     * This creates INSERT statements that can be committed to the repository.
+     * The output is saved to src/main/resources/db/seed_data.sql
+     */
+    public static void exportAllData() {
+        StringBuilder sql = new StringBuilder();
+        sql.append("-- Seed data for cosplay rental application\n");
+        sql.append("-- Auto-generated export from database\n");
+        sql.append("-- This file can be safely committed to version control\n");
+        sql.append("-- Note: Users and rentals are NOT exported (user accounts are device-specific)\n\n");
+        
+        try (Connection conn = connect()) {
+            // Export Cosplays
+            sql.append("-- Cosplays\n");
+            var cosplaysStmt = conn.createStatement();
+            var cosplaysRs = cosplaysStmt.executeQuery("SELECT * FROM cosplays");
+            while (cosplaysRs.next()) {
+                sql.append(String.format("INSERT OR IGNORE INTO cosplays (cosplay_id, name, category, series_name, size, description, image_path, rent_rate_1day, rent_rate_2days, rent_rate_3days, add_ons) VALUES (%d, '%s', '%s', '%s', '%s', '%s', '%s', %.2f, %.2f, %.2f, %s);\n",
+                    cosplaysRs.getInt("cosplay_id"),
+                    escapeSql(cosplaysRs.getString("name")),
+                    escapeSql(cosplaysRs.getString("category")),
+                    escapeSql(cosplaysRs.getString("series_name")),
+                    escapeSql(cosplaysRs.getString("size")),
+                    escapeSql(cosplaysRs.getString("description")),
+                    escapeSql(cosplaysRs.getString("image_path")),
+                    cosplaysRs.getDouble("rent_rate_1day"),
+                    cosplaysRs.getDouble("rent_rate_2days"),
+                    cosplaysRs.getDouble("rent_rate_3days"),
+                    cosplaysRs.getString("add_ons") != null ? "'" + escapeSql(cosplaysRs.getString("add_ons")) + "'" : "NULL"));
+            }
+            sql.append("\n");
+            
+            // Export Featured Images
+            sql.append("-- Featured Images\n");
+            var featuredStmt = conn.createStatement();
+            var featuredRs = featuredStmt.executeQuery("SELECT * FROM featured_images WHERE image_url IS NOT NULL");
+            while (featuredRs.next()) {
+                sql.append(String.format("INSERT OR IGNORE INTO featured_images (slot, image_url, title, cosplay_id) VALUES (%d, '%s', '%s', %s);\n",
+                    featuredRs.getInt("slot"),
+                    escapeSql(featuredRs.getString("image_url")),
+                    escapeSql(featuredRs.getString("title")),
+                    featuredRs.getObject("cosplay_id") != null ? featuredRs.getInt("cosplay_id") : "NULL"));
+            }
+            sql.append("\n");
+            
+            // Export Event Banners
+            sql.append("-- Event Banners\n");
+            var bannersStmt = conn.createStatement();
+            var bannersRs = bannersStmt.executeQuery("SELECT * FROM event_banners");
+            while (bannersRs.next()) {
+                sql.append(String.format("INSERT OR IGNORE INTO event_banners (id, title, message, is_active, background_color, text_color, subtitle, image_path, event_name, venue, onsite_rent_date) VALUES (%d, '%s', '%s', %d, '%s', '%s', %s, %s, %s, %s, %s);\n",
+                    bannersRs.getInt("id"),
+                    escapeSql(bannersRs.getString("title")),
+                    escapeSql(bannersRs.getString("message")),
+                    bannersRs.getInt("is_active"),
+                    escapeSql(bannersRs.getString("background_color")),
+                    escapeSql(bannersRs.getString("text_color")),
+                    toSqlString(bannersRs.getString("subtitle")),
+                    toSqlString(bannersRs.getString("image_path")),
+                    toSqlString(bannersRs.getString("event_name")),
+                    toSqlString(bannersRs.getString("venue")),
+                    toSqlString(bannersRs.getString("onsite_rent_date"))));
+            }
+            
+            // Write to file
+            String outputPath = "src/main/resources/db/seed_data.sql";
+            java.nio.file.Files.writeString(java.nio.file.Paths.get(outputPath), sql.toString());
+            System.out.println("✓ Database exported to " + outputPath);
+            System.out.println("You can now commit this file to Git!");
+            
+        } catch (Exception e) {
+            System.err.println("Failed to export data: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private static String escapeSql(String value) {
+        if (value == null) return "";
+        return value.replace("'", "''");
+    }
+    
+    private static String toSqlString(String value) {
+        return value != null ? "'" + escapeSql(value) + "'" : "NULL";
     }
 }
 

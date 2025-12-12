@@ -6,6 +6,7 @@ import com.cosplay.util.CallbackServer;
 import com.cosplay.util.Database;
 import javafx.application.Application;
 import javafx.stage.Stage;
+import javafx.scene.image.Image;
 
 public class Launcher extends Application {
     private static CallbackServer callbackServer;
@@ -37,6 +38,14 @@ public class Launcher extends Application {
             // Close database connection pool
             Database.close();
         });
+        
+        // Set application icon
+        try {
+            Image icon = new Image(getClass().getResourceAsStream("/com/cosplay/ui/images/logo.PNG"));
+            stage.getIcons().add(icon);
+        } catch (Exception e) {
+            System.err.println("Failed to load application icon: " + e.getMessage());
+        }
     }
 
     public static void main(String[] args) {
