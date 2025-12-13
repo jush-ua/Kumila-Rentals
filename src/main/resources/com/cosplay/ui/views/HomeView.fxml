@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+
+<!-- Root container: vertical layout for all sections -->
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.HomeController"
+      spacing="0" alignment="TOP_CENTER" style="-fx-background-color: #FFF;"
+      minWidth="600" minHeight="400">
+
+    <!-- ========================== -->
+    <!-- Navigation Bar (Top Menu) - Sticky -->
+    <!-- ========================== -->
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+
+    <!-- ========================== -->
+    <!-- Scrollable Content Area -->
+    <!-- ========================== -->
+    <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" 
+                style="-fx-background-color: #FFF; -fx-background: #FFF;"
+                hbarPolicy="NEVER" vbarPolicy="AS_NEEDED">
+        <VBox spacing="0" alignment="TOP_CENTER" style="-fx-background-color: #FFF;">
+
+            <!-- ========================== -->
+            <!-- Event Banner Section -->
+            <!-- ========================== -->
+            <VBox alignment="CENTER" style="-fx-background-color: #FFF; -fx-padding: 30 40 20 40;">
+                <StackPane fx:id="heroBanner" managed="true" visible="true"
+                           prefWidth="820" maxWidth="820" prefHeight="190" minHeight="190" maxHeight="190"
+                           style="-fx-background-color: #e89f77; -fx-background-radius: 12; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 8, 0, 0, 2);">
+                    
+                    <!-- Background ImageView - will be set programmatically -->
+                    <ImageView fx:id="bannerImageView" fitWidth="820" fitHeight="190" preserveRatio="true" pickOnBounds="true" smooth="true">
+                        <clip>
+                            <javafx.scene.shape.Rectangle width="820" height="190" arcWidth="12" arcHeight="12"/>
+                        </clip>
+                    </ImageView>
+                    
+                    <!-- Overlay with text -->
+                    <VBox alignment="CENTER" spacing="8" style="-fx-padding: 20;">
+                        <!-- Decorative top stars -->
+                        <HBox alignment="CENTER" spacing="15">
+                            <Label text="✦" style="-fx-font-size: 24px; -fx-text-fill: rgba(255, 255, 255, 0.5);"/>
+                            <Label text="✧" style="-fx-font-size: 20px; -fx-text-fill: rgba(255, 255, 255, 0.4);"/>
+                            <Label text="·" style="-fx-font-size: 28px; -fx-text-fill: rgba(255, 255, 255, 0.3);"/>
+                            <Label text="·" style="-fx-font-size: 28px; -fx-text-fill: rgba(255, 255, 255, 0.3);"/>
+                            <Label text="✧" style="-fx-font-size: 20px; -fx-text-fill: rgba(255, 255, 255, 0.4);"/>
+                            <Label text="✦" style="-fx-font-size: 24px; -fx-text-fill: rgba(255, 255, 255, 0.5);"/>
+                        </HBox>
+                        
+                        <!-- Title with shadow for better readability -->
+                        <Label fx:id="heroBannerTitle" text="" 
+                               wrapText="true" alignment="CENTER" maxWidth="750"
+                               style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white; -fx-padding: 5 20; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 4, 0, 0, 1);"/>
+                        
+                        <!-- Subtitle with shadow -->
+                        <Label fx:id="heroBannerMessage" text="" 
+                               wrapText="true" alignment="CENTER" maxWidth="750"
+                               style="-fx-font-size: 15px; -fx-text-fill: white; -fx-padding: 0 20; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.6), 4, 0, 0, 1);"/>
+                        
+                        <!-- Decorative bottom stars -->
+                        <HBox alignment="CENTER" spacing="12">
+                            <Label text="✦" style="-fx-font-size: 18px; -fx-text-fill: rgba(255, 255, 255, 0.5);"/>
+                            <Label text="✧" style="-fx-font-size: 16px; -fx-text-fill: rgba(255, 255, 255, 0.4);"/>
+                            <Label text="·" style="-fx-font-size: 22px; -fx-text-fill: rgba(255, 255, 255, 0.3);"/>
+                            <Label text="✧" style="-fx-font-size: 16px; -fx-text-fill: rgba(255, 255, 255, 0.4);"/>
+                            <Label text="✦" style="-fx-font-size: 18px; -fx-text-fill: rgba(255, 255, 255, 0.5);"/>
+                        </HBox>
+                    </VBox>
+                </StackPane>
+            </VBox>
+
+            <!-- ========================== -->
+            <!-- Featured Sets Section -->
+            <!-- ========================== -->
+            <VBox alignment="TOP_CENTER" spacing="25" style="-fx-background-color: #f79e6b; -fx-padding: 40 40 50 40;" VBox.vgrow="ALWAYS" minHeight="500">
+                
+                <Label text="Featured Sets" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: white; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.15), 2, 0, 0, 1);"/>
+
+                <!-- Empty state label -->
+                <Label fx:id="emptyFeaturedLabel" text="No Featured Sets Available" 
+                       style="-fx-font-size: 20px; -fx-text-fill: white; -fx-padding: 50; -fx-opacity: 0.9;" 
+                       visible="false" managed="false"/>
+
+                <!-- Cards Grid -->
+                <HBox fx:id="featuredCardsContainer" alignment="CENTER" style="-fx-padding: 5;">
+                    <!-- Each card is a VBox with image and caption -->
+                    <VBox fx:id="set1Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set1Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set1Title" text="Featured #1" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 10 22; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox fx:id="set2Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set2Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set2Title" text="Featured #2" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 10 22; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10" right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox fx:id="set3Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set3Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set3Title" text="Featured #3" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 10 22; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10" right="10"/>
+                        </HBox.margin>
+                    </VBox>
+
+                    <VBox fx:id="set4Card" alignment="CENTER" spacing="10" style="-fx-background-color: transparent; -fx-cursor: hand;" prefWidth="200" minWidth="200" maxWidth="200">
+                        <StackPane prefWidth="180" prefHeight="260" style="-fx-background-radius: 15; -fx-border-radius: 15; -fx-background-clip: padding-box; -fx-effect: dropshadow(gaussian, rgba(255, 255, 255, 1), 15, 0.7, 0, 0);">
+                            <ImageView fx:id="set4Image" fitHeight="260" fitWidth="180" preserveRatio="false">
+                                <clip>
+                                    <javafx.scene.shape.Rectangle width="180" height="260" arcWidth="20" arcHeight="20"/>
+                                </clip>
+                            </ImageView>
+                        </StackPane>
+                        <Label fx:id="set4Title" text="Featured #4" style="-fx-text-fill: #d47f47; -fx-font-weight: bold; -fx-font-size: 14px; -fx-background-color: white; -fx-background-radius: 20; -fx-padding: 10 22; -fx-effect: dropshadow(gaussian, rgba(0, 0, 0, 0.1), 4, 0, 0, 1);" wrapText="true" maxWidth="180" alignment="CENTER"/>
+                        <HBox.margin>
+                            <javafx.geometry.Insets left="10"/>
+                        </HBox.margin>
+                    </VBox>
+                </HBox>
+            </VBox>
+        
+        </VBox>
+    </ScrollPane>
+
+</VBox>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="com.cosplay.ui.controllers.RegisterController"
+            fx:id="rootPane"
+            prefWidth="860" prefHeight="520"
+            style="-fx-background-color: white;">
+
+    <HBox AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+        <AnchorPane prefWidth="430" minWidth="430" styleClass="left-panel" HBox.hgrow="ALWAYS">
+            <VBox alignment="CENTER" spacing="10" AnchorPane.topAnchor="0" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0">
+                <Region VBox.vgrow="ALWAYS"/>
+                <ImageView fx:id="logoImage" fitWidth="180" fitHeight="180" preserveRatio="true" pickOnBounds="true" />
+                <Label text="Kumila Rentals" styleClass="left-title" />
+                <Label text="Wear your dream characters\netc...." styleClass="left-subtitle" />
+                <Region VBox.vgrow="ALWAYS"/>
+            </VBox>
+        </AnchorPane>
+
+        <AnchorPane minWidth="430" styleClass="right-panel" HBox.hgrow="ALWAYS">
+            <VBox alignment="CENTER" spacing="1" AnchorPane.topAnchor="30" AnchorPane.bottomAnchor="30" AnchorPane.leftAnchor="40" AnchorPane.rightAnchor="40">
+                <Label text="Create an Account" styleClass="title-label"/>
+
+                <VBox fx:id="textFieldPanel" spacing="4" alignment="TOP_LEFT" prefWidth="450" maxWidth="550">
+                    <Label fx:id="errorLabel" text="" style="-fx-text-fill: transparent; -fx-font-size:12px;" />
+
+                    <Label text="Username" styleClass="field-label"/>
+                    <TextField fx:id="usernameField" promptText="3-20 characters, letters/numbers/underscore" prefHeight="45" styleClass="rounded-field"/>
+
+                    <Region prefHeight="4"/>
+
+                    <Label text="Email" styleClass="field-label"/>
+                    <TextField fx:id="emailField" promptText="your.email@example.com" prefHeight="45" styleClass="rounded-field"/>
+
+                    <Region prefHeight="4"/>
+
+                    <Label text="Password" styleClass="field-label"/>
+                    <PasswordField fx:id="passwordField" promptText="At least 6 characters" prefHeight="45" styleClass="rounded-field"/>
+
+                    <Region prefHeight="4"/>
+
+                    <Label text="Confirm Password" styleClass="field-label"/>
+                    <PasswordField fx:id="confirmPasswordField" promptText="Re-enter your password" prefHeight="45" styleClass="rounded-field"/>
+                </VBox>
+
+                <Region prefHeight="15"/>
+
+                <Button fx:id="registerButton" text="REGISTER"
+                        onAction="#handleRegister"
+                        prefWidth="200" prefHeight="50"
+                        styleClass="reg-accent-button"/>
+
+                <Region prefHeight="14"/>
+
+                <HBox spacing="6" alignment="CENTER">
+                    <Label text="Already have an account?" styleClass="normal-text" />
+                    <Hyperlink fx:id="goToLogin" text="Login Here" onAction="#goToLogin" styleClass="create-account-link" />
+                </HBox>
+
+            </VBox>
+        </AnchorPane>
+    </HBox>
+
+</AnchorPane>

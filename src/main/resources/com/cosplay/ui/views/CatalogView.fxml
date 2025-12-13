@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<VBox xmlns="http://javafx.com/javafx/22" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cosplay.ui.controllers.CatalogController"
+      spacing="0" alignment="TOP_LEFT" style="-fx-background-color: #FFF;"
+      minWidth="600" minHeight="400">
+    <fx:include source="/com/cosplay/ui/views/components/NavBar.fxml" fx:id="navBar" />
+    
+    <!-- Filter Section -->
+    <HBox spacing="18" alignment="CENTER_LEFT" style="-fx-padding: 25 40; -fx-background-color: #FAFAFA; -fx-border-width: 0 0 1 0; -fx-border-color: #E0E0E0;">
+        <TextField fx:id="searchField" promptText="🔍 Search cosplays..." prefWidth="300"
+                   style="-fx-background-color: white; -fx-border-color: #f79e6b; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 18; -fx-font-size: 14px;"/>
+        
+        <Region prefWidth="20"/>
+        
+        <Label text="Category:" style="-fx-font-weight: 600; -fx-font-size: 15px; -fx-text-fill: #333;"/>
+        <ComboBox fx:id="categoryComboBox" promptText="All Categories" 
+                  style="-fx-background-color: white; -fx-border-color: #f79e6b; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 18; -fx-font-weight: 600; -fx-font-size: 14px;"/>
+        
+        <Region prefWidth="20"/>
+        
+        <Label text="Sort By:" style="-fx-font-weight: 600; -fx-font-size: 15px; -fx-text-fill: #333;"/>
+        <ComboBox fx:id="sortByComboBox" promptText="Default" 
+                  style="-fx-background-color: white; -fx-border-color: #f79e6b; -fx-border-width: 2; -fx-border-radius: 20; -fx-background-radius: 20; -fx-padding: 8 18; -fx-font-weight: 600; -fx-font-size: 14px;"/>
+    </HBox>
+    
+    <ScrollPane fitToWidth="true" fitToHeight="true" VBox.vgrow="ALWAYS" style="-fx-background-color: #FFF; -fx-background: #FFF;" hbarPolicy="NEVER">
+        <FlowPane fx:id="cosplayGrid" hgap="25" vgap="25" style="-fx-padding: 30 40;" alignment="TOP_LEFT"/>
+    </ScrollPane>
+</VBox>
