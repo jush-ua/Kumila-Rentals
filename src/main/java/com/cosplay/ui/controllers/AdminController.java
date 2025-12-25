@@ -12,6 +12,7 @@ import com.cosplay.ui.SceneNavigator;
 import com.cosplay.ui.Views;
 import com.cosplay.util.Session;
 import com.cosplay.util.StyledAlert;
+import com.cosplay.util.ImageCropper;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.collections.FXCollections;
@@ -1302,7 +1303,7 @@ public class AdminController {
         txtImagePath.setEditable(false);
         HBox.setHgrow(txtImagePath, Priority.ALWAYS);
         Button btnBrowseImage = new Button("Browse");
-        btnBrowseImage.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 0 8 8 0; -fx-cursor: hand; -fx-font-weight: 600; -fx-font-size: 14px;");
+        btnBrowseImage.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 0 0 0 0; -fx-cursor: hand; -fx-font-weight: 600; -fx-font-size: 14px;");
         btnBrowseImage.setOnAction(e -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Select Banner Image");
@@ -1314,7 +1315,25 @@ public class AdminController {
                 txtImagePath.setText(selectedFile.getAbsolutePath());
             }
         });
-        imageBox.getChildren().addAll(txtImagePath, btnBrowseImage);
+        Button btnCropImage = new Button("✂ Crop");
+        btnCropImage.setStyle("-fx-background-color: #FF9800; -fx-text-fill: white; -fx-padding: 12 20; -fx-background-radius: 0 8 8 0; -fx-cursor: hand; -fx-font-weight: 600; -fx-font-size: 14px;");
+        btnCropImage.setOnAction(e -> {
+            String currentPath = txtImagePath.getText().trim();
+            if (currentPath.isEmpty()) {
+                showAlert(Alert.AlertType.WARNING, "No Image", "Please select an image first before cropping.");
+                return;
+            }
+            File imageFile = new File(currentPath);
+            if (!imageFile.exists()) {
+                showAlert(Alert.AlertType.WARNING, "File Not Found", "The selected image file does not exist.");
+                return;
+            }
+            String croppedPath = ImageCropper.showCropDialog(currentPath);
+            if (croppedPath != null) {
+                txtImagePath.setText(croppedPath);
+            }
+        });
+        imageBox.getChildren().addAll(txtImagePath, btnBrowseImage, btnCropImage);
         
         Separator sep1 = new Separator();
         sep1.setStyle("-fx-background-color: #E0E0E0;");
@@ -1395,7 +1414,7 @@ public class AdminController {
         
         bgColorBox.getChildren().addAll(txtBgColor, bgColorPicker);
         
-        Label lblTextColor = new Label("Text Color");
+        Label lblTextColor = new Label("Text Color (for text overlay on images)");
         lblTextColor.setStyle("-fx-font-weight: 600; -fx-font-size: 14px; -fx-text-fill: #333;");
         
         HBox textColorBox = new HBox(10);

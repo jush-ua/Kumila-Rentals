@@ -26,13 +26,18 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
-      <version>${javafx.version}</version>
+      <version>21.0.1</version>
     </dependency>
     <!-- JavaFX graphics is required for layout nodes such as VBox/HBox, Scene, etc. -->
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-graphics</artifactId>
-      <version>${javafx.version}</version>
+      <version>21.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-swing</artifactId>
+      <version>21.0.1</version>
     </dependency>
     <!-- JavaFX base contains core APIs referenced by other modules -->
     <dependency>
